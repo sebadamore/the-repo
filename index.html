@@ -2,271 +2,424 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Sharing UX — Visual Gallery (12 tools)</title>
+<title>Sharing UX — Visual Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1116;
-    --panel: #161922;
-    --line: #262a36;
-    --line-strong: #383d4d;
-    --text: #e7e9ee;
-    --mute: #9aa1ad;
-    --mute2: #6b7280;
-    --accent: #7aa2ff;
-    --accent-bg: #1e3a8a;
-    --good: #4ade80;
-    --good-bg: #14532d;
+    --purple: #7B46F6;
+    --purple-dark: #6030E0;
+    --purple-soft: #F0EBFF;
+    --purple-mid: #C4B0FB;
+    --bg: #F7F6FB;
+    --panel: #FFFFFF;
+    --sidebar: #1A1A2E;
+    --sidebar-hover: #252540;
+    --sidebar-active: #7B46F6;
+    --line: #E8E5F0;
+    --line-strong: #D1CBEA;
+    --text: #1A1A2E;
+    --mute: #6B6987;
+    --mute2: #9E9CB8;
+    --good: #16A34A;
+    --good-soft: #DCFCE7;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --bad: #DC2626;
+    --bad-soft: #FEE2E2;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  a { color: var(--accent); text-decoration: none; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  a { color: var(--purple); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  header.hero { padding: 40px 32px 28px; border-bottom: 1px solid var(--line); }
-  header.hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.01em; }
-  header.hero p { margin: 0; color: var(--mute); max-width: 80ch; }
-  header.hero .note {
-    margin-top: 14px;
-    padding: 12px 14px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--accent);
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--mute);
-    max-width: 80ch;
+  /* ── LAYOUT ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  aside.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--sidebar);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-brand .logo {
+    width: 32px; height: 32px;
+    background: var(--purple);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .sidebar-brand .brand-text { line-height: 1.2; }
+  .sidebar-brand .brand-title { font-size: 13px; font-weight: 600; color: white; }
+  .sidebar-brand .brand-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+  .sidebar-section { padding: 16px 12px 8px; }
+  .sidebar-section-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.08em; padding: 0 8px; margin-bottom: 4px; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: 6px;
+    color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+  }
+  .sidebar-link:hover { background: var(--sidebar-hover); color: white; text-decoration: none; }
+  .sidebar-link.active { background: var(--purple); color: white; }
+  .sidebar-link .dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .sidebar-link .has-badge {
+    margin-left: auto;
+    font-size: 9px; font-weight: 700;
+    background: rgba(123,70,246,0.35);
+    color: var(--purple-mid);
+    padding: 1px 5px; border-radius: 4px;
   }
 
-  nav.toc {
-    position: sticky; top: 0;
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-footer a {
+    font-size: 12px; color: rgba(255,255,255,0.4); display: block;
+  }
+  .sidebar-footer a:hover { color: rgba(255,255,255,0.7); text-decoration: none; }
+
+  /* ── MAIN ── */
+  .main-wrap {
+    margin-left: 220px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header.top-bar {
     background: var(--panel);
     border-bottom: 1px solid var(--line);
     padding: 14px 32px;
-    display: flex; gap: 6px; flex-wrap: wrap;
-    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky; top: 0; z-index: 50;
   }
-  nav.toc a {
-    padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
-    color: var(--text); font-size: 12px;
+  header.top-bar .page-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  header.top-bar .page-subtitle { font-size: 12px; color: var(--mute); margin-top: 1px; }
+  header.top-bar .cta-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; background: var(--purple); color: white;
+    border-radius: 6px; font-size: 13px; font-weight: 600; white-space: nowrap;
+    transition: background 0.12s;
   }
-  nav.toc a:hover { background: var(--line); text-decoration: none; border-color: var(--line-strong); }
-  nav.toc a.has { border-color: var(--good); color: var(--good); }
+  header.top-bar .cta-primary:hover { background: var(--purple-dark); text-decoration: none; }
 
-  main { padding: 32px; max-width: 1300px; margin: 0 auto; }
+  .note-banner {
+    margin: 24px 32px 0;
+    padding: 12px 16px;
+    background: var(--purple-soft);
+    border: 1px solid var(--purple-mid);
+    border-left: 3px solid var(--purple);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--mute);
+    max-width: 900px;
+  }
+  .note-banner strong { color: var(--text); }
 
-  section.tool { margin-bottom: 56px; scroll-margin-top: 80px; }
-  section.tool .head {
+  main { padding: 28px 32px 80px; max-width: 1200px; }
+
+  /* ── TOOL SECTION ── */
+  section.tool { margin-bottom: 64px; scroll-margin-top: 72px; }
+
+  .tool-header {
     display: flex; justify-content: space-between; align-items: flex-start;
-    gap: 20px; margin-bottom: 16px;
-    flex-wrap: wrap;
+    gap: 20px; margin-bottom: 20px; flex-wrap: wrap;
   }
-  section.tool h2 { margin: 0 0 6px; font-size: 22px; display: flex; align-items: center; gap: 10px; }
-  section.tool .cat {
-    font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px;
+  .tool-header-left h2 {
+    margin: 0 0 4px; font-size: 20px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px;
   }
-  section.tool .blurb { margin: 0; color: var(--mute); max-width: 75ch; font-size: 13px; }
-  section.tool .head-links { font-size: 12px; color: var(--mute); display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; align-items: center; }
-  section.tool .head-links a { color: var(--accent); }
-  section.tool .cta {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 6px 12px; background: var(--accent-bg); color: var(--accent);
-    border-radius: 6px; font-weight: 500; font-size: 12px;
+  .cat-chip {
+    font-size: 10px; font-weight: 600; color: var(--purple);
+    background: var(--purple-soft); border: 1px solid var(--purple-mid);
+    padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em;
   }
-  section.tool .cta:hover { background: #1e40af; text-decoration: none; }
+  .tool-header .blurb { margin: 0; color: var(--mute); max-width: 70ch; font-size: 13px; line-height: 1.6; }
+  .tool-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .cta-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border: 1px solid var(--purple); color: var(--purple);
+    border-radius: 6px; font-size: 12px; font-weight: 600;
+    transition: background 0.12s;
+  }
+  .cta-ghost:hover { background: var(--purple-soft); text-decoration: none; }
 
-  .grid {
+  /* ── DIMENSION STRIP ── */
+  .dim-strip {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px) { .dim-strip { grid-template-columns: 1fr; } }
+  .dim-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.05);
+  }
+  .dim-card h4 {
+    margin: 0 0 6px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);
+  }
+  .dim-card p { margin: 0; font-size: 13px; color: var(--text); line-height: 1.55; }
+
+  /* ── IMAGE GRID ── */
+  .img-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
   }
   figure {
     margin: 0;
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     display: flex; flex-direction: column;
+    box-shadow: 0 1px 4px rgba(26,26,46,0.06);
+    transition: box-shadow 0.15s, transform 0.15s;
   }
+  figure:hover { box-shadow: 0 4px 16px rgba(26,26,46,0.1); transform: translateY(-2px); }
   figure .imgwrap {
-    background: #fff;
+    background: #f8f8fc;
     aspect-ratio: 16 / 10;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
   }
   figure img { display: block; width: 100%; height: 100%; object-fit: contain; }
-  figure figcaption { padding: 12px 14px; }
-  figure figcaption .t { font-weight: 600; margin: 0 0 4px; font-size: 13px; }
-  figure figcaption .d { color: var(--mute); font-size: 12px; margin: 0; }
+  figure figcaption { padding: 14px 16px; border-top: 1px solid var(--line); }
+  figure figcaption .t { font-weight: 600; margin: 0 0 4px; font-size: 13px; color: var(--text); }
+  figure figcaption .d { color: var(--mute); font-size: 12px; margin: 0; line-height: 1.5; }
 
-  .external-link-box {
-    padding: 22px 24px;
-    background: var(--panel);
-    border: 1px dashed var(--line-strong);
-    border-radius: 10px;
-    color: var(--mute);
-    font-size: 13px;
-    line-height: 1.6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .external-link-box strong { color: var(--text); font-weight: 600; }
-  .external-link-box .cta-big {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 10px 18px;
-    background: var(--accent);
-    color: white;
-    border-radius: 6px;
-    font-size: 13px; font-weight: 500;
-    white-space: nowrap;
-  }
-  .external-link-box .cta-big:hover { background: #1d4ed8; text-decoration: none; }
-
-  .dimensions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-    font-size: 13px;
-  }
-  @media (max-width: 900px) { .dimensions { grid-template-columns: 1fr; } }
-  .dim {
-    padding: 14px 16px; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 8px;
-  }
-  .dim h4 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute); font-weight: 600; }
-  .dim p { margin: 0; font-size: 13px; color: var(--text); }
-
-  footer { padding: 32px 32px 60px; color: var(--mute); font-size: 12px; border-top: 1px solid var(--line); max-width: 1300px; margin: 32px auto 0; }
-
-  .hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
-
-  /* ============ USER SCREENSHOTS ============ */
-  .user-shots {
-    margin-top: 24px;
+  /* ── EXTERNAL LINK BOX ── */
+  .ext-link-box {
+    margin-top: 16px;
     padding: 18px 20px;
-    background: linear-gradient(180deg, rgba(122,162,255,0.04), transparent);
+    background: var(--panel);
     border: 1px solid var(--line);
+    border-radius: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 20px; flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.05);
+  }
+  .ext-link-box .desc { font-size: 13px; color: var(--mute); line-height: 1.55; }
+  .ext-link-box .cta-solid {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; background: var(--purple); color: white;
+    border-radius: 6px; font-size: 13px; font-weight: 600; white-space: nowrap;
+    transition: background 0.12s;
+  }
+  .ext-link-box .cta-solid:hover { background: var(--purple-dark); text-decoration: none; }
+
+  /* ── DIVIDER ── */
+  .section-divider { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+
+  /* ── USER SCREENSHOTS ── */
+  .user-shots {
+    margin-top: 20px;
+    padding: 18px 20px;
+    background: var(--panel);
+    border: 1px solid var(--purple-mid);
     border-radius: 10px;
   }
   .user-shots h3 {
-    margin: 0 0 4px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-    font-weight: 600;
-    display: flex; align-items: center; gap: 8px;
+    margin: 0 0 4px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--purple); display: flex; align-items: center; gap: 8px;
   }
-  .user-shots .sub {
-    font-size: 12px;
-    color: var(--mute);
-    margin: 0 0 14px;
-  }
+  .user-shots .sub { font-size: 12px; color: var(--mute); margin: 0 0 14px; }
   .user-shots .sub code {
-    background: rgba(255,255,255,0.06);
-    padding: 1px 6px;
-    border-radius: 3px;
-    color: var(--text);
-    font-size: 11px;
+    background: var(--purple-soft); color: var(--purple);
+    padding: 1px 6px; border-radius: 4px; font-size: 11px;
   }
-  .user-shots .empty {
-    font-size: 12px;
-    color: var(--mute2);
-    font-style: italic;
-  }
+  .user-shots .empty { font-size: 12px; color: var(--mute2); font-style: italic; }
 
-  /* ============ PAIN POINTS ============ */
+  /* ── PAIN POINTS ── */
   .pain-points {
     margin-top: 20px;
     padding: 18px 20px;
-    background: rgba(220, 38, 38, 0.04);
-    border: 1px solid rgba(220, 38, 38, 0.15);
+    background: var(--panel);
+    border: 1px solid rgba(220,38,38,0.2);
     border-radius: 10px;
   }
   .pain-points h3 {
-    margin: 0 0 12px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #f87171;
-    font-weight: 600;
-    display: flex; align-items: center; gap: 8px;
+    margin: 0 0 14px; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--bad); display: flex; align-items: center; gap: 8px;
   }
   .pain-points ul {
     margin: 0; padding: 0; list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 10px;
   }
   .pain-points li {
-    background: var(--panel);
+    background: var(--bg);
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 12px 14px;
     font-size: 13px;
     line-height: 1.5;
   }
-  .pain-points li .t {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    font-size: 13px;
+  .pain-points li .t { font-weight: 600; color: var(--text); margin-bottom: 4px; font-size: 13px; }
+  .pain-points li .d { color: var(--mute); font-size: 12px; }
+  .pain-points li .src { margin-top: 6px; font-size: 11px; color: var(--mute2); }
+  .pain-points li .src a { color: var(--purple); }
+
+  footer {
+    padding: 24px 32px 48px;
+    color: var(--mute2); font-size: 12px; line-height: 1.7;
+    border-top: 1px solid var(--line);
+    margin-left: 220px;
   }
-  .pain-points li .d {
-    color: var(--mute);
-    font-size: 12px;
+
+  @media (max-width: 768px) {
+    aside.sidebar { display: none; }
+    .main-wrap { margin-left: 0; }
+    footer { margin-left: 0; }
   }
-  .pain-points li .src {
-    margin-top: 6px;
-    font-size: 11px;
-    color: var(--mute2);
-  }
-  .pain-points li .src a { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <h1>Sharing UX — visual gallery</h1>
-  <p>Screenshots of the share/permissions surfaces across 12 tools. Tools with inline screenshots below have stable public CDNs. Others link straight to the live help article, which serves its own fresh images on every visit.</p>
-  <div class="note"><strong>Why some tools don't show inline images:</strong> Stormboard, Claude, and several other vendors use Intercom's help center, which signs image URLs with short-lived tokens. Embedding those URLs in a local file stops working within days. For those tools, the button opens the live help article where the images load fresh — that's the most reliable way to see the actual UI.</div>
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">S</div>
+    <div class="brand-text">
+      <div class="brand-title">Sharing UX</div>
+      <div class="brand-sub">Visual Gallery</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Whiteboards</div>
+    <a class="sidebar-link active" href="#stormboard">
+      <span class="dot" style="background:#7B46F6"></span>Stormboard
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#miro">
+      <span class="dot" style="background:#7B46F6"></span>Miro
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#figjam">
+      <span class="dot" style="background:#7B46F6"></span>FigJam
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#lucidspark">
+      <span class="dot" style="background:#7B46F6"></span>Lucidspark
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#whimsical">
+      <span class="dot" style="background:#7B46F6"></span>Whimsical
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#tldraw">
+      <span class="dot" style="background:#7B46F6"></span>tldraw
+      <span class="has-badge">SHOTS</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Docs &amp; Notes</div>
+    <a class="sidebar-link" href="#notion">
+      <span class="dot" style="background:#7C3AED"></span>Notion
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#evernote">
+      <span class="dot" style="background:#7C3AED"></span>Evernote
+      <span class="has-badge">SHOTS</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Design &amp; Builders</div>
+    <a class="sidebar-link" href="#canva">
+      <span class="dot" style="background:#DB2777"></span>Canva
+      <span class="has-badge">SHOTS</span>
+    </a>
+    <a class="sidebar-link" href="#lovable">
+      <span class="dot" style="background:#EA580C"></span>Lovable
+      <span class="has-badge">SHOTS</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">AI Assistants</div>
+    <a class="sidebar-link" href="#perplexity">
+      <span class="dot" style="background:#0891B2"></span>Perplexity
+    </a>
+    <a class="sidebar-link" href="#claude">
+      <span class="dot" style="background:#0891B2"></span>Claude
+      <span class="has-badge">SHOTS</span>
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <a href="https://sebadamore.github.io/the-repo/artifact/" target="_blank">→ Open dashboard view</a>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main-wrap">
+
+<header class="top-bar">
+  <div>
+    <div class="page-title">Sharing UX — Visual Gallery</div>
+    <div class="page-subtitle">12 tools · permissions · public links · guest collaboration</div>
+  </div>
+  <a class="cta-primary" href="https://sebadamore.github.io/the-repo/artifact/" target="_blank">Open dashboard →</a>
 </header>
 
-<nav class="toc">
-  <a href="#stormboard" class="has">Stormboard</a>
-  <a href="#miro" class="has">Miro</a>
-  <a href="#figjam" class="has">FigJam</a>
-  <a href="#lucidspark" class="has">Lucidspark</a>
-  <a href="#whimsical" class="has">Whimsical</a>
-  <a href="#tldraw" class="has">tldraw</a>
-  <a href="#notion" class="has">Notion</a>
-  <a href="#evernote" class="has">Evernote</a>
-  <a href="#canva" class="has">Canva</a>
-  <a href="#lovable" class="has">Lovable</a>
-  <a href="#perplexity">Perplexity</a>
-  <a href="#claude" class="has">Claude</a>
-</nav>
+<div class="note-banner">
+  <strong>Why some tools don't show inline images:</strong> Stormboard, Claude, and several other vendors use Intercom's help center, which signs image URLs with short-lived tokens. Embedding those URLs in a local file stops working within days. For those tools, the button opens the live help article where the images load fresh.
+</div>
 
 <main>
 
-<!-- ================= STORMBOARD ================= -->
+<!-- ════════════════ STORMBOARD ════════════════ -->
 <section class="tool" id="stormboard">
-  <div class="head">
-    <div>
-      <h2>Stormboard <span class="cat">Whiteboard</span></h2>
-      <p class="blurb">Data-first digital whiteboard. Conservative sharing posture: no public URLs, email-only invites, strict Member/Guest license separation.</p>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Stormboard <span class="cat-chip">Whiteboard</span></h2>
+      <p class="blurb">Data-first digital whiteboard. Conservative sharing posture: no public URLs, email-only invites, strict Member / Guest license separation.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Member/Guest × Administrator/Contributor/Viewer/Guest Contributor. Two-axis model splits billing from permission.</p></div>
-    <div class="dim"><h4>Public link</h4><p>None. All external access requires email-invited Guest account.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Email invite. Contribute requires Enterprise + Guest Pass (one Storm at a time).</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Member/Guest × Administrator/Contributor/Viewer/Guest Contributor. Two-axis model splits billing from permission.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>None. All external access requires email-invited Guest account.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Email invite. Contribute requires Enterprise + Guest Pass (one Storm at a time).</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Stormboard Invite Users dialog with 4 tabs" src="https://images.squarespace-cdn.com/content/v1/62460a56418af8236d4f3fee/1649950867655-4UCCRU21XB6YTIV2J9B9/image-asset.png"></div>
       <figcaption><p class="t">Invite Users dialog (4 tabs)</p><p class="d">Replaces the old "Share" button. Tabs for Link, ID/Key, Email, plus a fourth tab to resend invites. Role picker at bottom (Viewer / Contributor).</p></figcaption>
@@ -276,28 +429,28 @@
       <figcaption><p class="t">Actions menu — user management</p><p class="d">Storm Admin's control panel: see who's online, change access levels per user via dropdown, email all Storm users.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>For the Guest Pass banner, per-invitee role picker, and member-upgrade flow — live help article shows them freshly.</div>
-    <a class="cta-big" href="https://help.stormboard.com/en/articles/11492871-what-is-a-guest" target="_blank">Open live help article →</a>
+  <div class="ext-link-box">
+    <div class="desc">For the Guest Pass banner, per-invitee role picker, and member-upgrade flow — live help article shows them freshly.</div>
+    <a class="cta-solid" href="https://help.stormboard.com/en/articles/11492871-what-is-a-guest" target="_blank">Open live help article →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= MIRO ================= -->
+<!-- ════════════════ MIRO ════════════════ -->
 <section class="tool" id="miro">
-  <div class="head">
-    <div>
-      <h2>Miro <span class="cat">Whiteboard</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Miro <span class="cat-chip">Whiteboard</span></h2>
       <p class="blurb">Category leader. Mature, Google-Docs-style sharing. 3 roles, anonymous public links, Visitors that don't need an account.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>3 roles: Editor / Commenter / Viewer. Default sharing policy set per team/company.</p></div>
-    <div class="dim"><h4>Public link</h4><p>"Anyone with the link" → Can view / comment / edit. Password optional. Free caps at view.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Visitors follow public link — no account. Enterprise admins can disable org-wide.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>3 roles: Editor / Commenter / Viewer. Default sharing policy set per team/company.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>"Anyone with the link" → Can view / comment / edit. Password optional. Free caps at view.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Visitors follow public link — no account. Enterprise admins can disable org-wide.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap" style="background:#fafafa"><img alt="Miro share board dialog with invite options" src="https://us.seibert.group/_astro/image8.CXSOlrYS_Z1rlQDD.webp"></div>
       <figcaption><p class="t">Share dialog</p><p class="d">Top-right Share button opens the invite flow — two entry paths: from within the board, or from the dashboard.</p></figcaption>
@@ -315,56 +468,55 @@
       <figcaption><p class="t">Download &amp; export</p><p class="d">Three-dots menu: Image, PDF, CSV of sticky/text content, or embed link. Plan-gated resolution on Free.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>For the actual "Anyone with the link" toggle with the password affordance and Visitor join flow, see Miro's live help article.</div>
-    <a class="cta-big" href="https://help.miro.com/hc/en-us/articles/360017730813-Sharing-boards-and-inviting-collaborators" target="_blank">Open live help article →</a>
+  <div class="ext-link-box">
+    <div class="desc">For the actual "Anyone with the link" toggle with the password affordance and Visitor join flow, see Miro's live help article.</div>
+    <a class="cta-solid" href="https://help.miro.com/hc/en-us/articles/360017730813-Sharing-boards-and-inviting-collaborators" target="_blank">Open live help article →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= FIGJAM ================= -->
+<!-- ════════════════ FIGJAM ════════════════ -->
 <section class="tool" id="figjam">
-  <div class="head">
-    <div>
-      <h2>FigJam (Figma) <span class="cat">Whiteboard</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>FigJam (Figma) <span class="cat-chip">Whiteboard</span></h2>
       <p class="blurb">Inherits Figma's battle-tested sharing dialog. Public links with password, admin-level kill-switch, open-session controls.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Can view / Can edit at file, project, team, and org levels — with inheritance + explicit overrides.</p></div>
-    <div class="dim"><h4>Public link</h4><p>"Anyone with the link" or "Anyone with link + password." Org admins can disable entirely.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Open sessions let non-signed-in users edit. Viewers are free; Editors consume a seat.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Can view / Can edit at file, project, team, and org levels — with inheritance + explicit overrides.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>"Anyone with the link" or "Anyone with link + password." Org admins can disable entirely.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Open sessions let non-signed-in users edit. Viewers are free; Editors consume a seat.</p></div>
   </div>
-
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap" style="background:#f5f5f7"><img alt="Figma sharing hierarchy: prototypes in files in projects in teams in orgs" src="https://help.figma.com/hc/article_attachments/35463302908055"></div>
       <figcaption><p class="t">Sharing hierarchy</p><p class="d">Figma's nested permission scopes — org → team → project → file → prototype.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>For the actual share-dialog UI (role dropdown, password modal, link-sharing toggle), see the live help article.</div>
-    <a class="cta-big" href="https://help.figma.com/hc/en-us/articles/360040531773-Share-files-and-prototypes" target="_blank">Open live help article →</a>
+  <div class="ext-link-box">
+    <div class="desc">For the actual share-dialog UI (role dropdown, password modal, link-sharing toggle), see the live help article.</div>
+    <a class="cta-solid" href="https://help.figma.com/hc/en-us/articles/360040531773-Share-files-and-prototypes" target="_blank">Open live help article →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= LUCIDSPARK ================= -->
+<!-- ════════════════ LUCIDSPARK ════════════════ -->
 <section class="tool" id="lucidspark">
-  <div class="head">
-    <div>
-      <h2>Lucidspark <span class="cat">Whiteboard</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Lucidspark <span class="cat-chip">Whiteboard</span></h2>
       <p class="blurb">Lucid's whiteboard. Notable for its "Guest Collaborator link" — unique in letting non-account holders edit on Enterprise.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>4 levels: View / Comment / Edit / Edit and Share. More granular than Miro.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Shareable link with role. "Anyone with the link" surfaces vary by plan/chart type.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p><strong>Enterprise Guest Collaborator link</strong>: fully edit without a Lucid account or paid seat. Unique in this set.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>4 levels: View / Comment / Edit / Edit and Share. More granular than Miro.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Shareable link with role. "Anyone with the link" surfaces vary by plan/chart type.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p><strong>Enterprise Guest Collaborator link</strong>: fully edit without a Lucid account or paid seat. Unique in this set.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Lucidspark share dialog with Email / Link / Slack / Join ID tabs" src="https://corporate-assets.lucid.co/co/fe5179a3-84cb-462a-b26d-1e1c541ea33f.png"></div>
       <figcaption><p class="t">Share dialog — 4 methods</p><p class="d">Top-right of board → share via Email, Link, Slack, or Join ID in one dialog.</p></figcaption>
@@ -388,23 +540,22 @@
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= WHIMSICAL ================= -->
+<!-- ════════════════ WHIMSICAL ════════════════ -->
 <section class="tool" id="whimsical">
-  <div class="head">
-    <div>
-      <h2>Whimsical <span class="cat">Whiteboard</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Whimsical <span class="cat-chip">Whiteboard</span></h2>
       <p class="blurb">Light, IA-focused collaboration tool. Anonymous comments/edits via toggle, hard guest caps as a pricing lever.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>3 roles + "No access." Inheritance from folder to file; per-file override.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Airplane icon → view/comment/edit. Password protection. "Include board position" pin.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Hard per-file caps: Free 10, Pro 50, Business 100, Enterprise 200. Anonymous edits via toggle.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>3 roles + "No access." Inheritance from folder to file; per-file override.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Airplane icon → view/comment/edit. Password protection. "Include board position" pin.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Hard per-file caps: Free 10, Pro 50, Business 100, Enterprise 200. Anonymous edits via toggle.</p></div>
   </div>
-
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Whimsical workspace sections sidebar" src="https://cdn.sanity.io/images/xye5jv54/production/dc8cfd24dc5c149f282eb492c4657302727897b9-648x919.webp"></div>
       <figcaption><p class="t">Workspace sections</p><p class="d">Private / Team / Shared-with-me as the primary access axis.</p></figcaption>
@@ -419,27 +570,27 @@
     </figure>
     <figure>
       <div class="imgwrap"><img alt="Allow anonymous comments and edits toggle" src="https://cdn.sanity.io/images/xye5jv54/production/ac795f42bdf42c6fcb3645da3a76e3675d868a88-916x351.webp"></div>
-      <figcaption><p class="t">Anonymous comments & edits</p><p class="d">Toggle lets non-Whimsical users interact on paid plans.</p></figcaption>
+      <figcaption><p class="t">Anonymous comments &amp; edits</p><p class="d">Toggle lets non-Whimsical users interact on paid plans.</p></figcaption>
     </figure>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= TLDRAW ================= -->
+<!-- ════════════════ TLDRAW ════════════════ -->
 <section class="tool" id="tldraw">
-  <div class="head">
-    <div>
-      <h2>tldraw <span class="cat">Whiteboard</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>tldraw <span class="cat-chip">Whiteboard</span></h2>
       <p class="blurb">Lowest-friction whiteboard in the set. No login, no accounts — drawings are shared by URL, room-based real-time collaboration.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Near-zero in hosted app — URL holders co-edit. SDK exposes editor/viewer roles via auth layer.</p></div>
-    <div class="dim"><h4>Public link</h4><p>The URL <em>is</em> the permission. Unique room IDs, up to ~50 concurrent users.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Everyone is a guest. No seat accounting, no admin controls.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Near-zero in hosted app — URL holders co-edit. SDK exposes editor/viewer roles via auth layer.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>The URL <em>is</em> the permission. Unique room IDs, up to ~50 concurrent users.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Everyone is a guest. No seat accounting, no admin controls.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap" style="background:#fafafa"><img alt="tldraw sync real-time collaboration demo animation" src="https://substack-post-media.s3.amazonaws.com/public/images/153968e1-91ef-4dfe-a66c-b13cd23b2a67_1920x1080.gif"></div>
       <figcaption><p class="t">Multiplayer canvas (animated)</p><p class="d">From the tldraw sync launch — real-time collaboration with no login, just a shared room ID.</p></figcaption>
@@ -449,29 +600,28 @@
       <figcaption><p class="t">Live cursors &amp; presence</p><p class="d">The full "share dialog" tldraw ships — live cursors, names, viewport following. No modal needed.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>tldraw deliberately ships no share dialog on the hosted app — the URL is the permission. These GIFs from the tldraw sync launch are the closest to a "sharing UX" shot.</div>
-    <a class="cta-big" href="https://tldraw.com" target="_blank">Open tldraw.com →</a>
+  <div class="ext-link-box">
+    <div class="desc">tldraw deliberately ships no share dialog on the hosted app — the URL is the permission. These GIFs from the tldraw sync launch are the closest to a "sharing UX" shot.</div>
+    <a class="cta-solid" href="https://tldraw.com" target="_blank">Open tldraw.com →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= NOTION ================= -->
+<!-- ════════════════ NOTION ════════════════ -->
 <section class="tool" id="notion">
-  <div class="head">
-    <div>
-      <h2>Notion <span class="cat">Docs</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Notion <span class="cat-chip">Docs</span></h2>
       <p class="blurb">Docs + database hybrid. Most granular permission model in the set — 4 tiers, page-level inheritance, and link expiry built-in.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>4 levels: Full access / Can edit / Can comment / Can view. Inheritance from parent pages; broadest access wins.</p></div>
-    <div class="dim"><h4>Public link</h4><p>"Anyone on the web with link" — view/comment/edit. Optional expiry date. Publish-to-web is separate.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Email-invited guests scoped to pages. Don't consume Member seats. "Full access" guest can remove workspace owners — footgun.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>4 levels: Full access / Can edit / Can comment / Can view. Inheritance from parent pages; broadest access wins.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>"Anyone on the web with link" — view/comment/edit. Optional expiry date. Publish-to-web is separate.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Email-invited guests scoped to pages. Don't consume Member seats. "Full access" guest can remove workspace owners — footgun.</p></div>
   </div>
-
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Notion share menu" src="https://images.ctfassets.net/spoqsaf9291f/23AarIKXH9Leog04ZjSPie/402c55b221810b5f4e393a9cc33bbc59/share_menu__1_.png"></div>
       <figcaption><p class="t">Share menu</p><p class="d">Top-of-page share button opens invite, general access, and publish tabs.</p></figcaption>
@@ -495,22 +645,22 @@
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= EVERNOTE ================= -->
+<!-- ════════════════ EVERNOTE ════════════════ -->
 <section class="tool" id="evernote">
-  <div class="head">
-    <div>
-      <h2>Evernote <span class="cat">Notes</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Evernote <span class="cat-chip">Notes</span></h2>
       <p class="blurb">Legacy note app. Note-level public links work; notebook-level public links do not — meaningful asymmetry for sharing workflows.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Notes: view/edit/edit+invite. Notebooks: same roles but recipients must have Evernote accounts.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Per-note only. "Anyone with link can view" and "can edit" — edit happens in reduced Lite editor. Notebooks: no public URL.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>No free-guest tier. External notebook collaborators are full invitees.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Notes: view/edit/edit+invite. Notebooks: same roles but recipients must have Evernote accounts.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Per-note only. "Anyone with link can view" and "can edit" — edit happens in reduced Lite editor. Notebooks: no public URL.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>No free-guest tier. External notebook collaborators are full invitees.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Evernote Share button in note header" src="https://images.ctfassets.net/lzny33ho1g45/7pSgzaA2nkcNUyC0CCSciv/f9988355f25998dcef1a739d39da3752/Evernote_share_button"></div>
       <figcaption><p class="t">Share button</p><p class="d">Top-right of any note opens the share modal.</p></figcaption>
@@ -538,22 +688,22 @@
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= CANVA ================= -->
+<!-- ════════════════ CANVA ════════════════ -->
 <section class="tool" id="canva">
-  <div class="head">
-    <div>
-      <h2>Canva <span class="cat">Design</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Canva <span class="cat-chip">Design</span></h2>
       <p class="blurb">Design surface with the broadest consumer footprint. Sharing feels like Google Docs but layered with team-discovery and brand controls.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Can edit / Can comment / Can view. Scopes: only-you / only-team / anyone-with-link. Team-discovery toggles search visibility.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Anyone with the link — edit, comment, or view. Anonymous edit works with no Canva account.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>No seat cost for link-followers. Restrict Design Sharing controls prevent re-sharing externally (Teams/Enterprise).</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Can edit / Can comment / Can view. Scopes: only-you / only-team / anyone-with-link. Team-discovery toggles search visibility.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Anyone with the link — edit, comment, or view. Anonymous edit works with no Canva account.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>No seat cost for link-followers. Restrict Design Sharing controls prevent re-sharing externally (Teams/Enterprise).</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap"><img alt="Canva share dialog with anyone-with-link option" src="https://www.thesideblogger.com/wp-content/uploads/2022/11/canva-share-1-1024x649.png"></div>
       <figcaption><p class="t">Share design dialog</p><p class="d">Default view with link-sharing-restricted toggle → switch to "Anyone with the link."</p></figcaption>
@@ -577,22 +727,22 @@
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= LOVABLE ================= -->
+<!-- ════════════════ LOVABLE ════════════════ -->
 <section class="tool" id="lovable">
-  <div class="head">
-    <div>
-      <h2>Lovable <span class="cat">Builder</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Lovable <span class="cat-chip">Builder</span></h2>
       <p class="blurb">AI app builder. Clean split between "publish the app" (public URL, no code access) and "share the project" (editor access).</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>4 roles: Viewer / Editor / Admin / Owner. Clear escalation — Owners transfer/delete, Admins manage settings, Editors build.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Published URL ≠ editor access. App is public at URL, source/editor gated. Enterprise: restrict external publishing to owners/admins.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Email invite only. No free-guest tier. Project-level or workspace-level scopes. Credits charged to owner's workspace.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>4 roles: Viewer / Editor / Admin / Owner. Clear escalation — Owners transfer/delete, Admins manage settings, Editors build.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Published URL ≠ editor access. App is public at URL, source/editor gated. Enterprise: restrict external publishing to owners/admins.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Email invite only. No free-guest tier. Project-level or workspace-level scopes. Credits charged to owner's workspace.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap" style="background:#fafafa"><img alt="Lovable Workspaces and Multiplayer interface" src="https://userimg-assets-eu.customeriomail.com/images/client-env-165734/1745487576684_Frame%201597884705%20(1)_01JSKJNFW97V3MMP89PXAF1Q17.png"></div>
       <figcaption><p class="t">Workspaces &amp; Multiplayer</p><p class="d">From the Lovable 2.0 launch — workspace switcher and real-time collaborator presence on a shared project.</p></figcaption>
@@ -606,49 +756,49 @@
       <figcaption><p class="t">Custom Domains / Publish</p><p class="d">The "publish" surface that's independent from editor sharing — end-users hit this URL, not the editor.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>Lovable's own docs use text-only permission tables. These launch-post shots are the closest to a real "share dialog" — for the latest UI, see the live changelog and collaboration docs.</div>
-    <a class="cta-big" href="https://docs.lovable.dev/features/collaboration" target="_blank">Open live docs page →</a>
+  <div class="ext-link-box">
+    <div class="desc">Lovable's own docs use text-only permission tables. These launch-post shots are the closest to a real "share dialog" — for the latest UI, see the live changelog and collaboration docs.</div>
+    <a class="cta-solid" href="https://docs.lovable.dev/features/collaboration" target="_blank">Open live docs page →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= PERPLEXITY ================= -->
+<!-- ════════════════ PERPLEXITY ════════════════ -->
 <section class="tool" id="perplexity">
-  <div class="head">
-    <div>
-      <h2>Perplexity <span class="cat">AI research</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Perplexity <span class="cat-chip">AI Research</span></h2>
       <p class="blurb">AI answer engine. Two distinct primitives — Thread (single Q&A, link-shareable) and Space (invited collaborators with roles).</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>Threads: private/sharable. Spaces: Viewer / Contributor. Enterprise adds org admin / member / read-only.</p></div>
-    <div class="dim"><h4>Public link</h4><p>Thread "Sharable" toggle — anyone with link can view anonymously. No edit for Threads; view only.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p>Space invites by email or link. Contributor can create threads, Viewer read-only. No seat economics.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>Threads: private/sharable. Spaces: Viewer / Contributor. Enterprise adds org admin / member / read-only.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>Thread "Sharable" toggle — anyone with link can view anonymously. No edit for Threads; view only.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p>Space invites by email or link. Contributor can create threads, Viewer read-only. No seat economics.</p></div>
   </div>
-  <div class="external-link-box">
-    <div>Perplexity's help center is JavaScript-rendered. The live article shows the Share button location, Sharable toggle, and role picker for Space invites.</div>
-    <a class="cta-big" href="https://www.perplexity.ai/help-center/en/articles/10354769-what-is-a-thread" target="_blank">Open live help article →</a>
+  <div class="ext-link-box">
+    <div class="desc">Perplexity's help center is JavaScript-rendered. The live article shows the Share button location, Sharable toggle, and role picker for Space invites.</div>
+    <a class="cta-solid" href="https://www.perplexity.ai/help-center/en/articles/10354769-what-is-a-thread" target="_blank">Open live help article →</a>
   </div>
 </section>
 
-<hr class="hr">
+<hr class="section-divider">
 
-<!-- ================= CLAUDE ================= -->
+<!-- ════════════════ CLAUDE ════════════════ -->
 <section class="tool" id="claude">
-  <div class="head">
-    <div>
-      <h2>Claude <span class="cat">AI assistant</span></h2>
+  <div class="tool-header">
+    <div class="tool-header-left">
+      <h2>Claude <span class="cat-chip">AI Assistant</span></h2>
       <p class="blurb">Projects bound to the organization. "Public" means org-visible — never open internet. Individual chats shareable via private links.</p>
     </div>
   </div>
-  <div class="dimensions">
-    <div class="dim"><h4>Permissions</h4><p>2 levels: Can use / Can edit. No viewer-only tier. Project visibility: Private or Public-in-org.</p></div>
-    <div class="dim"><h4>Public link</h4><p>"Public" ≠ internet-public — means every org member can see it. Individual chat shares via private link.</p></div>
-    <div class="dim"><h4>Guest collaboration</h4><p><strong>No external-guest model.</strong> All collaborators are org members.</p></div>
+  <div class="dim-strip">
+    <div class="dim-card"><h4>Permissions</h4><p>2 levels: Can use / Can edit. No viewer-only tier. Project visibility: Private or Public-in-org.</p></div>
+    <div class="dim-card"><h4>Public link</h4><p>"Public" ≠ internet-public — means every org member can see it. Individual chat shares via private link.</p></div>
+    <div class="dim-card"><h4>Guest collaboration</h4><p><strong>No external-guest model.</strong> All collaborators are org members.</p></div>
   </div>
-  <div class="grid">
+  <div class="img-grid">
     <figure>
       <div class="imgwrap" style="background:#fafafa"><img alt="Claude Projects — team collaboration illustration" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/06b448dbf07818caf8ac1db37f0165bea8c9a410-2880x1620.png"></div>
       <figcaption><p class="t">Projects — team collaboration</p><p class="d">Hero from Anthropic's Projects launch. Pro &amp; Team plans get Projects; Team adds cross-user sharing.</p></figcaption>
@@ -666,22 +816,21 @@
       <figcaption><p class="t">Shared chats in Project activity feed</p><p class="d">The Team-plan-only sharing surface — teammates opt-in to publish their best conversations into the shared feed.</p></figcaption>
     </figure>
   </div>
-  <div class="external-link-box" style="margin-top:16px">
-    <div>For the Share button / General-access dropdown / bulk-email invite modals (the actual sharing toggles), see the live help article.</div>
-    <a class="cta-big" href="https://support.claude.com/en/articles/9519189-manage-project-visibility-and-sharing" target="_blank">Open live help article →</a>
+  <div class="ext-link-box">
+    <div class="desc">For the Share button / General-access dropdown / bulk-email invite modals (the actual sharing toggles), see the live help article.</div>
+    <a class="cta-solid" href="https://support.claude.com/en/articles/9519189-manage-project-visibility-and-sharing" target="_blank">Open live help article →</a>
   </div>
 </section>
 
 </main>
+</div><!-- /main-wrap -->
+</div><!-- /layout -->
 
 <footer>
-  Inline images from Figma, Whimsical (Sanity), Notion (Contentful), Stormboard &amp; Anthropic (Squarespace / www-cdn), Lucid (corporate-assets), Seibert Group (astro/webp), tldraw (Substack S3), Zapier (Contentful), The Side Blogger (WordPress), Lovable (customer.io). If an image stops loading, the vendor has rotated their asset path — ping me and I'll refresh. Your own screenshots load from <code>user-screenshots/&lt;tool&gt;/</code>.
+  Inline images from Figma, Whimsical (Sanity), Notion (Contentful), Stormboard &amp; Anthropic (Squarespace / www-cdn), Lucid (corporate-assets), Seibert Group (astro/webp), tldraw (Substack S3), Zapier (Contentful), The Side Blogger (WordPress), Lovable (customer.io). If an image stops loading, the vendor has rotated their asset path. Your own screenshots load from <code>user-screenshots/&lt;tool&gt;/</code>.
 </footer>
 
 <script>
-// =========================================================
-// PAIN POINTS — hand-curated from G2, Reddit, community forums
-// =========================================================
 const PAIN = {
   stormboard: [
     { t: "No public link option", d: "External users must be invited by email and create a Stormboard account — no 'anyone with the link' affordance at all.", src: "G2 / Capterra reviews" },
@@ -753,11 +902,6 @@ const PAIN = {
   ]
 };
 
-// =========================================================
-// USER-SCREENSHOT AUTO-LOADER
-// Scans user-screenshots/<id>/NN.ext for NN = 01..20 and
-// ext in {png,jpg,jpeg,webp,gif}. Skips any that don't exist.
-// =========================================================
 const TOOL_IDS = Object.keys(PAIN);
 const MAX_SHOTS = 20;
 const EXTS = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
@@ -787,7 +931,6 @@ async function loadUserShots(toolId) {
 }
 
 function renderSection(section, toolId) {
-  // Pain points
   const painData = PAIN[toolId] || [];
   const painHTML = `
     <div class="pain-points">
@@ -802,12 +945,11 @@ function renderSection(section, toolId) {
       </ul>
     </div>`;
 
-  // User screenshots placeholder
   const shotsHTML = `
     <div class="user-shots" data-tool="${toolId}">
       <h3><span>📷</span> Your screenshots</h3>
       <p class="sub">Drop images in <code>user-screenshots/${toolId}/</code> named <code>01.png</code>, <code>02.jpg</code>, … up to <code>20</code>. Reload to see them here.</p>
-      <div class="shots-grid grid"></div>
+      <div class="shots-grid img-grid"></div>
       <div class="empty">No user screenshots found. Add files and reload.</div>
     </div>`;
 
@@ -820,7 +962,7 @@ async function populateUserShots(toolId) {
   const gridEl = container.querySelector('.shots-grid');
   const emptyEl = container.querySelector('.empty');
   const shots = await loadUserShots(toolId);
-  if (shots.length === 0) return; // keep "empty" message
+  if (shots.length === 0) return;
   emptyEl.style.display = 'none';
   gridEl.innerHTML = shots.map(s => `
     <figure>
@@ -829,14 +971,29 @@ async function populateUserShots(toolId) {
     </figure>`).join('');
 }
 
-// Wire it all up
+// Sidebar active state on scroll
+const sections = document.querySelectorAll('section.tool');
+const sidebarLinks = document.querySelectorAll('.sidebar-link[href^="#"]');
+
+function updateActive() {
+  let current = '';
+  sections.forEach(s => {
+    const top = s.getBoundingClientRect().top;
+    if (top <= 100) current = s.id;
+  });
+  sidebarLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateActive, { passive: true });
+updateActive();
+
 document.querySelectorAll('section.tool').forEach(section => {
   const id = section.id;
   if (!id) return;
   renderSection(section, id);
 });
 
-// Probe user screenshots in parallel across all tools
 TOOL_IDS.forEach(id => populateUserShots(id));
 </script>
 

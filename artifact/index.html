@@ -3,129 +3,233 @@
 <head>
 <meta charset="utf-8">
 <title>Sharing UX Benchmark — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: light;
-    --bg: #fafafa;
-    --panel: #ffffff;
-    --line: #e5e7eb;
-    --line-strong: #d1d5db;
-    --text: #1f2937;
-    --mute: #6b7280;
-    --mute2: #9ca3af;
-    --accent: #2563eb;
-    --accent-soft: #eff6ff;
-    --chip-bg: #f3f4f6;
-    --good: #16a34a;
-    --good-soft: #dcfce7;
-    --warn: #d97706;
-    --warn-soft: #fef3c7;
-    --bad: #dc2626;
-    --bad-soft: #fee2e2;
-    --neutral-soft: #f3f4f6;
-    --whiteboard: #2563eb;
-    --docs: #7c3aed;
-    --ai: #0891b2;
-    --design: #db2777;
-    --builder: #ea580c;
+    --purple: #7B46F6;
+    --purple-dark: #6030E0;
+    --purple-soft: #F0EBFF;
+    --purple-mid: #C4B0FB;
+    --bg: #F7F6FB;
+    --panel: #FFFFFF;
+    --sidebar: #1A1A2E;
+    --sidebar-hover: #252540;
+    --line: #E8E5F0;
+    --line-strong: #D1CBEA;
+    --text: #1A1A2E;
+    --mute: #6B6987;
+    --mute2: #9E9CB8;
+    --chip-bg: #F0EBFF;
+    --good: #16A34A;
+    --good-soft: #DCFCE7;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --bad: #DC2626;
+    --bad-soft: #FEE2E2;
+    --neutral-soft: #F3F4F6;
+    --cat-whiteboard: #7B46F6;
+    --cat-docs: #7C3AED;
+    --cat-ai: #0891B2;
+    --cat-design: #DB2777;
+    --cat-builder: #EA580C;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  a { color: var(--accent); text-decoration: none; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  a { color: var(--purple); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  header.top { padding: 28px 28px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
-  header.top h1 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
-  header.top p { margin: 0; color: var(--mute); max-width: 80ch; font-size: 13px; }
-  header.top .gallery-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 8px 14px; background: var(--accent); color: white; border-radius: 6px; font-size: 13px; font-weight: 500; }
-  header.top .gallery-cta:hover { background: #1d4ed8; text-decoration: none; }
+  /* ── TOP BAR ── */
+  header.top-bar {
+    background: var(--sidebar);
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 12px; }
+  .top-bar-logo {
+    width: 30px; height: 30px; background: var(--purple);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white;
+  }
+  .top-bar-title { font-size: 15px; font-weight: 600; color: white; }
+  .top-bar-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-left: 4px; }
+  .top-bar-right a {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; background: rgba(123,70,246,0.25); color: var(--purple-mid);
+    border: 1px solid rgba(123,70,246,0.35);
+    border-radius: 6px; font-size: 12px; font-weight: 600;
+    transition: background 0.12s;
+  }
+  .top-bar-right a:hover { background: rgba(123,70,246,0.4); text-decoration: none; }
 
-  .viewtabs { display: flex; gap: 4px; padding: 12px 28px 0; border-bottom: 1px solid var(--line); background: var(--panel); }
-  .viewtabs button { appearance: none; border: 0; background: transparent; padding: 8px 14px; font: inherit; color: var(--mute); cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; }
-  .viewtabs button.active { color: var(--text); border-bottom-color: var(--accent); }
+  /* ── TABS ── */
+  .viewtabs {
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    padding: 0 28px;
+    display: flex; gap: 2px;
+    position: sticky; top: 56px; z-index: 90;
+  }
+  .viewtabs button {
+    appearance: none; border: 0; background: transparent;
+    padding: 14px 16px; font: inherit; font-size: 13px; font-weight: 500;
+    color: var(--mute); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.12s;
+  }
+  .viewtabs button.active { color: var(--purple); border-bottom-color: var(--purple); }
   .viewtabs button:hover { color: var(--text); }
 
+  /* ── MAIN ── */
   main { padding: 24px 28px 80px; max-width: 1400px; margin: 0 auto; }
 
-  .toolgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 24px; }
-  .toolcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; cursor: pointer; transition: border-color 0.12s, transform 0.12s; display: flex; flex-direction: column; gap: 4px; position: relative; }
-  .toolcard:hover { border-color: var(--line-strong); transform: translateY(-1px); }
-  .toolcard.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .toolcard .name { font-weight: 600; font-size: 15px; }
-  .toolcard .cat { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; }
-  .toolcard .tag { font-size: 11px; color: var(--mute2); margin-top: 6px; }
-  .toolcard .has-shots { position: absolute; top: 10px; right: 10px; font-size: 10px; color: var(--good); background: var(--good-soft); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+  /* ── FILTER BAR ── */
+  .filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filters button {
+    appearance: none; border: 1px solid var(--line);
+    background: var(--panel); padding: 6px 14px;
+    font: inherit; font-size: 12px; font-weight: 500;
+    color: var(--mute); border-radius: 999px; cursor: pointer;
+    transition: all 0.12s;
+  }
+  .filters button.active { background: var(--purple); color: white; border-color: var(--purple); }
+  .filters button:hover:not(.active) { border-color: var(--purple-mid); color: var(--text); }
 
-  .cat-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-  .cat-whiteboard { background: var(--whiteboard); }
-  .cat-docs { background: var(--docs); }
-  .cat-ai { background: var(--ai); }
-  .cat-design { background: var(--design); }
-  .cat-builder { background: var(--builder); }
+  /* ── TOOL GRID ── */
+  .toolgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .toolcard {
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    cursor: pointer;
+    transition: border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+    display: flex; flex-direction: column; gap: 3px;
+    position: relative;
+  }
+  .toolcard:hover { border-color: var(--purple-mid); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(123,70,246,0.12); }
+  .toolcard.selected { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-soft); }
+  .toolcard .tc-name { font-weight: 700; font-size: 14px; color: var(--text); }
+  .toolcard .tc-cat { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .toolcard .tc-pricing { font-size: 11px; color: var(--mute2); margin-top: 6px; }
+  .toolcard .shots-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 9px; font-weight: 700;
+    color: var(--good); background: var(--good-soft);
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .cat-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+  .cat-whiteboard { background: var(--cat-whiteboard); }
+  .cat-docs { background: var(--cat-docs); }
+  .cat-ai { background: var(--cat-ai); }
+  .cat-design { background: var(--cat-design); }
+  .cat-builder { background: var(--cat-builder); }
 
-  .detail { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 0; overflow: hidden; }
-  .detail .head { padding: 20px 24px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-  .detail .head h2 { margin: 0 0 4px; font-size: 20px; }
-  .detail .head .summary { margin: 0; color: var(--mute); font-size: 13px; max-width: 70ch; }
-  .detail .head-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-  .detail .head .pricing-pill { background: var(--chip-bg); padding: 4px 10px; border-radius: 999px; font-size: 12px; color: var(--mute); white-space: nowrap; }
-  .detail .head .shot-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; white-space: nowrap; }
-  .detail .head .shot-btn:hover { background: #1d4ed8; text-decoration: none; }
+  /* ── DETAIL PANEL ── */
+  .detail {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  }
+  .detail .d-head {
+    padding: 20px 24px 18px;
+    border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  }
+  .detail .d-head h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .detail .d-head .d-summary { margin: 0; color: var(--mute); font-size: 13px; max-width: 65ch; line-height: 1.6; }
+  .detail .d-head-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+  .detail .pricing-chip { background: var(--chip-bg); color: var(--purple); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .detail .shot-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple); color: white;
+    padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  }
+  .detail .shot-btn:hover { background: var(--purple-dark); text-decoration: none; }
 
   .dimensions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--line); }
   @media (max-width: 900px) { .dimensions { grid-template-columns: 1fr; } }
-  .dim { background: var(--panel); padding: 18px 20px 22px; }
-  .dim h3 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--mute); font-weight: 600; }
-  .dim .verdict { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-bottom: 10px; }
+  .dim {
+    background: var(--panel);
+    padding: 20px 22px 24px;
+  }
+  .dim h3 { font-size: 11px; font-weight: 700; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute); }
+  .verdict { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
   .verdict.good { background: var(--good-soft); color: var(--good); }
   .verdict.warn { background: var(--warn-soft); color: var(--warn); }
-  .verdict.bad { background: var(--bad-soft); color: var(--bad); }
+  .verdict.bad  { background: var(--bad-soft); color: var(--bad); }
   .verdict.neutral { background: var(--neutral-soft); color: var(--mute); }
-  .dim .detail-body { font-size: 13px; color: var(--text); }
-  .dim .detail-body ul { padding-left: 18px; margin: 8px 0 0; }
-  .dim .detail-body ul li { margin-bottom: 4px; }
-  .dim .detail-body .keyline { font-weight: 500; margin-bottom: 6px; }
+  .dim .d-body { font-size: 13px; color: var(--text); }
+  .dim .d-body .keyline { font-weight: 500; margin-bottom: 8px; color: var(--text); line-height: 1.5; }
+  .dim .d-body ul { padding-left: 18px; margin: 0; }
+  .dim .d-body ul li { margin-bottom: 5px; color: var(--mute); line-height: 1.5; }
 
-  .sources { padding: 16px 24px; background: #fafafa; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; }
-  .sources .label { color: var(--mute); }
-  .sources a { color: var(--accent); }
+  .sources {
+    padding: 14px 24px;
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+    font-size: 12px; align-items: center;
+  }
+  .sources .src-label { color: var(--mute); font-weight: 500; }
+  .sources a { color: var(--purple); }
 
-  .matrix { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  /* ── MATRIX ── */
+  .matrix { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(26,26,46,0.06); }
   table.mtx { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.mtx th, table.mtx td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
-  table.mtx thead th { background: #f9fafb; font-weight: 600; font-size: 12px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--line); position: sticky; top: 0; }
-  table.mtx tbody tr:hover { background: #f9fafb; cursor: pointer; }
-  table.mtx .tname { font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  table.mtx .tcat { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
-  table.mtx .shots-tag { font-size: 9px; color: var(--good); background: var(--good-soft); padding: 1px 5px; border-radius: 3px; font-weight: 600; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+  table.mtx th, table.mtx td { padding: 13px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  table.mtx thead th { background: var(--bg); font-weight: 700; font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--line); position: sticky; top: 112px; }
+  table.mtx tbody tr:hover { background: var(--purple-soft); cursor: pointer; }
+  table.mtx .tname { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  table.mtx .tcat { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 3px; }
+  table.mtx .shots-tag { font-size: 9px; color: var(--good); background: var(--good-soft); padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-right: 6px; margin-bottom: 6px; }
   .badge.good { background: var(--good-soft); color: var(--good); }
   .badge.warn { background: var(--warn-soft); color: var(--warn); }
   .badge.bad  { background: var(--bad-soft); color: var(--bad); }
   .badge.neutral { background: var(--neutral-soft); color: var(--mute); }
 
-  .filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-  .filters button { appearance: none; border: 1px solid var(--line); background: var(--panel); padding: 5px 12px; font: inherit; font-size: 12px; color: var(--mute); border-radius: 999px; cursor: pointer; }
-  .filters button.active { background: var(--accent); color: white; border-color: var(--accent); }
-  .filters button:hover:not(.active) { border-color: var(--line-strong); color: var(--text); }
+  /* ── INSIGHTS ── */
+  .section-intro { color: var(--mute); font-size: 13px; margin: 0 0 20px; max-width: 80ch; line-height: 1.6; }
+  .section-h { font-size: 14px; font-weight: 700; margin: 28px 0 12px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .section-h::before { content: ''; display: block; width: 3px; height: 16px; background: var(--purple); border-radius: 2px; }
 
-  .section-intro { color: var(--mute); font-size: 13px; margin: 0 0 16px; max-width: 80ch; }
-  h3.section-h { font-size: 15px; margin: 24px 0 10px; }
-
-  .insights { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 24px; }
-  .insight { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
-  .insight h4 { margin: 0 0 6px; font-size: 13px; }
-  .insight p { margin: 0; color: var(--mute); font-size: 12px; }
+  .insights { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .insight {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.05);
+  }
+  .insight h4 { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--text); }
+  .insight p { margin: 0; color: var(--mute); font-size: 12px; line-height: 1.6; }
 
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<header class="top">
-  <h1>Sharing UX benchmark — 12 tools compared</h1>
-  <p>How each tool handles three sharing dimensions: permissions model, public / anonymous link access, and external-guest collaboration. Click any tool to deep-dive, or switch to the matrix view for a side-by-side.</p>
-  <a class="gallery-cta" href="../index.html" target="_blank">Open visual gallery →</a>
+<header class="top-bar">
+  <div class="top-bar-left">
+    <div class="top-bar-logo">S</div>
+    <span class="top-bar-title">Sharing UX Benchmark</span>
+    <span class="top-bar-sub">12 tools compared</span>
+  </div>
+  <div class="top-bar-right">
+    <a href="https://sebadamore.github.io/the-repo/" target="_blank">Visual gallery →</a>
+  </div>
 </header>
 
 <div class="viewtabs">
@@ -135,6 +239,8 @@
 </div>
 
 <main>
+
+  <!-- TOOL DEEP-DIVE -->
   <section id="view-tools">
     <div class="filters" id="tool-filters">
       <button class="active" data-filter="all">All (12)</button>
@@ -148,18 +254,28 @@
     <div id="tool-detail"></div>
   </section>
 
+  <!-- COMPARISON MATRIX -->
   <section id="view-matrix" class="hidden">
     <p class="section-intro">Each cell is a compact verdict — click a row to jump to that tool's deep-dive. Tools with a green "shots" tag have visual screenshots in the gallery.</p>
     <div class="matrix">
       <table class="mtx">
-        <thead><tr><th style="width:180px;">Tool</th><th>Permissions model</th><th>Public / anonymous link</th><th>External &amp; guest collaboration</th></tr></thead>
+        <thead>
+          <tr>
+            <th style="width:200px;">Tool</th>
+            <th>Permissions model</th>
+            <th>Public / anonymous link</th>
+            <th>External &amp; guest collaboration</th>
+          </tr>
+        </thead>
         <tbody id="matrix-body"></tbody>
       </table>
     </div>
   </section>
 
+  <!-- INSIGHTS -->
   <section id="view-insights" class="hidden">
     <p class="section-intro">Patterns that emerge when you read all 12 side-by-side.</p>
+
     <h3 class="section-h">Permissions model</h3>
     <div class="insights">
       <div class="insight"><h4>3–4 roles is the de-facto standard</h4><p>Miro, Notion, Canva, Whimsical, Figma all converge on Viewer / Commenter / Editor. Notion adds "Full access"; Lucidspark adds "Edit + share"; Miro keeps it strictly 3.</p></div>
@@ -167,25 +283,28 @@
       <div class="insight"><h4>Dangerous defaults exist</h4><p>Notion: a Guest granted Full access can remove the Workspace Owner from a page. Miro/Figma default to "Can edit" when creating public links on paid plans.</p></div>
       <div class="insight"><h4>Real-time tools lean open</h4><p>tldraw and Lovable start from "share the URL, you're in." Miro, FigJam, Whimsical follow the Google-Docs mental model. Stormboard is the outlier that still requires an invited account.</p></div>
     </div>
+
     <h3 class="section-h">Public / anonymous link</h3>
     <div class="insights">
-      <div class="insight"><h4>"Anyone with the link" is table stakes — except Stormboard &amp; Evernote notebooks</h4><p>10 of 12 offer anonymous view via URL; most also offer anonymous edit. Stormboard requires email-based Guest invite; Evernote has no public URL for notebooks (notes yes).</p></div>
+      <div class="insight"><h4>"Anyone with the link" is table stakes — except Stormboard &amp; Evernote notebooks</h4><p>10 of 12 offer anonymous view via URL; most also offer anonymous edit. Stormboard requires email-based Guest invite; Evernote has no public URL for notebooks.</p></div>
       <div class="insight"><h4>Password + expiry are the enterprise signal</h4><p>Figma, Notion, Whimsical ship both. Miro ships password-only. Canva/Lovable lean on published-vs-shared as a separate affordance.</p></div>
       <div class="insight"><h4>Admin kill-switch is now standard</h4><p>Figma and Miro let organization admins disable public links entirely. Stormboard's enterprise posture is stricter by default — no public sharing to disable in the first place.</p></div>
       <div class="insight"><h4>"Published" ≠ "shared" in builders</h4><p>Lovable and Canva distinguish the public-facing output (a website / design) from editor access to the source. This is an honest model newer to the whiteboard category.</p></div>
     </div>
+
     <h3 class="section-h">External / guest collaboration</h3>
     <div class="insights">
-      <div class="insight"><h4>Free-guest economics diverge widely</h4><p>Lucidspark and Stormboard (Enterprise) let unlimited Guests contribute without a seat. Whimsical caps at 10 (Free) / 50 (Pro) / 100 (Business) / 200 (Enterprise) guests per file. Miro's "Visitor" via public link is effectively unlimited but read/comment-only on Free.</p></div>
+      <div class="insight"><h4>Free-guest economics diverge widely</h4><p>Lucidspark and Stormboard (Enterprise) let unlimited Guests contribute without a seat. Whimsical caps at 10 / 50 / 100 / 200 guests per file. Miro's "Visitor" via public link is effectively unlimited but read/comment-only on Free.</p></div>
       <div class="insight"><h4>"No account needed" is the UX signal</h4><p>tldraw, Miro Visitors, Whimsical anonymous-edit, Canva public link, Evernote note link — all let someone work without signing up. Stormboard, Claude, Notion require an account.</p></div>
       <div class="insight"><h4>Per-guest roles are rarer than you'd think</h4><p>Lucid and Stormboard Enterprise offer per-guest role selection. Most others treat all link-followers identically, with the link itself carrying the permission.</p></div>
       <div class="insight"><h4>Collaboration surfaces vary by primitive</h4><p>Perplexity: Thread (public link) vs Space (invited roles). Claude: Project (org-visible) vs Chat (private link). Notion: page or entire workspace. The whiteboard tools standardize on the Board as the unit.</p></div>
     </div>
   </section>
+
 </main>
 
 <script>
-const GALLERY_URL = "../index.html";
+const GALLERY_URL = "https://sebadamore.github.io/the-repo/";
 
 const TOOLS = [
   { id: "stormboard", name: "Stormboard", cat: "whiteboard", catLabel: "Whiteboard", pricing: "Free / Business / Enterprise", hasShots: true,
@@ -301,32 +420,54 @@ function renderGrid() {
   for (const t of filtered) {
     const card = document.createElement("div");
     card.className = "toolcard" + (t.id === activeTool ? " selected" : "");
-    card.innerHTML = `${t.hasShots ? '<span class="has-shots">SHOTS</span>' : ''}<span class="cat"><span class="cat-dot cat-${t.cat}"></span>${t.catLabel}</span><span class="name">${t.name}</span><span class="tag">${t.pricing}</span>`;
+    card.innerHTML = `
+      ${t.hasShots ? '<span class="shots-badge">SHOTS</span>' : ''}
+      <span class="tc-cat"><span class="cat-dot cat-${t.cat}"></span>${t.catLabel}</span>
+      <span class="tc-name">${t.name}</span>
+      <span class="tc-pricing">${t.pricing}</span>`;
     card.onclick = () => { activeTool = t.id; renderGrid(); renderDetail(); };
     grid.appendChild(card);
   }
 }
 
-function verdictBadge(v) { return `<span class="verdict ${v.verdict}">${v.verdictLabel}</span>`; }
+function verdictBadge(v) {
+  return `<span class="verdict ${v.verdict}">${v.verdictLabel}</span>`;
+}
 
 function renderDetail() {
   const t = TOOLS.find(x => x.id === activeTool);
   if (!t) { detailEl.innerHTML = ""; return; }
-  const dim = (dimObj) => `<div class="detail-body">${verdictBadge(dimObj)}<div class="keyline">${dimObj.keyline}</div><ul>${dimObj.bullets.map(b => `<li>${b}</li>`).join("")}</ul></div>`;
+
+  const dim = (dimObj) => `
+    <div class="d-body">
+      ${verdictBadge(dimObj)}
+      <div class="keyline">${dimObj.keyline}</div>
+      <ul>${dimObj.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+    </div>`;
+
   const shotLabel = t.hasShots ? 'View screenshots →' : 'See help article →';
   const shotHref = t.hasShots ? `${GALLERY_URL}#${t.id}` : (t.sources[0] ? t.sources[0].url : '#');
 
   detailEl.innerHTML = `<div class="detail">
-    <div class="head">
-      <div><h2>${t.name}</h2><p class="summary">${t.summary}</p></div>
-      <div class="head-right"><a class="shot-btn" href="${shotHref}" target="_blank">${shotLabel}</a><span class="pricing-pill">${t.pricing}</span></div>
+    <div class="d-head">
+      <div>
+        <h2>${t.name}</h2>
+        <p class="d-summary">${t.summary}</p>
+      </div>
+      <div class="d-head-right">
+        <a class="shot-btn" href="${shotHref}" target="_blank">${shotLabel}</a>
+        <span class="pricing-chip">${t.pricing}</span>
+      </div>
     </div>
     <div class="dimensions">
       <div class="dim"><h3>Permissions model</h3>${dim(t.permissions)}</div>
       <div class="dim"><h3>Public / anonymous link</h3>${dim(t.publicLink)}</div>
       <div class="dim"><h3>External &amp; guest collaboration</h3>${dim(t.externalGuest)}</div>
     </div>
-    <div class="sources"><span class="label">Sources:</span>${t.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label}</a>`).join("")}</div>
+    <div class="sources">
+      <span class="src-label">Sources:</span>
+      ${t.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label}</a>`).join("")}
+    </div>
   </div>`;
 }
 
@@ -334,8 +475,25 @@ function renderMatrix() {
   matrixBody.innerHTML = "";
   for (const t of TOOLS) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td><div class="tname"><span>${t.name}</span>${t.hasShots ? '<span class="shots-tag">SHOTS</span>' : ''}</div><div class="tcat"><span class="cat-dot cat-${t.cat}"></span>${t.catLabel}</div></td><td><span class="badge ${t.permissions.verdict}">${t.permissions.verdictLabel}</span><div style="margin-top:6px;">${t.permissions.keyline}</div></td><td><span class="badge ${t.publicLink.verdict}">${t.publicLink.verdictLabel}</span><div style="margin-top:6px;">${t.publicLink.keyline}</div></td><td><span class="badge ${t.externalGuest.verdict}">${t.externalGuest.verdictLabel}</span><div style="margin-top:6px;">${t.externalGuest.keyline}</div></td>`;
-    tr.onclick = () => { activeTool = t.id; switchView("tools"); renderGrid(); renderDetail(); document.getElementById("tool-detail").scrollIntoView({ behavior: "smooth", block: "start" }); };
+    tr.innerHTML = `
+      <td>
+        <div class="tname">
+          <span class="cat-dot cat-${t.cat}"></span>
+          <span>${t.name}</span>
+          ${t.hasShots ? '<span class="shots-tag">SHOTS</span>' : ''}
+        </div>
+        <div class="tcat">${t.catLabel}</div>
+      </td>
+      <td><span class="badge ${t.permissions.verdict}">${t.permissions.verdictLabel}</span><div style="font-size:12px;color:var(--mute);margin-top:4px;">${t.permissions.keyline}</div></td>
+      <td><span class="badge ${t.publicLink.verdict}">${t.publicLink.verdictLabel}</span><div style="font-size:12px;color:var(--mute);margin-top:4px;">${t.publicLink.keyline}</div></td>
+      <td><span class="badge ${t.externalGuest.verdict}">${t.externalGuest.verdictLabel}</span><div style="font-size:12px;color:var(--mute);margin-top:4px;">${t.externalGuest.keyline}</div></td>`;
+    tr.onclick = () => {
+      activeTool = t.id;
+      switchView("tools");
+      renderGrid();
+      renderDetail();
+      document.getElementById("tool-detail").scrollIntoView({ behavior: "smooth", block: "start" });
+    };
     matrixBody.appendChild(tr);
   }
 }
@@ -346,6 +504,7 @@ function switchView(v) {
   document.getElementById("view-matrix").classList.toggle("hidden", v !== "matrix");
   document.getElementById("view-insights").classList.toggle("hidden", v !== "insights");
 }
+
 document.querySelectorAll(".viewtabs .tab").forEach(b => { b.onclick = () => switchView(b.dataset.view); });
 document.querySelectorAll("#tool-filters button").forEach(b => {
   b.onclick = () => {
@@ -353,7 +512,10 @@ document.querySelectorAll("#tool-filters button").forEach(b => {
     b.classList.add("active");
     activeFilter = b.dataset.filter;
     const stillVisible = TOOLS.find(t => t.id === activeTool && (activeFilter === "all" || t.cat === activeFilter));
-    if (!stillVisible) { const first = TOOLS.find(t => activeFilter === "all" || t.cat === activeFilter); if (first) activeTool = first.id; }
+    if (!stillVisible) {
+      const first = TOOLS.find(t => activeFilter === "all" || t.cat === activeFilter);
+      if (first) activeTool = first.id;
+    }
     renderGrid();
     renderDetail();
   };
