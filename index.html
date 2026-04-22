@@ -261,6 +261,94 @@
   }
   .user-shots .empty { font-size: 12px; color: var(--mute2); font-style: italic; }
 
+  /* drop zone */
+  .drop-zone {
+    border: 2px dashed var(--purple-mid);
+    border-radius: 8px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    margin-bottom: 14px;
+    font-size: 12px; color: var(--mute);
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--purple);
+    background: var(--purple-soft);
+    color: var(--purple);
+  }
+  .drop-zone input[type="file"] { display: none; }
+  .drop-zone .drop-icon { font-size: 22px; margin-bottom: 4px; }
+
+  /* screenshot card with delete */
+  figure { position: relative; }
+  .del-btn {
+    position: absolute; top: 6px; right: 6px; z-index: 10;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(220,38,38,0.85); color: white;
+    border: 0; cursor: pointer; font-size: 14px; line-height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  figure:hover .del-btn { opacity: 1; }
+  .del-btn:hover { background: var(--bad); }
+
+  /* ── LIGHTBOX ── */
+  .lb-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,10,20,0.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .lb-overlay.open { opacity: 1; pointer-events: all; }
+  .lb-img-wrap {
+    max-width: calc(100vw - 140px);
+    max-height: calc(100vh - 80px);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .lb-img-wrap img {
+    max-width: 100%; max-height: calc(100vh - 80px);
+    object-fit: contain; border-radius: 8px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+    display: block;
+  }
+  .lb-caption {
+    position: absolute; bottom: -36px; left: 0; right: 0;
+    text-align: center; color: rgba(255,255,255,0.6);
+    font-size: 12px;
+  }
+  .lb-counter {
+    position: absolute; top: -30px; right: 0;
+    font-size: 11px; color: rgba(255,255,255,0.4);
+  }
+  .lb-close {
+    position: absolute; top: 16px; right: 20px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 0;
+    color: white; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .lb-close:hover { background: rgba(255,255,255,0.2); }
+  .lb-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: 0;
+    color: white; font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; flex-shrink: 0;
+    z-index: 10;
+  }
+  .lb-arrow:hover { background: rgba(123,70,246,0.6); }
+  .lb-arrow.prev { left: 20px; }
+  .lb-arrow.next { right: 20px; }
+  .lb-arrow:disabled { opacity: 0.2; cursor: default; }
+  /* make every image in the gallery clickable */
+  figure .imgwrap { cursor: zoom-in; }
+
   /* ── PAIN POINTS ── */
   .pain-points {
     margin-top: 20px;
@@ -903,9 +991,30 @@ const PAIN = {
 };
 
 const TOOL_IDS = Object.keys(PAIN);
-const MAX_SHOTS = 20;
-const EXTS = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+const USE_API = true; // set false if running without local server (file:// mode)
 
+// ── API helpers ──
+async function apiList(toolId) {
+  try {
+    const r = await fetch(`/api/screenshots/${toolId}`);
+    if (!r.ok) return null; // server not running
+    return await r.json();
+  } catch { return null; }
+}
+
+async function apiDelete(toolId, file) {
+  const r = await fetch(`/api/screenshots/${toolId}/${file}`, { method: 'DELETE' });
+  return r.ok;
+}
+
+async function apiUpload(toolId, files) {
+  const fd = new FormData();
+  for (const f of files) fd.append('files', f);
+  const r = await fetch(`/api/screenshots/${toolId}`, { method: 'POST', body: fd });
+  return r.ok;
+}
+
+// ── fallback: probe-based loader (file:// mode) ──
 async function probe(url) {
   return new Promise(resolve => {
     const img = new Image();
@@ -914,46 +1023,97 @@ async function probe(url) {
     img.src = url;
   });
 }
-
-async function loadUserShots(toolId) {
+async function probeList(toolId) {
+  const exts = ['png','jpg','jpeg','webp','gif'];
   const results = [];
-  for (let i = 1; i <= MAX_SHOTS; i++) {
-    const prefix = String(i).padStart(2, '0');
-    let found = null;
-    for (const ext of EXTS) {
+  for (let i = 1; i <= 20; i++) {
+    const prefix = String(i).padStart(2,'0');
+    for (const ext of exts) {
       const url = `user-screenshots/${toolId}/${prefix}.${ext}`;
-      const ok = await probe(url);
-      if (ok) { found = ok; break; }
+      if (await probe(url)) { results.push({ file: `${prefix}.${ext}`, url }); break; }
     }
-    if (found) results.push({ n: prefix, url: found });
   }
   return results;
 }
 
+// ── render ──
 function renderSection(section, toolId) {
   const painData = PAIN[toolId] || [];
   const painHTML = `
     <div class="pain-points">
       <h3><span>⚠</span> Pain points users report</h3>
-      <ul>
-        ${painData.map(p => `
-          <li>
-            <div class="t">${p.t}</div>
-            <div class="d">${p.d}</div>
-            <div class="src">Source: ${p.src}</div>
-          </li>`).join('')}
+      <ul>${painData.map(p => `
+        <li>
+          <div class="t">${p.t}</div>
+          <div class="d">${p.d}</div>
+          <div class="src">Source: ${p.src}</div>
+        </li>`).join('')}
       </ul>
     </div>`;
 
   const shotsHTML = `
     <div class="user-shots" data-tool="${toolId}">
       <h3><span>📷</span> Your screenshots</h3>
-      <p class="sub">Drop images in <code>user-screenshots/${toolId}/</code> named <code>01.png</code>, <code>02.jpg</code>, … up to <code>20</code>. Reload to see them here.</p>
+      <label class="drop-zone" id="drop-${toolId}">
+        <input type="file" accept="image/*" multiple>
+        <div class="drop-icon">⬆</div>
+        Drag &amp; drop images here, or click to browse
+      </label>
       <div class="shots-grid img-grid"></div>
-      <div class="empty">No user screenshots found. Add files and reload.</div>
+      <div class="empty">No screenshots yet.</div>
     </div>`;
 
   section.insertAdjacentHTML('beforeend', shotsHTML + painHTML);
+  initDropZone(toolId);
+}
+
+function initDropZone(toolId) {
+  const zone = document.getElementById(`drop-${toolId}`);
+  if (!zone) return;
+  const input = zone.querySelector('input[type="file"]');
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', async e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+    if (files.length) await uploadAndRefresh(toolId, files);
+  });
+  input.addEventListener('change', async () => {
+    const files = [...input.files];
+    if (files.length) await uploadAndRefresh(toolId, files);
+    input.value = '';
+  });
+}
+
+async function uploadAndRefresh(toolId, files) {
+  const ok = await apiUpload(toolId, files);
+  if (ok) await populateUserShots(toolId);
+}
+
+function renderShot(toolId, shot) {
+  const fig = document.createElement('figure');
+  fig.dataset.file = shot.file;
+  fig.innerHTML = `
+    <button class="del-btn" title="Delete">✕</button>
+    <div class="imgwrap"><img src="${shot.url}?t=${Date.now()}" alt="Screenshot ${shot.file}"></div>
+    <figcaption><p class="t">${shot.file}</p></figcaption>`;
+  fig.querySelector('.del-btn').addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm(`Delete ${shot.file}?`)) return;
+    const ok = await apiDelete(toolId, shot.file);
+    if (ok) { fig.remove(); checkEmpty(toolId); }
+  });
+  return fig;
+}
+
+function checkEmpty(toolId) {
+  const container = document.querySelector(`.user-shots[data-tool="${toolId}"]`);
+  if (!container) return;
+  const grid  = container.querySelector('.shots-grid');
+  const empty = container.querySelector('.empty');
+  empty.style.display = grid.children.length === 0 ? '' : 'none';
 }
 
 async function populateUserShots(toolId) {
@@ -961,14 +1121,14 @@ async function populateUserShots(toolId) {
   if (!container) return;
   const gridEl = container.querySelector('.shots-grid');
   const emptyEl = container.querySelector('.empty');
-  const shots = await loadUserShots(toolId);
-  if (shots.length === 0) return;
+
+  let shots = await apiList(toolId);
+  if (shots === null) shots = await probeList(toolId); // fallback
+
+  gridEl.innerHTML = '';
+  if (shots.length === 0) { emptyEl.style.display = ''; return; }
   emptyEl.style.display = 'none';
-  gridEl.innerHTML = shots.map(s => `
-    <figure>
-      <div class="imgwrap"><img src="${s.url}" alt="Your screenshot ${s.n}"></div>
-      <figcaption><p class="t">Your screenshot ${s.n}</p></figcaption>
-    </figure>`).join('');
+  shots.forEach(s => gridEl.appendChild(renderShot(toolId, s)));
 }
 
 // Sidebar active state on scroll
@@ -995,6 +1155,79 @@ document.querySelectorAll('section.tool').forEach(section => {
 });
 
 TOOL_IDS.forEach(id => populateUserShots(id));
+
+// ── LIGHTBOX ──
+const lb = document.createElement('div');
+lb.className = 'lb-overlay';
+lb.innerHTML = `
+  <button class="lb-close" id="lb-close">✕</button>
+  <button class="lb-arrow prev" id="lb-prev">‹</button>
+  <div class="lb-img-wrap">
+    <span class="lb-counter" id="lb-counter"></span>
+    <img id="lb-img" src="" alt="">
+    <div class="lb-caption" id="lb-caption"></div>
+  </div>
+  <button class="lb-arrow next" id="lb-next">›</button>`;
+document.body.appendChild(lb);
+
+let lbImages = [];   // [{src, caption}]
+let lbIndex  = 0;
+
+function lbOpen(images, startIdx) {
+  lbImages = images;
+  lbIndex  = startIdx;
+  lbShow();
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function lbClose() {
+  lb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lbShow() {
+  const cur = lbImages[lbIndex];
+  const img = document.getElementById('lb-img');
+  img.style.opacity = '0';
+  img.src = cur.src;
+  img.onload = () => { img.style.transition = 'opacity 0.15s'; img.style.opacity = '1'; };
+  document.getElementById('lb-caption').textContent = cur.caption || '';
+  document.getElementById('lb-counter').textContent = `${lbIndex + 1} / ${lbImages.length}`;
+  document.getElementById('lb-prev').disabled = lbIndex === 0;
+  document.getElementById('lb-next').disabled = lbIndex === lbImages.length - 1;
+}
+
+document.getElementById('lb-prev').addEventListener('click', () => { if (lbIndex > 0) { lbIndex--; lbShow(); } });
+document.getElementById('lb-next').addEventListener('click', () => { if (lbIndex < lbImages.length - 1) { lbIndex++; lbShow(); } });
+document.getElementById('lb-close').addEventListener('click', lbClose);
+lb.addEventListener('click', e => { if (e.target === lb) lbClose(); });
+
+document.addEventListener('keydown', e => {
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape')      lbClose();
+  if (e.key === 'ArrowLeft'  && lbIndex > 0)                    { lbIndex--; lbShow(); }
+  if (e.key === 'ArrowRight' && lbIndex < lbImages.length - 1)  { lbIndex++; lbShow(); }
+});
+
+// Wire up clicks on all figures in a section
+function wireImageClicks(section) {
+  section.addEventListener('click', e => {
+    const imgwrap = e.target.closest('.imgwrap');
+    if (!imgwrap) return;
+    // collect all images in this section
+    const figs = [...section.querySelectorAll('figure')];
+    const images = figs.map(f => ({
+      src: f.querySelector('img')?.src || '',
+      caption: f.querySelector('figcaption .t')?.textContent || ''
+    })).filter(i => i.src);
+    const clickedFig = e.target.closest('figure');
+    const clickedIdx = figs.indexOf(clickedFig);
+    if (images.length && clickedIdx !== -1) lbOpen(images, clickedIdx);
+  });
+}
+
+document.querySelectorAll('section.tool').forEach(wireImageClicks);
 </script>
 
 </body>

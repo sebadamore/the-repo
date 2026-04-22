@@ -217,6 +217,116 @@
   .insight p { margin: 0; color: var(--mute); font-size: 12px; line-height: 1.6; }
 
   .hidden { display: none !important; }
+
+  /* ── CHARTS ── */
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+  .charts-full { margin-bottom: 20px; }
+  .chart-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 24px 24px;
+    box-shadow: 0 2px 8px rgba(26,26,46,0.06);
+  }
+  .chart-panel h3 { margin: 0 0 3px; font-size: 13px; font-weight: 700; color: var(--text); }
+  .chart-sub { font-size: 11px; color: var(--mute); margin: 0 0 16px; }
+  .hbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .hbar-label { font-size: 12px; font-weight: 500; width: 96px; flex-shrink: 0; color: var(--text); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar-track { flex: 1; height: 18px; background: var(--bg); border-radius: 4px; overflow: hidden; position: relative; }
+  .hbar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .hbar-val { font-size: 11px; color: var(--mute); width: 22px; flex-shrink: 0; }
+  .hbar-badges { display: flex; gap: 4px; flex-shrink: 0; }
+  .hbar-pip {
+    display: inline-block; width: 52px; height: 18px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; line-height: 18px; text-align: center;
+  }
+  .hbar-pip.good { background: var(--good-soft); color: var(--good); }
+  .hbar-pip.warn { background: var(--warn-soft); color: var(--warn); }
+  .hbar-pip.bad  { background: var(--bad-soft);  color: var(--bad);  }
+  .hbar-pip.neutral { background: var(--neutral-soft); color: var(--mute); }
+
+  /* heatmap */
+  .heatmap { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .heatmap th { font-size: 10px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 0 10px; text-align: center; }
+  .heatmap th.tool-th { text-align: right; padding-right: 12px; }
+  .heatmap td { padding: 4px 5px; text-align: center; }
+  .heatmap td.tool-td { text-align: right; padding-right: 12px; font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .heatmap tr:hover td { filter: brightness(0.95); }
+  .hm-cell {
+    display: inline-block; width: 110px; padding: 5px 10px;
+    border-radius: 6px; font-size: 10px; font-weight: 700; line-height: 1.2;
+  }
+  .hm-cell.good { background: var(--good-soft); color: var(--good); }
+  .hm-cell.warn { background: var(--warn-soft); color: var(--warn); }
+  .hm-cell.bad  { background: var(--bad-soft);  color: var(--bad);  }
+
+  /* ── DATABRICKS CONNECTOR ── */
+  .db-connector {
+    background: var(--sidebar);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .db-connector-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; cursor: pointer; user-select: none;
+  }
+  .db-connector-header:hover { background: var(--sidebar-hover); }
+  .db-connector-title { display: flex; align-items: center; gap: 10px; }
+  .db-logo {
+    width: 24px; height: 24px; border-radius: 5px;
+    background: #FF3621; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: white; flex-shrink: 0;
+  }
+  .db-connector-title span { font-size: 13px; font-weight: 600; color: white; }
+  .db-connector-title small { font-size: 11px; color: rgba(255,255,255,0.45); margin-left: 4px; }
+  .db-chevron { font-size: 11px; color: rgba(255,255,255,0.4); transition: transform 0.2s; }
+  .db-chevron.open { transform: rotate(180deg); }
+  .db-body { padding: 0 20px 20px; display: none; }
+  .db-body.open { display: block; }
+  .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  @media (max-width: 700px) { .db-grid { grid-template-columns: 1fr; } }
+  .db-field { display: flex; flex-direction: column; gap: 4px; }
+  .db-field label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.07em; }
+  .db-input {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px; padding: 8px 10px; color: white; font: inherit; font-size: 12px;
+    outline: none; transition: border-color 0.12s;
+  }
+  .db-input:focus { border-color: var(--purple); }
+  .db-input::placeholder { color: rgba(255,255,255,0.25); }
+  .db-query { width: 100%; resize: vertical; min-height: 70px; margin-bottom: 10px; font-family: 'Menlo', monospace; }
+  .db-footer { display: flex; align-items: center; gap: 12px; }
+  .db-run-btn {
+    appearance: none; border: 0; cursor: pointer;
+    background: var(--purple); color: white;
+    padding: 9px 20px; border-radius: 6px; font: inherit; font-size: 12px; font-weight: 600;
+    transition: background 0.12s; white-space: nowrap;
+  }
+  .db-run-btn:hover { background: var(--purple-dark); }
+  .db-run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .db-status { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .db-status.err { color: #FDA4A4; }
+  .db-status.ok  { color: #86EFAC; }
+
+  /* databricks result */
+  .db-result { margin-bottom: 20px; }
+  .db-result-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .db-result-table th { background: var(--bg); font-weight: 700; font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.06em; padding: 9px 12px; text-align: left; border-bottom: 2px solid var(--line); }
+  .db-result-table td { padding: 8px 12px; border-bottom: 1px solid var(--line); color: var(--text); }
+  .db-result-table tr:hover td { background: var(--purple-soft); }
+
+  /* stat cards */
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .stat-cards { grid-template-columns: 1fr 1fr; } }
+  .stat-card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.05);
+  }
+  .stat-card .sc-num { font-size: 28px; font-weight: 700; color: var(--purple); line-height: 1; }
+  .stat-card .sc-label { font-size: 11px; color: var(--mute); margin-top: 4px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -236,6 +346,7 @@
   <button class="tab active" data-view="tools">Tool deep-dive</button>
   <button class="tab" data-view="matrix">Comparison matrix</button>
   <button class="tab" data-view="insights">Cross-cutting insights</button>
+  <button class="tab" data-view="charts">Charts</button>
 </div>
 
 <main>
@@ -269,6 +380,83 @@
         </thead>
         <tbody id="matrix-body"></tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section id="view-charts" class="hidden">
+
+    <!-- DATABRICKS CONNECTOR -->
+    <div class="db-connector">
+      <div class="db-connector-header" id="db-toggle">
+        <div class="db-connector-title">
+          <div class="db-logo">D</div>
+          <span>Databricks</span>
+          <small>connect your own data</small>
+        </div>
+        <span class="db-chevron" id="db-chevron">▼</span>
+      </div>
+      <div class="db-body" id="db-body">
+        <div class="db-grid">
+          <div class="db-field">
+            <label>Workspace URL</label>
+            <input id="db-host" class="db-input" type="text" placeholder="https://adb-xxxx.azuredatabricks.net" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="db-field">
+            <label>SQL Warehouse ID</label>
+            <input id="db-warehouse" class="db-input" type="text" placeholder="abc1234def5678" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="db-field" style="grid-column:1/-1">
+            <label>Personal access token</label>
+            <input id="db-token" class="db-input" type="password" placeholder="dapi…" autocomplete="off">
+          </div>
+        </div>
+        <div class="db-field" style="margin-bottom:10px">
+          <label>SQL query</label>
+          <textarea id="db-query" class="db-input db-query" placeholder="SELECT category, COUNT(*) AS count FROM my_table GROUP BY category ORDER BY count DESC"></textarea>
+        </div>
+        <div class="db-footer">
+          <button class="db-run-btn" id="db-run">Run query</button>
+          <span class="db-status" id="db-status"></span>
+        </div>
+      </div>
+    </div>
+    <div id="db-result"></div>
+
+    <p class="section-intro">Scores derived from each tool's verdict across the three dimensions: good = 3 · warn = 2 · bad = 1. Max possible: 9.</p>
+    <div class="stat-cards" id="stat-cards"></div>
+    <div class="charts-full">
+      <div class="chart-panel">
+        <h3>Overall sharing UX score — all 12 tools ranked</h3>
+        <p class="chart-sub">Sorted by total score (permissions + public link + external guest)</p>
+        <div id="chart-overall"></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-panel">
+        <h3>Permissions model scores</h3>
+        <p class="chart-sub">How expressive and safe each tool's role model is</p>
+        <div id="chart-permissions"></div>
+      </div>
+      <div class="chart-panel">
+        <h3>Public / anonymous link scores</h3>
+        <p class="chart-sub">Ease and safety of sharing without an account</p>
+        <div id="chart-publiclink"></div>
+      </div>
+    </div>
+    <div class="charts-full">
+      <div class="chart-panel">
+        <h3>External &amp; guest collaboration scores</h3>
+        <p class="chart-sub">Free-guest economics, no-account editing, per-guest roles</p>
+        <div id="chart-external"></div>
+      </div>
+    </div>
+    <div class="charts-full">
+      <div class="chart-panel">
+        <h3>Dimension heatmap</h3>
+        <p class="chart-sub">All 12 tools × 3 dimensions at a glance</p>
+        <div style="overflow-x:auto"><table class="heatmap" id="chart-heatmap"></table></div>
+      </div>
     </div>
   </section>
 
@@ -503,6 +691,8 @@ function switchView(v) {
   document.getElementById("view-tools").classList.toggle("hidden", v !== "tools");
   document.getElementById("view-matrix").classList.toggle("hidden", v !== "matrix");
   document.getElementById("view-insights").classList.toggle("hidden", v !== "insights");
+  document.getElementById("view-charts").classList.toggle("hidden", v !== "charts");
+  if (v === "charts") renderCharts();
 }
 
 document.querySelectorAll(".viewtabs .tab").forEach(b => { b.onclick = () => switchView(b.dataset.view); });
@@ -524,6 +714,202 @@ document.querySelectorAll("#tool-filters button").forEach(b => {
 renderGrid();
 renderDetail();
 renderMatrix();
+
+const SCORE = { good: 3, warn: 2, bad: 1 };
+const SCORE_COLOR = { 3: '#16A34A', 2: '#D97706', 1: '#DC2626' };
+const SCORE_BG    = { 3: '#DCFCE7', 2: '#FEF3C7', 1: '#FEE2E2' };
+
+function toolScore(t) {
+  return SCORE[t.permissions.verdict] + SCORE[t.publicLink.verdict] + SCORE[t.externalGuest.verdict];
+}
+
+function barColor(score, max) {
+  const pct = score / max;
+  if (pct >= 0.88) return '#16A34A';
+  if (pct >= 0.75) return '#65A30D';
+  if (pct >= 0.62) return '#D97706';
+  return '#DC2626';
+}
+
+function hbarRow(label, score, max, pips) {
+  const pct = Math.round((score / max) * 100);
+  const color = barColor(score, max);
+  const pipHtml = pips.map(p => `<span class="hbar-pip ${p.v}">${p.label}</span>`).join('');
+  return `<div class="hbar-row">
+    <span class="hbar-label" title="${label}">${label}</span>
+    <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="hbar-val">${score}</span>
+    <div class="hbar-badges">${pipHtml}</div>
+  </div>`;
+}
+
+// ── DATABRICKS CONNECTOR ──
+document.getElementById('db-toggle').addEventListener('click', () => {
+  const body = document.getElementById('db-body');
+  const chevron = document.getElementById('db-chevron');
+  const open = body.classList.toggle('open');
+  chevron.classList.toggle('open', open);
+});
+
+async function pollStatement(host, token, statementId) {
+  const url = `${host}/api/2.0/sql/statements/${statementId}`;
+  for (let i = 0; i < 60; i++) {
+    await new Promise(r => setTimeout(r, 1000));
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (data.status?.state === 'SUCCEEDED') return data;
+    if (['FAILED', 'CANCELED', 'CLOSED'].includes(data.status?.state)) {
+      throw new Error(data.status?.error?.message || data.status?.state);
+    }
+  }
+  throw new Error('Query timed out after 60 seconds');
+}
+
+function renderDbResult(columns, rows) {
+  const el = document.getElementById('db-result');
+  const isBarCandidate = columns.length === 2 && rows.length > 0 && !isNaN(Number(rows[0][1]));
+
+  if (isBarCandidate) {
+    const vals = rows.map(r => Number(r[1]));
+    const max = Math.max(...vals);
+    const bars = rows.map(r => {
+      const v = Number(r[1]);
+      const pct = max > 0 ? Math.round((v / max) * 100) : 0;
+      const color = barColor(pct, 100);
+      return `<div class="hbar-row">
+        <span class="hbar-label" title="${r[0]}">${r[0]}</span>
+        <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="hbar-val">${v.toLocaleString()}</span>
+        <div class="hbar-badges"></div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div class="db-result chart-panel charts-full">
+      <h3>${columns[0]} vs ${columns[1]}</h3>
+      <p class="chart-sub">${rows.length} rows from Databricks</p>
+      ${bars}
+    </div>`;
+  } else {
+    const ths = columns.map(c => `<th>${c}</th>`).join('');
+    const trs = rows.map(r => `<tr>${r.map(v => `<td>${v ?? ''}</td>`).join('')}</tr>`).join('');
+    el.innerHTML = `<div class="db-result chart-panel charts-full" style="overflow-x:auto">
+      <h3>Query results</h3>
+      <p class="chart-sub">${rows.length} rows from Databricks</p>
+      <table class="db-result-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>
+    </div>`;
+  }
+}
+
+document.getElementById('db-run').addEventListener('click', async () => {
+  const host    = document.getElementById('db-host').value.trim().replace(/\/$/, '');
+  const token   = document.getElementById('db-token').value.trim();
+  const warehouse = document.getElementById('db-warehouse').value.trim();
+  const sql     = document.getElementById('db-query').value.trim();
+  const statusEl = document.getElementById('db-status');
+  const btn     = document.getElementById('db-run');
+
+  if (!host || !token || !warehouse || !sql) {
+    statusEl.className = 'db-status err';
+    statusEl.textContent = 'Fill in all fields before running.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.className = 'db-status';
+  statusEl.textContent = 'Running…';
+  document.getElementById('db-result').innerHTML = '';
+
+  try {
+    const res = await fetch(`${host}/api/2.0/sql/statements`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ warehouse_id: warehouse, statement: sql, wait_timeout: '30s', on_wait_timeout: 'CONTINUE' })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
+
+    let data = await res.json();
+    if (data.status?.state === 'RUNNING' || data.status?.state === 'PENDING') {
+      statusEl.textContent = 'Waiting for results…';
+      data = await pollStatement(host, token, data.statement_id);
+    }
+
+    const columns = data.manifest?.schema?.columns?.map(c => c.name) ?? [];
+    const rows    = data.result?.data_array ?? [];
+    renderDbResult(columns, rows);
+
+    statusEl.className = 'db-status ok';
+    statusEl.textContent = `${rows.length} rows · ${columns.length} columns`;
+  } catch (e) {
+    statusEl.className = 'db-status err';
+    statusEl.textContent = e.message;
+    document.getElementById('db-result').innerHTML = '';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+let chartsRendered = false;
+function renderCharts() {
+  if (chartsRendered) return;
+  chartsRendered = true;
+
+  // stat cards
+  const good9 = TOOLS.filter(t => toolScore(t) === 9).length;
+  const goodPct = Math.round((TOOLS.filter(t => toolScore(t) >= 8).length / TOOLS.length) * 100);
+  const badCount = TOOLS.filter(t => toolScore(t) <= 5).length;
+  const avgScore = (TOOLS.reduce((s,t) => s + toolScore(t), 0) / TOOLS.length).toFixed(1);
+  document.getElementById('stat-cards').innerHTML = `
+    <div class="stat-card"><div class="sc-num">${good9}</div><div class="sc-label">Tools with a perfect 9/9 score</div></div>
+    <div class="stat-card"><div class="sc-num">${goodPct}%</div><div class="sc-label">Tools scoring 8 or above</div></div>
+    <div class="stat-card"><div class="sc-num">${badCount}</div><div class="sc-label">Tools scoring 5 or below</div></div>
+    <div class="stat-card"><div class="sc-num">${avgScore}</div><div class="sc-label">Average overall score (max 9)</div></div>`;
+
+  // overall chart
+  const sorted = [...TOOLS].sort((a,b) => toolScore(b) - toolScore(a));
+  document.getElementById('chart-overall').innerHTML = sorted.map(t => {
+    const s = toolScore(t);
+    const pips = [
+      { v: t.permissions.verdict, label: 'Perm' },
+      { v: t.publicLink.verdict,  label: 'Link' },
+      { v: t.externalGuest.verdict, label: 'Guest' },
+    ];
+    return hbarRow(t.name, s, 9, pips);
+  }).join('');
+
+  // per-dimension charts
+  function dimChart(containerId, dimKey) {
+    const byDim = [...TOOLS].sort((a,b) => SCORE[b[dimKey].verdict] - SCORE[a[dimKey].verdict]);
+    document.getElementById(containerId).innerHTML = byDim.map(t => {
+      const s = SCORE[t[dimKey].verdict];
+      return hbarRow(t.name, s, 3, [{ v: t[dimKey].verdict, label: t[dimKey].verdict.toUpperCase() }]);
+    }).join('');
+  }
+  dimChart('chart-permissions', 'permissions');
+  dimChart('chart-publiclink', 'publicLink');
+  dimChart('chart-external', 'externalGuest');
+
+  // heatmap
+  const hm = document.getElementById('chart-heatmap');
+  hm.innerHTML = `<thead><tr>
+    <th class="tool-th">Tool</th>
+    <th>Permissions model</th>
+    <th>Public / anon link</th>
+    <th>External &amp; guest</th>
+    <th>Score</th>
+  </tr></thead><tbody>${TOOLS.map(t => {
+    const cell = (dim) => `<td><span class="hm-cell ${dim.verdict}">${dim.verdictLabel}</span></td>`;
+    const s = toolScore(t);
+    const sc = barColor(s, 9);
+    return `<tr>
+      <td class="tool-td">${t.name}</td>
+      ${cell(t.permissions)}${cell(t.publicLink)}${cell(t.externalGuest)}
+      <td><strong style="color:${sc}">${s}/9</strong></td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
 </script>
 
 </body>
