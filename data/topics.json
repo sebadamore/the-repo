@@ -9,5 +9,27 @@
     "builtIn": true,
     "builtInUrl": "/artifact/index.html",
     "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "sign-up",
+    "name": "Sign up",
+    "icon": "📋",
+    "description": "",
+    "builtIn": false,
+    "appCount": 1,
+    "dimensionCount": 0,
+    "createdAt": "2026-04-24T13:18:38.645Z",
+    "updatedAt": "2026-04-24T13:18:51.522Z"
+  },
+  {
+    "id": "sign-up-sign-in",
+    "name": "Sign-up / Sign-in",
+    "icon": "🔐",
+    "description": "How 12 SaaS tools handle account creation, authentication options, friction during sign-up, and the post-signup onboarding into the product. Same tools as the sharing benchmark.",
+    "builtIn": false,
+    "appCount": 12,
+    "dimensionCount": 3,
+    "createdAt": "2026-04-24T14:28:31.839Z",
+    "updatedAt": "2026-04-24T14:28:31.884Z"
   }
 ]

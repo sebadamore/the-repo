@@ -1,0 +1,19 @@
+{
+  "id": "sign-up",
+  "name": "Sign up",
+  "icon": "📋",
+  "description": "",
+  "dimensions": [],
+  "apps": [
+    {
+      "id": "notion-4697f2",
+      "name": "Notion",
+      "url": "notion.so",
+      "category": "",
+      "findings": {},
+      "createdAt": "2026-04-24T13:18:51.522Z"
+    }
+  ],
+  "createdAt": "2026-04-24T13:18:38.645Z",
+  "updatedAt": "2026-04-24T13:18:51.522Z"
+}
