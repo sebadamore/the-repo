@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Topic — UX Research Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7B46F6;
+    --purple-dark: #6030E0;
+    --purple-soft: #F0EBFF;
+    --purple-mid: #C4B0FB;
+    --bg: #F7F6FB;
+    --panel: #FFFFFF;
+    --sidebar: #1A1A2E;
+    --sidebar-hover: #252540;
+    --line: #E8E5F0;
+    --line-strong: #D1CBEA;
+    --text: #1A1A2E;
+    --mute: #6B6987;
+    --mute2: #9E9CB8;
+    --good: #16A34A;
+    --good-soft: #DCFCE7;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --bad: #DC2626;
+    --bad-soft: #FEE2E2;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 'Inter', -apple-system, sans-serif; }
+  a { color: var(--purple); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  aside.sidebar {
+    width: 220px; flex-shrink: 0; background: var(--sidebar);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-brand .logo {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-brand .brand-name { color: #fff; font-weight: 600; font-size: 14px; }
+  .sidebar-brand .brand-sub { color: var(--purple-mid); font-size: 11px; margin-top: 1px; }
+  .sidebar-nav { padding: 12px 0; flex: 1; }
+  .nav-label {
+    padding: 8px 20px 4px; font-size: 10px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.35);
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 20px;
+    color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer;
+    transition: background .15s, color .15s; text-decoration: none;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: #fff; text-decoration: none; }
+  .nav-item.active { background: rgba(123,70,246,0.25); color: var(--purple-mid); font-weight: 600; }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    height: 56px; background: var(--panel); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; padding: 0 28px; gap: 12px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-back {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--mute); font-size: 13px; cursor: pointer;
+    text-decoration: none; transition: color .15s;
+  }
+  .topbar-back:hover { color: var(--purple); }
+  .topbar-title { font-weight: 600; font-size: 15px; flex: 1; }
+  .topbar-icon { font-size: 18px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 7px; font-size: 13px;
+    font-weight: 500; cursor: pointer; border: none; transition: background .15s;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-ghost { background: transparent; color: var(--mute); border: 1px solid var(--line-strong); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-danger { background: transparent; color: var(--bad); border: 1px solid #FECACA; }
+  .btn-danger:hover { background: var(--bad-soft); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); padding: 0 28px; background: var(--panel); }
+  .tab {
+    padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--mute);
+    cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: color .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  /* ── CONTENT ── */
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* ── TOPIC HEADER ── */
+  .topic-header {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 24px; margin-bottom: 24px; display: flex; gap: 20px; align-items: flex-start;
+  }
+  .topic-header-icon {
+    width: 56px; height: 56px; border-radius: 14px; background: var(--purple-soft);
+    font-size: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .topic-header-body { flex: 1; }
+  .topic-header-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .topic-header-desc { color: var(--mute); font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
+  .topic-meta-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .meta-chip {
+    font-size: 11px; color: var(--mute); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 20px; padding: 3px 10px;
+  }
+  .dim-chip-small {
+    font-size: 11px; font-weight: 500; background: var(--purple-soft); color: var(--purple);
+    border-radius: 20px; padding: 3px 10px;
+  }
+
+  /* ── APP GRID VIEW ── */
+  .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .app-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden; transition: box-shadow .15s;
+  }
+  .app-card:hover { box-shadow: 0 4px 16px rgba(123,70,246,.1); }
+  .app-card-head {
+    padding: 16px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .app-avatar {
+    width: 36px; height: 36px; border-radius: 8px; background: var(--purple-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: var(--purple); flex-shrink: 0;
+  }
+  .app-name { font-weight: 600; font-size: 13px; }
+  .app-url { font-size: 11px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .app-card-body { padding: 14px 16px; }
+  .app-dim-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .app-dim-label { font-size: 12px; color: var(--mute); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .verdict-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; border-radius: 6px; padding: 2px 8px; cursor: pointer;
+  }
+  .verdict-badge.good  { background: var(--good-soft); color: var(--good); }
+  .verdict-badge.warn  { background: var(--warn-soft); color: var(--warn); }
+  .verdict-badge.bad   { background: var(--bad-soft);  color: var(--bad); }
+  .verdict-badge.none  { background: var(--bg); color: var(--mute2); border: 1px solid var(--line); }
+  .app-card-actions {
+    padding: 10px 16px; display: flex; gap: 8px;
+    border-top: 1px solid var(--line); background: var(--bg);
+  }
+
+  /* ── MATRIX VIEW ── */
+  .matrix-wrap { overflow-x: auto; }
+  .matrix {
+    border-collapse: collapse; width: 100%; min-width: 600px;
+    background: var(--panel); border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .matrix th {
+    padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--mute);
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    text-align: left; white-space: nowrap;
+  }
+  .matrix td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: 13px; }
+  .matrix tr:last-child td { border-bottom: none; }
+  .matrix-app-cell { display: flex; align-items: center; gap: 10px; }
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .score-bar { height: 6px; border-radius: 3px; background: var(--line); flex: 1; min-width: 60px; }
+  .score-bar-fill { height: 100%; border-radius: 3px; background: var(--purple); }
+
+  /* ── SCREENSHOTS VIEW ── */
+  .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .app-screenshot-section { margin-bottom: 28px; }
+  .app-screenshot-title {
+    font-size: 13px; font-weight: 600; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .screenshot-count { font-size: 11px; color: var(--mute2); font-weight: 400; }
+  .shot-figures { display: flex; flex-wrap: wrap; gap: 10px; }
+  .shot-fig {
+    position: relative; cursor: pointer;
+    border-radius: 8px; overflow: hidden; border: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .shot-fig img { display: block; width: 140px; height: 90px; object-fit: cover; }
+  .shot-fig:hover .shot-del { opacity: 1; }
+  .shot-del {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(0,0,0,.6); color: #fff; border: none;
+    border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+    cursor: pointer; opacity: 0; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center; font-family: inherit;
+  }
+  .drop-zone {
+    border: 2px dashed var(--line-strong); border-radius: 8px; padding: 16px;
+    text-align: center; font-size: 12px; color: var(--mute2); cursor: pointer;
+    transition: border-color .15s, background .15s; margin-top: 8px;
+  }
+  .drop-zone.drag-over { border-color: var(--purple); background: var(--purple-soft); }
+  .drop-zone input { display: none; }
+
+  /* ── LIGHTBOX ── */
+  .lb-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.88); z-index: 300;
+    align-items: center; justify-content: center;
+  }
+  .lb-overlay.open { display: flex; }
+  .lb-img-wrap { max-width: 90vw; max-height: 88vh; position: relative; }
+  .lb-img-wrap img { display: block; max-width: 90vw; max-height: 88vh; border-radius: 8px; object-fit: contain; transition: opacity .18s; }
+  .lb-close {
+    position: fixed; top: 18px; right: 24px; background: none; border: none;
+    color: rgba(255,255,255,.7); font-size: 28px; cursor: pointer; z-index: 10;
+  }
+  .lb-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,.1); border: none; color: #fff;
+    font-size: 28px; width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background .15s;
+  }
+  .lb-arrow:hover { background: rgba(255,255,255,.25); }
+  .lb-arrow.prev { left: 16px; }
+  .lb-arrow.next { right: 16px; }
+  .lb-caption {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,.75); font-size: 13px; text-align: center;
+    max-width: 600px; padding: 0 20px;
+  }
+  .lb-counter { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; }
+
+  /* ── MODALS (app / finding / edit topic) ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel); border-radius: 16px; padding: 32px;
+    width: 480px; max-width: calc(100vw - 40px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.25);
+    animation: modal-in .18s ease; max-height: 92vh; overflow-y: auto;
+  }
+  @keyframes modal-in { from { opacity:0; transform: scale(.96) translateY(8px); } to { opacity:1; transform: none; } }
+  .modal h2 { font-size: 17px; font-weight: 700; margin: 0 0 20px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--mute); }
+  .field input, .field textarea, .field select {
+    width: 100%; border: 1px solid var(--line-strong); border-radius: 8px;
+    padding: 8px 12px; font: 14px 'Inter', sans-serif; color: var(--text);
+    background: var(--bg); outline: none; transition: border .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--purple); }
+  .field textarea { resize: vertical; min-height: 64px; }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px;
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+
+  /* ── VERDICT PICKER ── */
+  .verdict-picker { display: flex; gap: 8px; margin-top: 4px; }
+  .vpick {
+    flex: 1; padding: 8px; border-radius: 8px; border: 2px solid var(--line);
+    cursor: pointer; text-align: center; font-size: 12px; font-weight: 600; transition: all .15s;
+    background: none; font-family: inherit;
+  }
+  .vpick[data-v="good"]  { color: var(--good); }
+  .vpick[data-v="warn"]  { color: var(--warn); }
+  .vpick[data-v="bad"]   { color: var(--bad); }
+  .vpick[data-v="none"]  { color: var(--mute2); }
+  .vpick.selected[data-v="good"]  { background: var(--good-soft); border-color: var(--good); }
+  .vpick.selected[data-v="warn"]  { background: var(--warn-soft); border-color: var(--warn); }
+  .vpick.selected[data-v="bad"]   { background: var(--bad-soft);  border-color: var(--bad); }
+  .vpick.selected[data-v="none"]  { background: var(--bg); border-color: var(--mute2); }
+
+  /* ── EMPTY / LOADING ── */
+  .empty { text-align: center; padding: 60px 20px; color: var(--mute); }
+  .empty .icon { font-size: 36px; margin-bottom: 10px; }
+  .loading { color: var(--mute2); padding: 40px; text-align: center; }
+
+  /* ── ADD APP inline card ── */
+  .add-app-card {
+    border: 2px dashed var(--line-strong); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    min-height: 160px; color: var(--mute); font-size: 13px; font-weight: 500;
+    flex-direction: column; gap: 8px;
+  }
+  .add-app-card:hover { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .add-app-card .plus { font-size: 26px; font-weight: 300; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">R</div>
+      <div>
+        <div class="brand-name">Research Hub</div>
+        <div class="brand-sub">UX Benchmark Platform</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-item" href="platform.html">
+        <span class="icon">🗂</span> All Topics
+      </a>
+      <div class="nav-label" style="margin-top:12px">Topics</div>
+      <div id="sidebar-topics"></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <a class="topbar-back" href="platform.html">← Back</a>
+      <span class="topbar-icon" id="topbar-icon">📋</span>
+      <span class="topbar-title" id="topbar-title">Loading…</span>
+      <button class="btn btn-ghost btn-sm" onclick="openEditModal()">Edit Topic</button>
+      <button class="btn btn-primary" onclick="openAppModal()">+ Add App</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-view="apps" onclick="switchView('apps')">Apps</button>
+      <button class="tab" data-view="matrix" onclick="switchView('matrix')">Matrix</button>
+      <button class="tab" data-view="screenshots" onclick="switchView('screenshots')">Screenshots</button>
+    </div>
+
+    <div class="content">
+      <!-- TOPIC HEADER -->
+      <div class="topic-header" id="topic-header" style="display:none">
+        <div class="topic-header-icon" id="th-icon">📋</div>
+        <div class="topic-header-body">
+          <div class="topic-header-name" id="th-name"></div>
+          <div class="topic-header-desc" id="th-desc"></div>
+          <div class="topic-meta-chips" id="th-dims"></div>
+        </div>
+      </div>
+
+      <!-- VIEWS -->
+      <div id="view-apps"></div>
+      <div id="view-matrix" style="display:none"></div>
+      <div id="view-screenshots" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb">
+  <button class="lb-close" onclick="lbClose()">×</button>
+  <button class="lb-arrow prev" id="lb-prev" onclick="lbMove(-1)">‹</button>
+  <div class="lb-img-wrap"><img id="lb-img" src="" alt=""></div>
+  <button class="lb-arrow next" id="lb-next" onclick="lbMove(1)">›</button>
+  <div class="lb-caption">
+    <div id="lb-cap"></div>
+    <div class="lb-counter" id="lb-count"></div>
+  </div>
+</div>
+
+<!-- ADD / EDIT APP MODAL -->
+<div class="modal-overlay" id="app-modal" onclick="if(event.target===this)closeAppModal()">
+  <div class="modal">
+    <h2 id="app-modal-title">Add App</h2>
+    <div class="field">
+      <label>App / Tool name</label>
+      <input type="text" id="f-app-name" placeholder="e.g. Notion">
+    </div>
+    <div class="field">
+      <label>URL <span style="color:var(--mute2);font-weight:400">(optional)</span></label>
+      <input type="url" id="f-app-url" placeholder="https://notion.so">
+    </div>
+    <div class="field">
+      <label>Category <span style="color:var(--mute2);font-weight:400">(optional)</span></label>
+      <input type="text" id="f-app-cat" placeholder="e.g. Productivity">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="app-delete-btn" style="margin-right:auto;display:none" onclick="deleteApp()">Delete app</button>
+      <button class="btn btn-ghost" onclick="closeAppModal()">Cancel</button>
+      <button class="btn btn-primary" id="app-save-btn" onclick="saveApp()">Add App</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINDING MODAL -->
+<div class="modal-overlay" id="finding-modal" onclick="if(event.target===this)closeFindingModal()">
+  <div class="modal">
+    <h2 id="finding-modal-title">Edit Finding</h2>
+    <div class="field">
+      <label>Verdict</label>
+      <div class="verdict-picker">
+        <button class="vpick" data-v="good" onclick="selectVerdict('good')">✅ Good</button>
+        <button class="vpick" data-v="warn" onclick="selectVerdict('warn')">⚠️ Warn</button>
+        <button class="vpick" data-v="bad"  onclick="selectVerdict('bad')">❌ Bad</button>
+        <button class="vpick" data-v="none" onclick="selectVerdict('none')">– None</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="f-finding-notes" rows="4" placeholder="Describe what you observed…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeFindingModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFinding()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TOPIC MODAL -->
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <h2>Edit Topic</h2>
+    <div class="field" style="display:flex;gap:10px">
+      <div style="width:64px">
+        <label>Icon</label>
+        <input type="text" id="ef-icon" maxlength="4" placeholder="📋">
+      </div>
+      <div style="flex:1">
+        <label>Name</label>
+        <input type="text" id="ef-name">
+      </div>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="ef-desc" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label>Dimensions</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="ef-dim-input" placeholder="Add dimension…" onkeydown="if(event.key==='Enter'){event.preventDefault();editAddDim();}">
+        <button class="btn btn-ghost btn-sm" onclick="editAddDim()">Add</button>
+      </div>
+      <div id="ef-dims-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditTopic()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const TOPIC_ID = params.get('id');
+let topic = null;
+let activeView = 'apps';
+let editingAppId = null;
+let findingCtx = null; // { appId, dimId }
+let findingVerdict = 'none';
+let editDims = [];
+// lightbox
+let lbImages = [];
+let lbIdx = 0;
+
+if (!TOPIC_ID) { location.href = 'platform.html'; }
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function apiFetch(url, opts = {}) {
+  const r = await fetch(url, opts);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function loadTopic() {
+  topic = await apiFetch(`/api/topics/${TOPIC_ID}`);
+  renderAll();
+}
+
+async function loadAllTopics() {
+  try {
+    const list = await apiFetch('/api/topics');
+    const sidebar = document.getElementById('sidebar-topics');
+    sidebar.innerHTML = list.map(t => `
+      <a class="nav-item${t.id === TOPIC_ID ? ' active' : ''}" href="${t.builtIn && t.builtInUrl ? t.builtInUrl : 'topic.html?id='+t.id}">
+        <span class="icon">${t.icon || '📋'}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
+      </a>
+    `).join('');
+  } catch(_) {}
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderAll() {
+  document.title = topic.name + ' — UX Research';
+  document.getElementById('topbar-icon').textContent = topic.icon || '📋';
+  document.getElementById('topbar-title').textContent = topic.name;
+
+  const header = document.getElementById('topic-header');
+  header.style.display = '';
+  document.getElementById('th-icon').textContent = topic.icon || '📋';
+  document.getElementById('th-name').textContent = topic.name;
+  document.getElementById('th-desc').textContent = topic.description || '';
+  const dims = topic.dimensions || [];
+  document.getElementById('th-dims').innerHTML =
+    dims.map(d => `<span class="dim-chip-small">${esc(d.name)}</span>`).join('') +
+    `<span class="meta-chip">🛠 ${(topic.apps||[]).length} apps</span>`;
+
+  if (activeView === 'apps') renderApps();
+  else if (activeView === 'matrix') renderMatrix();
+  else if (activeView === 'screenshots') renderScreenshots();
+}
+
+function switchView(v) {
+  activeView = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
+  document.getElementById('view-apps').style.display       = v === 'apps'        ? '' : 'none';
+  document.getElementById('view-matrix').style.display     = v === 'matrix'      ? '' : 'none';
+  document.getElementById('view-screenshots').style.display = v === 'screenshots' ? '' : 'none';
+  if (topic) {
+    if (v === 'apps') renderApps();
+    else if (v === 'matrix') renderMatrix();
+    else if (v === 'screenshots') renderScreenshots();
+  }
+}
+
+// ── APPS VIEW ─────────────────────────────────────────────────────────────────
+function renderApps() {
+  const apps = topic.apps || [];
+  const dims = topic.dimensions || [];
+  const el = document.getElementById('view-apps');
+
+  if (apps.length === 0) {
+    el.innerHTML = `
+      <div class="app-grid">
+        <div class="empty" style="grid-column:1/-1">
+          <div class="icon">🛠</div>
+          <p>No apps yet. Add the first one to start benchmarking.</p>
+        </div>
+        <div class="add-app-card" onclick="openAppModal()"><div class="plus">+</div><div>Add App</div></div>
+      </div>`;
+    return;
+  }
+
+  const cards = apps.map(app => {
+    const dimRows = dims.map(d => {
+      const f = (app.findings || {})[d.id] || {};
+      const v = f.verdict || 'none';
+      return `<div class="app-dim-row">
+        <span class="app-dim-label" title="${esc(d.name)}">${esc(d.name)}</span>
+        <button class="verdict-badge ${v}" onclick="openFindingModal('${app.id}','${d.id}')">${verdictLabel(v)}</button>
+      </div>`;
+    }).join('');
+
+    return `<div class="app-card">
+      <div class="app-card-head">
+        <div class="app-avatar">${initials(app.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="app-name">${esc(app.name)}</div>
+          ${app.url ? `<div class="app-url"><a href="${esc(app.url)}" target="_blank" rel="noopener">${esc(app.url)}</a></div>` : ''}
+        </div>
+      </div>
+      <div class="app-card-body">
+        ${dimRows || '<div style="color:var(--mute2);font-size:12px">No dimensions defined yet.</div>'}
+      </div>
+      <div class="app-card-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openAppModal('${app.id}')">Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchView('screenshots');highlightApp('${app.id}')">📷 Screenshots</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="app-grid">${cards}
+    <div class="add-app-card" onclick="openAppModal()"><div class="plus">+</div><div>Add App</div></div>
+  </div>`;
+}
+
+// ── MATRIX VIEW ───────────────────────────────────────────────────────────────
+function renderMatrix() {
+  const apps = topic.apps || [];
+  const dims = topic.dimensions || [];
+  const el = document.getElementById('view-matrix');
+
+  if (apps.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="icon">📊</div><p>Add apps first to see the matrix.</p></div>';
+    return;
+  }
+
+  const maxScore = dims.length * 3;
+
+  const dimHeaders = dims.map(d => `<th>${esc(d.name)}</th>`).join('');
+
+  const rows = apps.map(app => {
+    const findings = app.findings || {};
+    let score = 0;
+    const dimCells = dims.map(d => {
+      const f = findings[d.id] || {};
+      const v = f.verdict || 'none';
+      if (v === 'good') score += 3;
+      else if (v === 'warn') score += 2;
+      else if (v === 'bad') score += 1;
+      const note = f.notes ? `title="${esc(f.notes)}"` : '';
+      return `<td><button class="verdict-badge ${v}" ${note} onclick="openFindingModal('${app.id}','${d.id}')">${verdictLabel(v)}</button></td>`;
+    }).join('');
+
+    const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+
+    return `<tr>
+      <td>
+        <div class="matrix-app-cell">
+          <div class="app-avatar" style="width:28px;height:28px;font-size:12px">${initials(app.name)}</div>
+          <div>
+            <div style="font-weight:600;font-size:13px">${esc(app.name)}</div>
+            ${app.category ? `<div style="font-size:11px;color:var(--mute2)">${esc(app.category)}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      ${dimCells}
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+          <span style="font-size:12px;color:var(--mute);white-space:nowrap">${score}/${maxScore}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `<div class="matrix-wrap"><table class="matrix">
+    <thead><tr>
+      <th style="min-width:160px">App</th>
+      ${dimHeaders}
+      <th style="min-width:120px">Score</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+// ── SCREENSHOTS VIEW ──────────────────────────────────────────────────────────
+async function renderScreenshots() {
+  const apps = topic.apps || [];
+  const el = document.getElementById('view-screenshots');
+
+  if (apps.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="icon">📷</div><p>Add apps first to manage screenshots.</p></div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="loading">Loading screenshots…</div>';
+
+  const sections = await Promise.all(apps.map(app => buildScreenshotSection(app)));
+  el.innerHTML = sections.join('');
+
+  // wire up drop zones
+  apps.forEach(app => initDropZone(app));
+  // wire lightbox clicks
+  wireImageClicks(el);
+}
+
+async function buildScreenshotSection(app) {
+  let shots = [];
+  try {
+    shots = await apiFetch(`/api/topics/${TOPIC_ID}/apps/${app.id}/screenshots`);
+  } catch(_) {}
+
+  const figures = shots.map(s => shotFig(app.id, s)).join('');
+
+  return `<div class="app-screenshot-section" id="ss-${app.id}">
+    <div class="app-screenshot-title">
+      <div class="app-avatar" style="width:28px;height:28px;font-size:12px">${initials(app.name)}</div>
+      ${esc(app.name)}
+      <span class="screenshot-count">${shots.length} screenshot${shots.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="shot-figures" id="sf-${app.id}">${figures}</div>
+    <div class="drop-zone" id="dz-${app.id}" onclick="document.getElementById('fi-${app.id}').click()">
+      <input type="file" id="fi-${app.id}" accept="image/*" multiple>
+      Drop screenshots here or click to upload
+    </div>
+  </div>`;
+}
+
+function shotFig(appId, shot) {
+  return `<div class="shot-fig" data-url="${esc(shot.url)}" data-file="${esc(shot.file)}" data-app="${appId}">
+    <img src="${esc(shot.url)}" alt="${esc(shot.file)}" loading="lazy">
+    <button class="shot-del" onclick="deleteShot(event,'${appId}','${esc(shot.file)}')">×</button>
+  </div>`;
+}
+
+function initDropZone(app) {
+  const dz = document.getElementById(`dz-${app.id}`);
+  const fi = document.getElementById(`fi-${app.id}`);
+  if (!dz || !fi) return;
+
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    uploadFiles(app.id, [...e.dataTransfer.files]);
+  });
+  fi.addEventListener('change', () => {
+    if (fi.files.length) uploadFiles(app.id, [...fi.files]);
+    fi.value = '';
+  });
+}
+
+async function uploadFiles(appId, files) {
+  const fd = new FormData();
+  files.forEach(f => fd.append('files', f));
+  try {
+    const res = await fetch(`/api/topics/${TOPIC_ID}/apps/${appId}/screenshots`, { method: 'POST', body: fd });
+    const data = await res.json();
+    // refresh that section
+    const sf = document.getElementById(`sf-${appId}`);
+    if (sf && data.screenshots) {
+      sf.innerHTML = data.screenshots.map(s => shotFig(appId, s)).join('');
+      wireImageClicks(sf);
+    }
+  } catch(e) { alert('Upload failed: ' + e.message); }
+}
+
+async function deleteShot(e, appId, file) {
+  e.stopPropagation();
+  if (!confirm('Delete this screenshot?')) return;
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}/screenshots/${encodeURIComponent(file)}`, { method: 'DELETE' });
+    e.target.closest('.shot-fig').remove();
+  } catch(err) { alert('Delete failed: ' + err.message); }
+}
+
+function wireImageClicks(container) {
+  const figs = [...(container.querySelectorAll ? container : document).querySelectorAll('.shot-fig')];
+  figs.forEach((fig, i) => {
+    fig.onclick = (e) => {
+      if (e.target.classList.contains('shot-del')) return;
+      const parent = fig.closest('.shot-figures') || document;
+      const siblings = [...parent.querySelectorAll('.shot-fig')];
+      const idx = siblings.indexOf(fig);
+      const images = siblings.map(f => ({
+        url: f.querySelector('img').src,
+        cap: f.dataset.app ? `${f.dataset.app} — ${f.dataset.file}` : f.dataset.file || ''
+      }));
+      lbOpen(images, Math.max(0, idx));
+    };
+  });
+}
+
+function highlightApp(appId) {
+  // called after switching to screenshots view
+  setTimeout(() => {
+    const el = document.getElementById(`ss-${appId}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────────────────────────────
+function lbOpen(images, idx) {
+  lbImages = images;
+  lbIdx = idx;
+  document.getElementById('lb').classList.add('open');
+  lbShow();
+}
+
+function lbClose() {
+  document.getElementById('lb').classList.remove('open');
+}
+
+function lbMove(dir) {
+  lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
+  lbShow();
+}
+
+function lbShow() {
+  const img = document.getElementById('lb-img');
+  img.style.opacity = '0';
+  img.src = lbImages[lbIdx].url;
+  img.onload = () => { img.style.opacity = '1'; };
+  document.getElementById('lb-cap').textContent = lbImages[lbIdx].cap || '';
+  document.getElementById('lb-count').textContent = `${lbIdx + 1} / ${lbImages.length}`;
+  document.getElementById('lb-prev').style.display = lbImages.length < 2 ? 'none' : '';
+  document.getElementById('lb-next').style.display = lbImages.length < 2 ? 'none' : '';
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb').classList.contains('open')) return;
+  if (e.key === 'Escape') lbClose();
+  else if (e.key === 'ArrowLeft') lbMove(-1);
+  else if (e.key === 'ArrowRight') lbMove(1);
+});
+
+// ── APP MODAL ─────────────────────────────────────────────────────────────────
+function openAppModal(appId) {
+  editingAppId = appId || null;
+  const app = appId ? (topic.apps || []).find(a => a.id === appId) : null;
+  document.getElementById('app-modal-title').textContent = appId ? 'Edit App' : 'Add App';
+  document.getElementById('f-app-name').value = app ? app.name : '';
+  document.getElementById('f-app-url').value = app ? (app.url || '') : '';
+  document.getElementById('f-app-cat').value = app ? (app.category || '') : '';
+  document.getElementById('app-save-btn').textContent = appId ? 'Save Changes' : 'Add App';
+  document.getElementById('app-delete-btn').style.display = appId ? '' : 'none';
+  document.getElementById('app-modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-app-name').focus(), 50);
+}
+
+function closeAppModal() {
+  document.getElementById('app-modal').classList.remove('open');
+  editingAppId = null;
+}
+
+async function saveApp() {
+  const name = document.getElementById('f-app-name').value.trim();
+  if (!name) { document.getElementById('f-app-name').focus(); return; }
+  const url = document.getElementById('f-app-url').value.trim();
+  const category = document.getElementById('f-app-cat').value.trim();
+  const btn = document.getElementById('app-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    if (editingAppId) {
+      await apiFetch(`/api/topics/${TOPIC_ID}/apps/${editingAppId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, url, category })
+      });
+    } else {
+      await apiFetch(`/api/topics/${TOPIC_ID}/apps`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, url, category })
+      });
+    }
+    closeAppModal();
+    await loadTopic();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingAppId ? 'Save Changes' : 'Add App';
+  }
+}
+
+async function deleteApp() {
+  if (!editingAppId || !confirm('Remove this app and all its data?')) return;
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${editingAppId}`, { method: 'DELETE' });
+    closeAppModal();
+    await loadTopic();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── FINDING MODAL ─────────────────────────────────────────────────────────────
+function openFindingModal(appId, dimId) {
+  findingCtx = { appId, dimId };
+  const app = (topic.apps || []).find(a => a.id === appId);
+  const dim = (topic.dimensions || []).find(d => d.id === dimId);
+  document.getElementById('finding-modal-title').textContent =
+    `${app ? app.name : appId} — ${dim ? dim.name : dimId}`;
+  const f = (app && app.findings && app.findings[dimId]) || {};
+  findingVerdict = f.verdict || 'none';
+  document.getElementById('f-finding-notes').value = f.notes || '';
+  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === findingVerdict));
+  document.getElementById('finding-modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-finding-notes').focus(), 50);
+}
+
+function closeFindingModal() {
+  document.getElementById('finding-modal').classList.remove('open');
+  findingCtx = null;
+}
+
+function selectVerdict(v) {
+  findingVerdict = v;
+  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === v));
+}
+
+async function saveFinding() {
+  if (!findingCtx) return;
+  const { appId, dimId } = findingCtx;
+  const notes = document.getElementById('f-finding-notes').value.trim();
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ findings: { [dimId]: { verdict: findingVerdict, notes } } })
+    });
+    closeFindingModal();
+    await loadTopic();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── EDIT TOPIC MODAL ──────────────────────────────────────────────────────────
+function openEditModal() {
+  document.getElementById('ef-icon').value = topic.icon || '📋';
+  document.getElementById('ef-name').value = topic.name || '';
+  document.getElementById('ef-desc').value = topic.description || '';
+  editDims = (topic.dimensions || []).map(d => ({ ...d }));
+  renderEditDims();
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function editAddDim() {
+  const input = document.getElementById('ef-dim-input');
+  const v = input.value.trim();
+  if (!v) return;
+  const id = v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40);
+  editDims.push({ id, name: v });
+  input.value = '';
+  renderEditDims();
+}
+
+function editRemoveDim(i) {
+  editDims.splice(i, 1);
+  renderEditDims();
+}
+
+function renderEditDims() {
+  document.getElementById('ef-dims-list').innerHTML = editDims.map((d, i) => `
+    <div style="display:flex;align-items:center;gap:4px;background:var(--purple-soft);color:var(--purple);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500">
+      ${esc(d.name)}
+      <button style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--purple);padding:0" onclick="editRemoveDim(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+async function saveEditTopic() {
+  const name = document.getElementById('ef-name').value.trim();
+  if (!name) { document.getElementById('ef-name').focus(); return; }
+  const icon = document.getElementById('ef-icon').value.trim() || '📋';
+  const description = document.getElementById('ef-desc').value.trim();
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, icon, description, dimensions: editDims })
+    });
+    closeEditModal();
+    await loadTopic();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function initials(name) {
+  return (name || '?').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function verdictLabel(v) {
+  return { good: '✅ Good', warn: '⚠️ Warn', bad: '❌ Bad', none: '– Rate' }[v] || '– Rate';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  await Promise.all([loadTopic(), loadAllTopics()]);
+  // render initial view
+  renderApps();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -5,7 +5,8 @@
       "name": "benchmark",
       "runtimeExecutable": "node",
       "runtimeArgs": ["server.js"],
-      "port": 3344
+      "port": 3344,
+      "autoPort": true
     }
   ]
 }

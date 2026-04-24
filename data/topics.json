@@ -1,0 +1,13 @@
+[
+  {
+    "id": "sharing",
+    "name": "Sharing & Permissions",
+    "icon": "🔗",
+    "description": "How apps handle sharing, permissions, and external-guest collaboration. 12 tools compared across 3 dimensions.",
+    "appCount": 12,
+    "dimensionCount": 3,
+    "builtIn": true,
+    "builtInUrl": "/artifact/index.html",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

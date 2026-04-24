@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UX Research Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7B46F6;
+    --purple-dark: #6030E0;
+    --purple-soft: #F0EBFF;
+    --purple-mid: #C4B0FB;
+    --bg: #F7F6FB;
+    --panel: #FFFFFF;
+    --sidebar: #1A1A2E;
+    --sidebar-hover: #252540;
+    --sidebar-active: #7B46F6;
+    --line: #E8E5F0;
+    --line-strong: #D1CBEA;
+    --text: #1A1A2E;
+    --mute: #6B6987;
+    --mute2: #9E9CB8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 'Inter', -apple-system, sans-serif; }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  aside.sidebar {
+    width: 220px; flex-shrink: 0; background: var(--sidebar);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-brand .logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-brand .brand-name { color: #fff; font-weight: 600; font-size: 14px; }
+  .sidebar-brand .brand-sub { color: var(--purple-mid); font-size: 11px; margin-top: 1px; }
+  .sidebar-nav { padding: 12px 0; flex: 1; }
+  .nav-label {
+    padding: 8px 20px 4px;
+    font-size: 10px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.35);
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px; color: rgba(255,255,255,0.65);
+    font-size: 13px; cursor: pointer; transition: background .15s, color .15s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: #fff; text-decoration: none; }
+  .nav-item.active { background: rgba(123,70,246,0.25); color: var(--purple-mid); font-weight: 600; }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    height: 56px; background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; padding: 0 28px;
+    gap: 16px; position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-weight: 600; font-size: 15px; flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 7px; font-size: 13px;
+    font-weight: 500; cursor: pointer; border: none; transition: background .15s;
+  }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-ghost {
+    background: transparent; color: var(--mute);
+    border: 1px solid var(--line-strong);
+  }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px; flex: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #1A1A2E 0%, #2D1B69 100%);
+    border-radius: 16px; padding: 40px 48px;
+    display: flex; align-items: center; gap: 40px;
+    margin-bottom: 32px;
+  }
+  .hero-text { flex: 1; }
+  .hero-text h1 { color: #fff; font-size: 26px; font-weight: 700; margin: 0 0 10px; }
+  .hero-text p { color: var(--purple-mid); font-size: 14px; line-height: 1.6; margin: 0 0 24px; max-width: 480px; }
+  .hero-stats { display: flex; gap: 32px; }
+  .hero-stat { text-align: center; }
+  .hero-stat .n { font-size: 28px; font-weight: 700; color: #fff; }
+  .hero-stat .l { font-size: 12px; color: var(--purple-mid); margin-top: 2px; }
+  .hero-icon { font-size: 72px; opacity: .85; flex-shrink: 0; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;
+  }
+  .section-header h2 { font-size: 15px; font-weight: 600; margin: 0; }
+  .section-header .count {
+    font-size: 12px; color: var(--mute2);
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 12px; padding: 1px 8px;
+  }
+  .section-header .spacer { flex: 1; }
+
+  /* ── TOPIC GRID ── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .topic-card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px;
+    cursor: pointer; transition: box-shadow .15s, border-color .15s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+    position: relative;
+  }
+  .topic-card:hover { box-shadow: 0 4px 20px rgba(123,70,246,.12); border-color: var(--purple-mid); text-decoration: none; color: inherit; }
+  .topic-card-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--purple-soft); font-size: 24px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px; flex-shrink: 0;
+  }
+  .topic-card-name { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+  .topic-card-desc { font-size: 12px; color: var(--mute); line-height: 1.5; flex: 1; margin-bottom: 16px; }
+  .topic-card-meta {
+    display: flex; gap: 12px;
+    font-size: 11px; color: var(--mute2);
+    border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto;
+  }
+  .topic-card-meta span { display: flex; align-items: center; gap: 4px; }
+  .topic-card-badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 10px; font-weight: 600; letter-spacing: .04em;
+    padding: 2px 7px; border-radius: 10px;
+    background: var(--purple-soft); color: var(--purple);
+  }
+
+  /* ── ADD CARD ── */
+  .topic-add-card {
+    background: transparent; border: 2px dashed var(--line-strong);
+    border-radius: 12px; padding: 20px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; min-height: 170px; color: var(--mute);
+    font-size: 13px; font-weight: 500;
+  }
+  .topic-add-card:hover { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .topic-add-card .plus { font-size: 28px; font-weight: 300; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel); border-radius: 16px;
+    padding: 32px; width: 520px; max-width: calc(100vw - 40px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.25);
+    animation: modal-in .18s ease;
+  }
+  @keyframes modal-in { from { opacity:0; transform: scale(.96) translateY(8px); } to { opacity:1; transform: none; } }
+  .modal h2 { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+  .modal .subtitle { font-size: 13px; color: var(--mute); margin-bottom: 24px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--mute); }
+  .field input, .field textarea, .field select {
+    width: 100%; border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: 9px 12px;
+    font: 14px 'Inter', sans-serif; color: var(--text);
+    background: var(--bg); outline: none; transition: border .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--purple); }
+  .field textarea { resize: vertical; min-height: 72px; }
+  .field-row { display: grid; grid-template-columns: 70px 1fr; gap: 10px; }
+  .dims-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .dim-chip {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--purple-soft); color: var(--purple);
+    border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 500;
+  }
+  .dim-chip button {
+    background: none; border: none; cursor: pointer;
+    font-size: 14px; color: var(--purple); padding: 0; line-height: 1;
+  }
+  .dim-add { display: flex; gap: 8px; }
+  .dim-add input { flex: 1; }
+  .dim-add button { flex-shrink: 0; }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;
+    padding-top: 20px; border-top: 1px solid var(--line);
+  }
+
+  /* ── EMPTY ── */
+  .empty {
+    text-align: center; padding: 60px 20px; color: var(--mute);
+  }
+  .empty .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">R</div>
+      <div>
+        <div class="brand-name">Research Hub</div>
+        <div class="brand-sub">UX Benchmark Platform</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Navigation</div>
+      <a class="nav-item active" href="platform.html">
+        <span class="icon">🗂</span> All Topics
+      </a>
+      <div class="nav-label" style="margin-top:12px">Quick access</div>
+      <div id="sidebar-topics"></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title">UX Research Platform</span>
+      <button class="btn btn-primary" onclick="openModal()">+ New Topic</button>
+    </div>
+
+    <div class="content">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-text">
+          <h1>Compare how products handle any UX pattern</h1>
+          <p>Pick a topic — sharing, onboarding, upgrade flows, dashboards — add the tools you want to study, and build a structured benchmark with dimensions, verdicts, and annotated screenshots.</p>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="n" id="stat-topics">–</div><div class="l">Topics</div></div>
+            <div class="hero-stat"><div class="n" id="stat-apps">–</div><div class="l">Apps tracked</div></div>
+          </div>
+        </div>
+        <div class="hero-icon">🔬</div>
+      </div>
+
+      <!-- TOPICS -->
+      <div class="section-header">
+        <h2>Research Topics</h2>
+        <span class="count" id="topic-count">0</span>
+        <span class="spacer"></span>
+      </div>
+      <div class="topic-grid" id="topic-grid">
+        <div class="empty" style="grid-column:1/-1">
+          <div class="icon">📭</div>
+          <p>Loading topics…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW TOPIC MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2>New Research Topic</h2>
+    <p class="subtitle">Define what UX pattern you want to benchmark across products.</p>
+
+    <div class="field field-row">
+      <div>
+        <label>Icon</label>
+        <input type="text" id="f-icon" value="📋" maxlength="4" placeholder="📋">
+      </div>
+      <div>
+        <label>Topic name</label>
+        <input type="text" id="f-name" placeholder="e.g. Onboarding flows">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea id="f-desc" placeholder="What aspect of UX are you studying? What does a good experience look like?"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Dimensions <span style="color:var(--mute2);font-weight:400">(aspects to rate for each app)</span></label>
+      <div class="dim-add">
+        <input type="text" id="f-dim-input" placeholder="e.g. First-run experience" onkeydown="if(event.key==='Enter'){event.preventDefault();addDim();}">
+        <button class="btn btn-ghost" onclick="addDim()">Add</button>
+      </div>
+      <div class="dims-list" id="dims-list"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createTopic()">Create Topic</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = '';
+let topics = [];
+let dims = [];
+
+// ── API ──────────────────────────────────────────
+async function apiTopics() {
+  const r = await fetch(`${BASE}/api/topics`);
+  return r.json();
+}
+
+async function apiCreateTopic(data) {
+  const r = await fetch(`${BASE}/api/topics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return r.json();
+}
+
+// ── RENDER ──────────────────────────────────────
+function renderTopics(list) {
+  const grid = document.getElementById('topic-grid');
+  const sidebarTopics = document.getElementById('sidebar-topics');
+
+  // count stats
+  const totalApps = list.reduce((s, t) => s + (t.appCount || 0), 0);
+  document.getElementById('stat-topics').textContent = list.length;
+  document.getElementById('stat-apps').textContent = totalApps;
+  document.getElementById('topic-count').textContent = list.length;
+
+  // sidebar quick links
+  sidebarTopics.innerHTML = list.map(t => `
+    <a class="nav-item" href="${topicUrl(t)}">
+      <span class="icon">${t.icon || '📋'}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</span>
+    </a>
+  `).join('');
+
+  // grid cards
+  const cards = list.map(t => `
+    <a class="topic-card" href="${topicUrl(t)}">
+      ${t.builtIn ? '<span class="topic-card-badge">Built-in</span>' : ''}
+      <div class="topic-card-icon">${t.icon || '📋'}</div>
+      <div class="topic-card-name">${esc(t.name)}</div>
+      <div class="topic-card-desc">${esc(t.description || 'No description yet.')}</div>
+      <div class="topic-card-meta">
+        <span>🛠 ${t.appCount || 0} apps</span>
+        <span>📐 ${t.dimensionCount || 0} dimensions</span>
+      </div>
+    </a>
+  `).join('');
+
+  grid.innerHTML = cards + `
+    <div class="topic-add-card" onclick="openModal()">
+      <div class="plus">+</div>
+      <div>New topic</div>
+    </div>
+  `;
+}
+
+function topicUrl(t) {
+  if (t.builtIn && t.builtInUrl) return t.builtInUrl;
+  return `topic.html?id=${t.id}`;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── MODAL ───────────────────────────────────────
+function openModal() {
+  dims = [];
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-icon').value = '📋';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-dim-input').value = '';
+  renderDims();
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function addDim() {
+  const input = document.getElementById('f-dim-input');
+  const v = input.value.trim();
+  if (!v) return;
+  dims.push(v);
+  input.value = '';
+  renderDims();
+}
+
+function removeDim(i) {
+  dims.splice(i, 1);
+  renderDims();
+}
+
+function renderDims() {
+  document.getElementById('dims-list').innerHTML = dims.map((d, i) => `
+    <div class="dim-chip">${esc(d)}<button onclick="removeDim(${i})">×</button></div>
+  `).join('');
+}
+
+async function createTopic() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  const icon = document.getElementById('f-icon').value.trim() || '📋';
+  const description = document.getElementById('f-desc').value.trim();
+
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
+  try {
+    const topic = await apiCreateTopic({ name, icon, description, dimensions: dims });
+    closeModal();
+    window.location.href = `topic.html?id=${topic.id}`;
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Create Topic';
+    alert('Failed to create topic: ' + e.message);
+  }
+}
+
+// ── INIT ────────────────────────────────────────
+async function init() {
+  try {
+    topics = await apiTopics();
+    renderTopics(topics);
+  } catch (e) {
+    document.getElementById('topic-grid').innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        <div class="icon">⚠️</div>
+        <p>Could not load topics. Is the server running?<br><small style="color:var(--mute2)">${e.message}</small></p>
+      </div>
+    `;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
