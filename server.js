@@ -197,10 +197,10 @@ app.delete('/api/topics/:id', (req, res) => {
 app.post('/api/topics/:id/apps', (req, res) => {
   const topic = loadTopic(req.params.id);
   if (!topic) return res.status(404).json({ error: 'not found' });
-  const { name, url = '', category = '' } = req.body;
+  const { name, url = '', category = '', pricing = '', summary = '', sources = [] } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   const appId = safeId(name) + '-' + crypto.randomBytes(3).toString('hex');
-  const app = { id: appId, name, url, category, findings: {}, createdAt: new Date().toISOString() };
+  const app = { id: appId, name, url, category, pricing, summary, sources, findings: {}, createdAt: new Date().toISOString() };
   topic.apps = [...(topic.apps || []), app];
   saveTopic(topic);
   res.status(201).json(app);
@@ -211,11 +211,14 @@ app.put('/api/topics/:id/apps/:appId', (req, res) => {
   if (!topic) return res.status(404).json({ error: 'not found' });
   const idx = topic.apps.findIndex(a => a.id === req.params.appId);
   if (idx === -1) return res.status(404).json({ error: 'app not found' });
-  const { name, url, category, findings } = req.body;
+  const { name, url, category, pricing, summary, sources, findings } = req.body;
   const app = { ...topic.apps[idx] };
-  if (name)     app.name     = name;
-  if (url !== undefined) app.url = url;
-  if (category) app.category = category;
+  if (name)               app.name     = name;
+  if (url !== undefined)  app.url      = url;
+  if (category)           app.category = category;
+  if (pricing !== undefined) app.pricing = pricing;
+  if (summary !== undefined) app.summary = summary;
+  if (sources  !== undefined) app.sources = sources;
   if (findings) app.findings = { ...app.findings, ...findings };
   topic.apps = [...topic.apps.slice(0, idx), app, ...topic.apps.slice(idx + 1)];
   saveTopic(topic);

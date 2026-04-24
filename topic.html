@@ -21,199 +21,300 @@
     --text: #1A1A2E;
     --mute: #6B6987;
     --mute2: #9E9CB8;
+    --chip-bg: #F0EBFF;
     --good: #16A34A;
     --good-soft: #DCFCE7;
     --warn: #D97706;
     --warn-soft: #FEF3C7;
     --bad: #DC2626;
     --bad-soft: #FEE2E2;
+    --neutral-soft: #F3F4F6;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 'Inter', -apple-system, sans-serif; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 'Inter', -apple-system, sans-serif; }
   a { color: var(--purple); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  /* ── LAYOUT ── */
-  .layout { display: flex; min-height: 100vh; }
-
-  /* ── SIDEBAR ── */
-  aside.sidebar {
-    width: 220px; flex-shrink: 0; background: var(--sidebar);
-    position: fixed; top: 0; left: 0; bottom: 0;
-    display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+  /* ── TOP BAR ── */
+  header.top-bar {
+    background: var(--sidebar); padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  .sidebar-brand {
-    padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.08);
-    display: flex; align-items: center; gap: 10px;
+  .top-bar-left { display: flex; align-items: center; gap: 12px; }
+  .top-bar-back {
+    color: rgba(255,255,255,0.45); font-size: 13px; display: flex; align-items: center;
+    gap: 6px; cursor: pointer; transition: color .15s; text-decoration: none;
   }
-  .sidebar-brand .logo {
-    width: 32px; height: 32px; border-radius: 8px; background: var(--purple);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0;
-  }
-  .sidebar-brand .brand-name { color: #fff; font-weight: 600; font-size: 14px; }
-  .sidebar-brand .brand-sub { color: var(--purple-mid); font-size: 11px; margin-top: 1px; }
-  .sidebar-nav { padding: 12px 0; flex: 1; }
-  .nav-label {
-    padding: 8px 20px 4px; font-size: 10px; font-weight: 600;
-    letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.35);
-  }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px; padding: 8px 20px;
-    color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer;
-    transition: background .15s, color .15s; text-decoration: none;
-  }
-  .nav-item:hover { background: var(--sidebar-hover); color: #fff; text-decoration: none; }
-  .nav-item.active { background: rgba(123,70,246,0.25); color: var(--purple-mid); font-weight: 600; }
-  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
-
-  /* ── MAIN ── */
-  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar {
-    height: 56px; background: var(--panel); border-bottom: 1px solid var(--line);
-    display: flex; align-items: center; padding: 0 28px; gap: 12px;
-    position: sticky; top: 0; z-index: 50;
-  }
-  .topbar-back {
-    display: flex; align-items: center; gap: 6px;
-    color: var(--mute); font-size: 13px; cursor: pointer;
-    text-decoration: none; transition: color .15s;
-  }
-  .topbar-back:hover { color: var(--purple); }
-  .topbar-title { font-weight: 600; font-size: 15px; flex: 1; }
-  .topbar-icon { font-size: 18px; }
-  .btn {
+  .top-bar-back:hover { color: rgba(255,255,255,0.8); text-decoration: none; }
+  .top-bar-sep { color: rgba(255,255,255,0.2); font-size: 18px; }
+  .top-bar-icon { font-size: 18px; }
+  .top-bar-title { font-size: 15px; font-weight: 600; color: white; }
+  .top-bar-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-left: 4px; }
+  .top-bar-right { display: flex; align-items: center; gap: 10px; }
+  .top-bar-btn {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 14px; border-radius: 7px; font-size: 13px;
-    font-weight: 500; cursor: pointer; border: none; transition: background .15s;
-    font-family: inherit;
+    padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; font-family: inherit; transition: background .12s;
   }
-  .btn-primary { background: var(--purple); color: #fff; }
-  .btn-primary:hover { background: var(--purple-dark); }
-  .btn-ghost { background: transparent; color: var(--mute); border: 1px solid var(--line-strong); }
-  .btn-ghost:hover { background: var(--bg); color: var(--text); }
-  .btn-danger { background: transparent; color: var(--bad); border: 1px solid #FECACA; }
-  .btn-danger:hover { background: var(--bad-soft); }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .top-bar-btn-ghost {
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .top-bar-btn-ghost:hover { background: rgba(255,255,255,0.14); color: #fff; }
+  .top-bar-btn-primary { background: var(--purple); color: white; }
+  .top-bar-btn-primary:hover { background: var(--purple-dark); }
 
   /* ── TABS ── */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); padding: 0 28px; background: var(--panel); }
-  .tab {
-    padding: 14px 16px; font-size: 13px; font-weight: 500; color: var(--mute);
-    cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent;
-    margin-bottom: -1px; transition: color .15s;
+  .viewtabs {
+    background: var(--panel); border-bottom: 1px solid var(--line);
+    padding: 0 28px; display: flex; gap: 2px;
+    position: sticky; top: 56px; z-index: 90;
   }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+  .viewtabs button {
+    appearance: none; border: 0; background: transparent;
+    padding: 14px 16px; font: inherit; font-size: 13px; font-weight: 500;
+    color: var(--mute); cursor: pointer; border-bottom: 2px solid transparent;
+    transition: color .12s;
+  }
+  .viewtabs button.active { color: var(--purple); border-bottom-color: var(--purple); }
+  .viewtabs button:hover { color: var(--text); }
 
-  /* ── CONTENT ── */
-  .content { padding: 24px 28px; flex: 1; }
+  /* ── MAIN ── */
+  main { padding: 24px 28px 80px; max-width: 1400px; margin: 0 auto; }
 
-  /* ── TOPIC HEADER ── */
-  .topic-header {
+  /* ── FILTERS ── */
+  .filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filters button {
+    appearance: none; border: 1px solid var(--line); background: var(--panel);
+    padding: 6px 14px; font: inherit; font-size: 12px; font-weight: 500;
+    color: var(--mute); border-radius: 999px; cursor: pointer; transition: all .12s;
+  }
+  .filters button.active { background: var(--purple); color: white; border-color: var(--purple); }
+  .filters button:hover:not(.active) { border-color: var(--purple-mid); color: var(--text); }
+
+  /* ── TOOL GRID ── */
+  .toolgrid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px; margin-bottom: 24px;
+  }
+  .toolcard {
+    background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 14px 14px 12px; cursor: pointer;
+    transition: border-color .12s, transform .12s, box-shadow .12s;
+    display: flex; flex-direction: column; gap: 3px; position: relative;
+  }
+  .toolcard:hover { border-color: var(--purple-mid); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(123,70,246,.12); }
+  .toolcard.selected { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-soft); }
+  .toolcard .tc-name { font-weight: 700; font-size: 14px; }
+  .toolcard .tc-cat { font-size: 10px; color: var(--mute); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+  .toolcard .tc-pricing { font-size: 11px; color: var(--mute2); margin-top: 6px; }
+  .toolcard .shots-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 9px; font-weight: 700; color: var(--good); background: var(--good-soft);
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .add-tool-card {
+    background: transparent; border: 2px dashed var(--line-strong); border-radius: 10px;
+    padding: 14px; cursor: pointer; transition: border-color .12s, background .12s;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; min-height: 90px; color: var(--mute2); font-size: 12px;
+  }
+  .add-tool-card:hover { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .add-tool-card .plus { font-size: 22px; font-weight: 300; }
+
+  /* ── DETAIL PANEL ── */
+  .detail {
     background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-    padding: 24px; margin-bottom: 24px; display: flex; gap: 20px; align-items: flex-start;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(26,26,46,.06);
   }
-  .topic-header-icon {
-    width: 56px; height: 56px; border-radius: 14px; background: var(--purple-soft);
-    font-size: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  .detail .d-head {
+    padding: 20px 24px 18px; border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
   }
-  .topic-header-body { flex: 1; }
-  .topic-header-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-  .topic-header-desc { color: var(--mute); font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
-  .topic-meta-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .meta-chip {
-    font-size: 11px; color: var(--mute); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 20px; padding: 3px 10px;
+  .detail .d-head h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; }
+  .detail .d-head .d-summary { margin: 0; color: var(--mute); font-size: 13px; max-width: 65ch; line-height: 1.6; }
+  .detail .d-head-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+  .shot-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple); color: white;
+    padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+    border: none; font-family: inherit; transition: background .12s;
   }
-  .dim-chip-small {
-    font-size: 11px; font-weight: 500; background: var(--purple-soft); color: var(--purple);
-    border-radius: 20px; padding: 3px 10px;
+  .shot-btn:hover { background: var(--purple-dark); }
+  .pricing-chip {
+    background: var(--chip-bg); color: var(--purple);
+    padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap;
   }
+  .edit-app-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(123,70,246,.1); color: var(--purple);
+    padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+    border: none; font-family: inherit; transition: background .12s;
+  }
+  .edit-app-btn:hover { background: rgba(123,70,246,.2); }
 
-  /* ── APP GRID VIEW ── */
-  .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-  .app-card {
-    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
-    overflow: hidden; transition: box-shadow .15s;
+  /* dimension columns */
+  .dimensions {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px; background: var(--line);
   }
-  .app-card:hover { box-shadow: 0 4px 16px rgba(123,70,246,.1); }
-  .app-card-head {
-    padding: 16px; display: flex; align-items: center; gap: 12px;
-    border-bottom: 1px solid var(--line);
+  .dim { background: var(--panel); padding: 20px 22px 24px; }
+  .dim h3 {
+    font-size: 11px; font-weight: 700; margin: 0 0 10px;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--mute);
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .app-avatar {
-    width: 36px; height: 36px; border-radius: 8px; background: var(--purple-soft);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 700; color: var(--purple); flex-shrink: 0;
+  .dim-rate-btn {
+    font-size: 10px; font-weight: 600; color: var(--purple);
+    background: var(--purple-soft); border: none; border-radius: 4px;
+    padding: 2px 7px; cursor: pointer; font-family: inherit; transition: background .12s;
+    white-space: nowrap;
   }
-  .app-name { font-weight: 600; font-size: 13px; }
-  .app-url { font-size: 11px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .app-card-body { padding: 14px 16px; }
-  .app-dim-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .app-dim-label { font-size: 12px; color: var(--mute); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .verdict-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; font-weight: 600; border-radius: 6px; padding: 2px 8px; cursor: pointer;
-  }
-  .verdict-badge.good  { background: var(--good-soft); color: var(--good); }
-  .verdict-badge.warn  { background: var(--warn-soft); color: var(--warn); }
-  .verdict-badge.bad   { background: var(--bad-soft);  color: var(--bad); }
-  .verdict-badge.none  { background: var(--bg); color: var(--mute2); border: 1px solid var(--line); }
-  .app-card-actions {
-    padding: 10px 16px; display: flex; gap: 8px;
-    border-top: 1px solid var(--line); background: var(--bg);
-  }
+  .dim-rate-btn:hover { background: var(--purple-mid); color: white; }
+  .verdict { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+  .verdict.good { background: var(--good-soft); color: var(--good); }
+  .verdict.warn { background: var(--warn-soft); color: var(--warn); }
+  .verdict.bad  { background: var(--bad-soft);  color: var(--bad); }
+  .verdict.neutral { background: var(--neutral-soft); color: var(--mute); }
+  .dim .d-body { font-size: 13px; }
+  .dim .d-body .keyline { font-weight: 500; margin-bottom: 8px; line-height: 1.5; }
+  .dim .d-body ul { padding-left: 18px; margin: 0; }
+  .dim .d-body ul li { margin-bottom: 5px; color: var(--mute); line-height: 1.5; }
+  .dim-empty { color: var(--mute2); font-size: 12px; font-style: italic; }
 
-  /* ── MATRIX VIEW ── */
-  .matrix-wrap { overflow-x: auto; }
-  .matrix {
-    border-collapse: collapse; width: 100%; min-width: 600px;
-    background: var(--panel); border-radius: 10px; overflow: hidden;
-    border: 1px solid var(--line);
+  /* sources */
+  .sources {
+    padding: 14px 24px; background: var(--bg); border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; align-items: center;
   }
-  .matrix th {
-    padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--mute);
-    background: var(--bg); border-bottom: 1px solid var(--line);
-    text-align: left; white-space: nowrap;
-  }
-  .matrix td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: 13px; }
-  .matrix tr:last-child td { border-bottom: none; }
-  .matrix-app-cell { display: flex; align-items: center; gap: 10px; }
-  .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
-  .score-bar { height: 6px; border-radius: 3px; background: var(--line); flex: 1; min-width: 60px; }
-  .score-bar-fill { height: 100%; border-radius: 3px; background: var(--purple); }
+  .sources .src-label { color: var(--mute); font-weight: 500; }
 
-  /* ── SCREENSHOTS VIEW ── */
-  .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-  .app-screenshot-section { margin-bottom: 28px; }
-  .app-screenshot-title {
-    font-size: 13px; font-weight: 600; margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
+  /* ── MATRIX ── */
+  .matrix { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  table.mtx { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.mtx th, table.mtx td { padding: 13px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  table.mtx thead th { background: var(--bg); font-weight: 700; font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .06em; border-bottom: 2px solid var(--line); position: sticky; top: 112px; }
+  table.mtx tbody tr:hover { background: var(--purple-soft); cursor: pointer; }
+  table.mtx .tname { font-weight: 700; }
+  table.mtx .tcat { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-right: 6px; margin-bottom: 4px; }
+  .badge.good { background: var(--good-soft); color: var(--good); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.bad  { background: var(--bad-soft);  color: var(--bad); }
+  .badge.neutral { background: var(--neutral-soft); color: var(--mute); }
+
+  /* ── CHARTS ── */
+  .section-intro { color: var(--mute); font-size: 13px; margin: 0 0 20px; max-width: 80ch; line-height: 1.6; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+  .charts-full { margin-bottom: 20px; }
+  .chart-panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px 24px 24px; box-shadow: 0 2px 8px rgba(26,26,46,.06);
   }
-  .screenshot-count { font-size: 11px; color: var(--mute2); font-weight: 400; }
-  .shot-figures { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chart-panel h3 { margin: 0 0 3px; font-size: 13px; font-weight: 700; }
+  .chart-sub { font-size: 11px; color: var(--mute); margin: 0 0 16px; }
+  .hbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .hbar-label { font-size: 12px; font-weight: 500; width: 110px; flex-shrink: 0; color: var(--text); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar-track { flex: 1; height: 18px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+  .hbar-val { font-size: 11px; color: var(--mute); width: 32px; flex-shrink: 0; }
+  .hbar-badges { display: flex; gap: 4px; flex-shrink: 0; }
+  .hbar-pip { display: inline-block; height: 18px; border-radius: 4px; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; padding: 0 6px; white-space: nowrap; }
+  .hbar-pip.good { background: var(--good-soft); color: var(--good); }
+  .hbar-pip.warn { background: var(--warn-soft); color: var(--warn); }
+  .hbar-pip.bad  { background: var(--bad-soft);  color: var(--bad);  }
+  .hbar-pip.neutral { background: var(--neutral-soft); color: var(--mute); }
+  /* heatmap */
+  .heatmap { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .heatmap th { font-size: 10px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .06em; padding: 0 0 10px; text-align: center; }
+  .heatmap th.tool-th { text-align: right; padding-right: 12px; }
+  .heatmap td { padding: 4px 5px; text-align: center; }
+  .heatmap td.tool-td { text-align: right; padding-right: 12px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .hm-cell { display: inline-block; padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; min-width: 80px; }
+  .hm-cell.good { background: var(--good-soft); color: var(--good); }
+  .hm-cell.warn { background: var(--warn-soft); color: var(--warn); }
+  .hm-cell.bad  { background: var(--bad-soft);  color: var(--bad);  }
+  .hm-cell.neutral { background: var(--neutral-soft); color: var(--mute); }
+  /* stat cards */
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .stat-cards { grid-template-columns: 1fr 1fr; } }
+  .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .stat-card .sc-num { font-size: 28px; font-weight: 700; color: var(--purple); line-height: 1; }
+  .stat-card .sc-label { font-size: 11px; color: var(--mute); margin-top: 4px; line-height: 1.4; }
+
+  /* ── GALLERY (Screenshots tab) ── */
+  .gallery-layout { display: flex; gap: 0; min-height: calc(100vh - 112px); margin: -24px -28px -80px; }
+  .gallery-sidebar {
+    width: 200px; flex-shrink: 0; background: var(--sidebar);
+    padding: 20px 0; overflow-y: auto; position: sticky; top: 112px;
+    max-height: calc(100vh - 112px);
+  }
+  .gs-label {
+    padding: 8px 20px 4px; font-size: 10px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.3);
+  }
+  .gs-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; color: rgba(255,255,255,0.65); font-size: 12px;
+    cursor: pointer; transition: background .12s; border-left: 3px solid transparent;
+  }
+  .gs-item:hover { background: var(--sidebar-hover); color: #fff; }
+  .gs-item.active { background: rgba(123,70,246,.2); color: var(--purple-mid); border-left-color: var(--purple); }
+  .gs-shots { font-size: 9px; font-weight: 700; background: var(--good-soft); color: var(--good); border-radius: 3px; padding: 1px 5px; flex-shrink: 0; }
+  .gallery-main { flex: 1; padding: 28px; overflow-y: auto; }
+  .gallery-section { margin-bottom: 40px; }
+  .gallery-section-head {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--line);
+  }
+  .gallery-section-head h2 { margin: 0; font-size: 18px; font-weight: 700; }
+  .gallery-section-head .cat-chip {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    background: var(--purple-soft); color: var(--purple); border-radius: 4px; padding: 2px 7px;
+  }
+  .gallery-section-head .summary-text { color: var(--mute); font-size: 12px; }
+  .dim-summary-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px; margin-bottom: 16px;
+  }
+  .dim-summary-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-summary-card .ds-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mute); margin-bottom: 6px; }
+  .dim-summary-card .ds-verdict { font-size: 11px; }
+  .dim-summary-card .ds-notes { font-size: 12px; color: var(--mute); margin-top: 4px; line-height: 1.5; }
+
+  .your-shots-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mute);
+  }
+  .your-shots-head svg { color: var(--purple); }
+  .shot-figures { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
   .shot-fig {
-    position: relative; cursor: pointer;
-    border-radius: 8px; overflow: hidden; border: 1px solid var(--line);
-    background: var(--bg);
+    position: relative; cursor: pointer; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--line); background: var(--bg); transition: box-shadow .12s;
   }
-  .shot-fig img { display: block; width: 140px; height: 90px; object-fit: cover; }
+  .shot-fig:hover { box-shadow: 0 4px 12px rgba(123,70,246,.15); }
+  .shot-fig img { display: block; width: 180px; height: 120px; object-fit: cover; }
   .shot-fig:hover .shot-del { opacity: 1; }
   .shot-del {
-    position: absolute; top: 4px; right: 4px;
-    background: rgba(0,0,0,.6); color: #fff; border: none;
-    border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
+    position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,.6); color: #fff;
+    border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px;
     cursor: pointer; opacity: 0; transition: opacity .15s;
     display: flex; align-items: center; justify-content: center; font-family: inherit;
   }
   .drop-zone {
-    border: 2px dashed var(--line-strong); border-radius: 8px; padding: 16px;
-    text-align: center; font-size: 12px; color: var(--mute2); cursor: pointer;
-    transition: border-color .15s, background .15s; margin-top: 8px;
+    border: 2px dashed var(--line-strong); border-radius: 8px; padding: 20px 16px;
+    text-align: center; color: var(--mute2); cursor: pointer; font-size: 12px;
+    transition: border-color .15s, background .15s;
   }
-  .drop-zone.drag-over { border-color: var(--purple); background: var(--purple-soft); }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
   .drop-zone input { display: none; }
+  .drop-zone .dz-icon { font-size: 20px; margin-bottom: 6px; }
 
   /* ── LIGHTBOX ── */
   .lb-overlay {
@@ -222,147 +323,162 @@
     align-items: center; justify-content: center;
   }
   .lb-overlay.open { display: flex; }
-  .lb-img-wrap { max-width: 90vw; max-height: 88vh; position: relative; }
-  .lb-img-wrap img { display: block; max-width: 90vw; max-height: 88vh; border-radius: 8px; object-fit: contain; transition: opacity .18s; }
-  .lb-close {
-    position: fixed; top: 18px; right: 24px; background: none; border: none;
-    color: rgba(255,255,255,.7); font-size: 28px; cursor: pointer; z-index: 10;
-  }
-  .lb-arrow {
-    position: fixed; top: 50%; transform: translateY(-50%);
-    background: rgba(255,255,255,.1); border: none; color: #fff;
-    font-size: 28px; width: 52px; height: 52px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: background .15s;
-  }
+  .lb-img-wrap img { display: block; max-width: 90vw; max-height: 86vh; border-radius: 8px; object-fit: contain; transition: opacity .18s; }
+  .lb-close { position: fixed; top: 18px; right: 24px; background: none; border: none; color: rgba(255,255,255,.7); font-size: 28px; cursor: pointer; z-index: 10; }
+  .lb-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); border: none; color: #fff; font-size: 28px; width: 52px; height: 52px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
   .lb-arrow:hover { background: rgba(255,255,255,.25); }
   .lb-arrow.prev { left: 16px; }
   .lb-arrow.next { right: 16px; }
-  .lb-caption {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    color: rgba(255,255,255,.75); font-size: 13px; text-align: center;
-    max-width: 600px; padding: 0 20px;
-  }
-  .lb-counter { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; }
+  .lb-caption { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.6); font-size: 12px; text-align: center; }
 
-  /* ── MODALS (app / finding / edit topic) ── */
+  /* ── MODALS ── */
   .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,.45); z-index: 200;
-    align-items: center; justify-content: center;
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 200; align-items: center; justify-content: center;
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: var(--panel); border-radius: 16px; padding: 32px;
-    width: 480px; max-width: calc(100vw - 40px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.25);
-    animation: modal-in .18s ease; max-height: 92vh; overflow-y: auto;
+    background: var(--panel); border-radius: 16px; padding: 28px 32px;
+    width: 520px; max-width: calc(100vw - 40px); max-height: 92vh; overflow-y: auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,.25); animation: modal-in .18s ease;
   }
-  @keyframes modal-in { from { opacity:0; transform: scale(.96) translateY(8px); } to { opacity:1; transform: none; } }
-  .modal h2 { font-size: 17px; font-weight: 700; margin: 0 0 20px; }
+  @keyframes modal-in { from { opacity:0; transform:scale(.96) translateY(8px); } to { opacity:1; transform:none; } }
+  .modal h2 { font-size: 17px; font-weight: 700; margin: 0 0 4px; }
+  .modal .modal-sub { font-size: 12px; color: var(--mute); margin-bottom: 20px; }
   .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--mute); }
+  .field label { display: block; font-size: 11px; font-weight: 600; margin-bottom: 5px; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; }
   .field input, .field textarea, .field select {
     width: 100%; border: 1px solid var(--line-strong); border-radius: 8px;
     padding: 8px 12px; font: 14px 'Inter', sans-serif; color: var(--text);
     background: var(--bg); outline: none; transition: border .15s;
   }
   .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--purple); }
-  .field textarea { resize: vertical; min-height: 64px; }
+  .field textarea { resize: vertical; min-height: 60px; }
   .modal-actions {
     display: flex; justify-content: flex-end; gap: 10px;
     margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
   }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: inherit; transition: background .12s; }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-ghost { background: transparent; color: var(--mute); border: 1px solid var(--line-strong); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+  .btn-danger { background: transparent; color: var(--bad); border: 1px solid #FECACA; }
+  .btn-danger:hover { background: var(--bad-soft); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
 
-  /* ── VERDICT PICKER ── */
-  .verdict-picker { display: flex; gap: 8px; margin-top: 4px; }
+  /* verdict picker */
+  .verdict-picker { display: flex; gap: 8px; }
   .vpick {
     flex: 1; padding: 8px; border-radius: 8px; border: 2px solid var(--line);
-    cursor: pointer; text-align: center; font-size: 12px; font-weight: 600; transition: all .15s;
-    background: none; font-family: inherit;
+    cursor: pointer; text-align: center; font-size: 12px; font-weight: 600;
+    transition: all .15s; background: none; font-family: inherit;
   }
-  .vpick[data-v="good"]  { color: var(--good); }
-  .vpick[data-v="warn"]  { color: var(--warn); }
-  .vpick[data-v="bad"]   { color: var(--bad); }
-  .vpick[data-v="none"]  { color: var(--mute2); }
-  .vpick.selected[data-v="good"]  { background: var(--good-soft); border-color: var(--good); }
-  .vpick.selected[data-v="warn"]  { background: var(--warn-soft); border-color: var(--warn); }
-  .vpick.selected[data-v="bad"]   { background: var(--bad-soft);  border-color: var(--bad); }
-  .vpick.selected[data-v="none"]  { background: var(--bg); border-color: var(--mute2); }
+  .vpick[data-v="good"] { color: var(--good); }
+  .vpick[data-v="warn"] { color: var(--warn); }
+  .vpick[data-v="bad"]  { color: var(--bad); }
+  .vpick[data-v="none"] { color: var(--mute2); }
+  .vpick.selected[data-v="good"] { background: var(--good-soft); border-color: var(--good); }
+  .vpick.selected[data-v="warn"] { background: var(--warn-soft); border-color: var(--warn); }
+  .vpick.selected[data-v="bad"]  { background: var(--bad-soft);  border-color: var(--bad); }
+  .vpick.selected[data-v="none"] { background: var(--bg); border-color: var(--mute2); }
 
-  /* ── EMPTY / LOADING ── */
+  /* bullets builder */
+  .bullets-list { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+  .bullet-row { display: flex; align-items: center; gap: 6px; }
+  .bullet-row input { flex: 1; }
+  .bullet-row button { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--mute2); padding: 0 2px; transition: color .12s; }
+  .bullet-row button:hover { color: var(--bad); }
+  .bullet-add { display: flex; gap: 8px; margin-top: 6px; }
+  .bullet-add input { flex: 1; }
+
+  /* sources builder */
+  .source-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .source-row input:first-child { width: 130px; flex-shrink: 0; }
+  .source-row input:last-of-type { flex: 1; }
+  .source-row button { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--mute2); padding: 0 2px; transition: color .12s; }
+  .source-row button:hover { color: var(--bad); }
+
+  .hidden { display: none !important; }
   .empty { text-align: center; padding: 60px 20px; color: var(--mute); }
   .empty .icon { font-size: 36px; margin-bottom: 10px; }
-  .loading { color: var(--mute2); padding: 40px; text-align: center; }
-
-  /* ── ADD APP inline card ── */
-  .add-app-card {
-    border: 2px dashed var(--line-strong); border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: border-color .15s, background .15s;
-    min-height: 160px; color: var(--mute); font-size: 13px; font-weight: 500;
-    flex-direction: column; gap: 8px;
-  }
-  .add-app-card:hover { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
-  .add-app-card .plus { font-size: 26px; font-weight: 300; }
 </style>
 </head>
 <body>
-<div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="logo">R</div>
-      <div>
-        <div class="brand-name">Research Hub</div>
-        <div class="brand-sub">UX Benchmark Platform</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-label">Navigation</div>
-      <a class="nav-item" href="platform.html">
-        <span class="icon">🗂</span> All Topics
-      </a>
-      <div class="nav-label" style="margin-top:12px">Topics</div>
-      <div id="sidebar-topics"></div>
-    </nav>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <a class="topbar-back" href="platform.html">← Back</a>
-      <span class="topbar-icon" id="topbar-icon">📋</span>
-      <span class="topbar-title" id="topbar-title">Loading…</span>
-      <button class="btn btn-ghost btn-sm" onclick="openEditModal()">Edit Topic</button>
-      <button class="btn btn-primary" onclick="openAppModal()">+ Add App</button>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab active" data-view="apps" onclick="switchView('apps')">Apps</button>
-      <button class="tab" data-view="matrix" onclick="switchView('matrix')">Matrix</button>
-      <button class="tab" data-view="screenshots" onclick="switchView('screenshots')">Screenshots</button>
-    </div>
-
-    <div class="content">
-      <!-- TOPIC HEADER -->
-      <div class="topic-header" id="topic-header" style="display:none">
-        <div class="topic-header-icon" id="th-icon">📋</div>
-        <div class="topic-header-body">
-          <div class="topic-header-name" id="th-name"></div>
-          <div class="topic-header-desc" id="th-desc"></div>
-          <div class="topic-meta-chips" id="th-dims"></div>
-        </div>
-      </div>
-
-      <!-- VIEWS -->
-      <div id="view-apps"></div>
-      <div id="view-matrix" style="display:none"></div>
-      <div id="view-screenshots" style="display:none"></div>
-    </div>
+<!-- TOP BAR -->
+<header class="top-bar">
+  <div class="top-bar-left">
+    <a class="top-bar-back" href="platform.html">← All Topics</a>
+    <span class="top-bar-sep">/</span>
+    <span class="top-bar-icon" id="topbar-icon">📋</span>
+    <span class="top-bar-title" id="topbar-title">Loading…</span>
+    <span class="top-bar-sub" id="topbar-sub"></span>
   </div>
+  <div class="top-bar-right">
+    <button class="top-bar-btn top-bar-btn-ghost" onclick="openEditModal()">Edit topic</button>
+    <button class="top-bar-btn top-bar-btn-primary" onclick="openAppModal()">+ Add app</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="viewtabs">
+  <button class="active" data-view="tools" onclick="switchView('tools')">Tool deep-dive</button>
+  <button data-view="matrix" onclick="switchView('matrix')">Comparison matrix</button>
+  <button data-view="charts" onclick="switchView('charts')">Charts</button>
+  <button data-view="gallery" onclick="switchView('gallery')">Screenshots</button>
 </div>
+
+<main>
+
+  <!-- TOOL DEEP-DIVE -->
+  <section id="view-tools">
+    <div class="filters" id="tool-filters"></div>
+    <div class="toolgrid" id="toolgrid"></div>
+    <div id="tool-detail"></div>
+  </section>
+
+  <!-- COMPARISON MATRIX -->
+  <section id="view-matrix" class="hidden">
+    <p class="section-intro" id="matrix-intro"></p>
+    <div class="matrix">
+      <table class="mtx">
+        <thead><tr id="matrix-head"></tr></thead>
+        <tbody id="matrix-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section id="view-charts" class="hidden">
+    <p class="section-intro" id="charts-intro"></p>
+    <div class="stat-cards" id="stat-cards"></div>
+    <div class="charts-full">
+      <div class="chart-panel">
+        <h3 id="chart-overall-title">Overall score — all apps ranked</h3>
+        <p class="chart-sub" id="chart-overall-sub"></p>
+        <div id="chart-overall"></div>
+      </div>
+    </div>
+    <div id="chart-dims-row" class="charts-row"></div>
+    <div class="charts-full">
+      <div class="chart-panel">
+        <h3>Dimension heatmap</h3>
+        <p class="chart-sub">All apps × all dimensions at a glance</p>
+        <div style="overflow-x:auto"><table class="heatmap" id="chart-heatmap"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS GALLERY -->
+  <section id="view-gallery" class="hidden" style="margin:-24px -28px -80px">
+    <div class="gallery-layout">
+      <div class="gallery-sidebar" id="gallery-sidebar"></div>
+      <div class="gallery-main" id="gallery-main"></div>
+    </div>
+  </section>
+
+</main>
 
 <!-- LIGHTBOX -->
 <div class="lb-overlay" id="lb">
@@ -370,40 +486,15 @@
   <button class="lb-arrow prev" id="lb-prev" onclick="lbMove(-1)">‹</button>
   <div class="lb-img-wrap"><img id="lb-img" src="" alt=""></div>
   <button class="lb-arrow next" id="lb-next" onclick="lbMove(1)">›</button>
-  <div class="lb-caption">
-    <div id="lb-cap"></div>
-    <div class="lb-counter" id="lb-count"></div>
-  </div>
-</div>
-
-<!-- ADD / EDIT APP MODAL -->
-<div class="modal-overlay" id="app-modal" onclick="if(event.target===this)closeAppModal()">
-  <div class="modal">
-    <h2 id="app-modal-title">Add App</h2>
-    <div class="field">
-      <label>App / Tool name</label>
-      <input type="text" id="f-app-name" placeholder="e.g. Notion">
-    </div>
-    <div class="field">
-      <label>URL <span style="color:var(--mute2);font-weight:400">(optional)</span></label>
-      <input type="url" id="f-app-url" placeholder="https://notion.so">
-    </div>
-    <div class="field">
-      <label>Category <span style="color:var(--mute2);font-weight:400">(optional)</span></label>
-      <input type="text" id="f-app-cat" placeholder="e.g. Productivity">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-danger btn-sm" id="app-delete-btn" style="margin-right:auto;display:none" onclick="deleteApp()">Delete app</button>
-      <button class="btn btn-ghost" onclick="closeAppModal()">Cancel</button>
-      <button class="btn btn-primary" id="app-save-btn" onclick="saveApp()">Add App</button>
-    </div>
-  </div>
+  <div class="lb-caption" id="lb-cap"></div>
 </div>
 
 <!-- FINDING MODAL -->
 <div class="modal-overlay" id="finding-modal" onclick="if(event.target===this)closeFindingModal()">
   <div class="modal">
-    <h2 id="finding-modal-title">Edit Finding</h2>
+    <h2 id="finding-modal-title">Rate dimension</h2>
+    <p class="modal-sub" id="finding-modal-sub"></p>
+
     <div class="field">
       <label>Verdict</label>
       <div class="verdict-picker">
@@ -413,13 +504,72 @@
         <button class="vpick" data-v="none" onclick="selectVerdict('none')">– None</button>
       </div>
     </div>
+
     <div class="field">
-      <label>Notes</label>
-      <textarea id="f-finding-notes" rows="4" placeholder="Describe what you observed…"></textarea>
+      <label>Verdict label <span style="font-weight:400;color:var(--mute2)">(short, e.g. "Clean 3-role model")</span></label>
+      <input type="text" id="f-verdict-label" placeholder="e.g. No public link option">
     </div>
+
+    <div class="field">
+      <label>Keyline <span style="font-weight:400;color:var(--mute2)">(1–2 sentence summary)</span></label>
+      <textarea id="f-keyline" rows="2" placeholder="Summarise what you found in one or two sentences."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Bullet points</label>
+      <div class="bullets-list" id="bullets-list"></div>
+      <div class="bullet-add">
+        <input type="text" id="f-bullet-input" placeholder="Add a bullet point…" onkeydown="if(event.key==='Enter'){event.preventDefault();addBullet();}">
+        <button class="btn btn-ghost btn-sm" onclick="addBullet()">Add</button>
+      </div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeFindingModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveFinding()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT APP MODAL -->
+<div class="modal-overlay" id="app-modal" onclick="if(event.target===this)closeAppModal()">
+  <div class="modal">
+    <h2 id="app-modal-title">Add App</h2>
+
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="f-app-name" placeholder="e.g. Notion">
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <input type="text" id="f-app-cat" placeholder="e.g. Docs & notes">
+    </div>
+    <div class="field">
+      <label>Pricing</label>
+      <input type="text" id="f-app-pricing" placeholder="e.g. Free / Pro / Business / Enterprise">
+    </div>
+    <div class="field">
+      <label>URL</label>
+      <input type="url" id="f-app-url" placeholder="https://notion.so">
+    </div>
+    <div class="field">
+      <label>Summary</label>
+      <textarea id="f-app-summary" rows="3" placeholder="One paragraph description of this tool's approach."></textarea>
+    </div>
+    <div class="field">
+      <label>Sources</label>
+      <div id="sources-list"></div>
+      <div class="source-row">
+        <input type="text" id="f-src-label" placeholder="Label">
+        <input type="url" id="f-src-url" placeholder="https://…" onkeydown="if(event.key==='Enter'){event.preventDefault();addSource();}">
+        <button class="btn btn-ghost btn-sm" onclick="addSource()">Add</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" id="app-delete-btn" style="display:none;margin-right:auto" onclick="deleteApp()">Delete app</button>
+      <button class="btn btn-ghost" onclick="closeAppModal()">Cancel</button>
+      <button class="btn btn-primary" id="app-save-btn" onclick="saveApp()">Add App</button>
     </div>
   </div>
 </div>
@@ -428,50 +578,56 @@
 <div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
   <div class="modal">
     <h2>Edit Topic</h2>
-    <div class="field" style="display:flex;gap:10px">
-      <div style="width:64px">
-        <label>Icon</label>
-        <input type="text" id="ef-icon" maxlength="4" placeholder="📋">
-      </div>
-      <div style="flex:1">
-        <label>Name</label>
-        <input type="text" id="ef-name">
-      </div>
+    <div style="display:flex;gap:10px" class="field">
+      <div style="width:70px"><label>Icon</label><input type="text" id="ef-icon" maxlength="4"></div>
+      <div style="flex:1"><label>Name</label><input type="text" id="ef-name"></div>
     </div>
-    <div class="field">
-      <label>Description</label>
-      <textarea id="ef-desc" rows="3"></textarea>
-    </div>
+    <div class="field"><label>Description</label><textarea id="ef-desc" rows="3"></textarea></div>
     <div class="field">
       <label>Dimensions</label>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
         <input type="text" id="ef-dim-input" placeholder="Add dimension…" onkeydown="if(event.key==='Enter'){event.preventDefault();editAddDim();}">
         <button class="btn btn-ghost btn-sm" onclick="editAddDim()">Add</button>
       </div>
-      <div id="ef-dims-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div id="ef-dims-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveEditTopic()">Save Changes</button>
+      <button class="btn btn-primary" onclick="saveEditTopic()">Save changes</button>
     </div>
   </div>
 </div>
 
 <script>
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const params = new URLSearchParams(location.search);
-const TOPIC_ID = params.get('id');
-let topic = null;
-let activeView = 'apps';
-let editingAppId = null;
-let findingCtx = null; // { appId, dimId }
+const params    = new URLSearchParams(location.search);
+const TOPIC_ID  = params.get('id');
+if (!TOPIC_ID) { location.href = 'platform.html'; }
+
+let topic       = null;
+let activeView  = 'tools';
+let activeTool  = null;
+let activeFilter = 'all';
+let chartsRendered = false;
+let galleryRendered = false;
+
+// finding modal
+let findingCtx = null;  // { appId, dimId }
 let findingVerdict = 'none';
+let findingBullets = [];
+
+// app modal
+let editingAppId = null;
+let appSources   = [];
+
+// edit topic modal
 let editDims = [];
+
 // lightbox
 let lbImages = [];
-let lbIdx = 0;
+let lbIdx    = 0;
 
-if (!TOPIC_ID) { location.href = 'platform.html'; }
+const SCORE = { good: 3, warn: 2, bad: 1, none: 0 };
 
 // ── API ───────────────────────────────────────────────────────────────────────
 async function apiFetch(url, opts = {}) {
@@ -482,212 +638,376 @@ async function apiFetch(url, opts = {}) {
 
 async function loadTopic() {
   topic = await apiFetch(`/api/topics/${TOPIC_ID}`);
-  renderAll();
+  chartsRendered = false;
+  galleryRendered = false;
+  updateTopbar();
+  if (activeView === 'tools')   { renderFilters(); renderGrid(); renderDetail(); }
+  if (activeView === 'matrix')  renderMatrix();
+  if (activeView === 'charts')  renderCharts();
+  if (activeView === 'gallery') renderGallery();
 }
 
-async function loadAllTopics() {
-  try {
-    const list = await apiFetch('/api/topics');
-    const sidebar = document.getElementById('sidebar-topics');
-    sidebar.innerHTML = list.map(t => `
-      <a class="nav-item${t.id === TOPIC_ID ? ' active' : ''}" href="${t.builtIn && t.builtInUrl ? t.builtInUrl : 'topic.html?id='+t.id}">
-        <span class="icon">${t.icon || '📋'}</span>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
-      </a>
-    `).join('');
-  } catch(_) {}
-}
-
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function renderAll() {
+function updateTopbar() {
   document.title = topic.name + ' — UX Research';
-  document.getElementById('topbar-icon').textContent = topic.icon || '📋';
-  document.getElementById('topbar-title').textContent = topic.name;
-
-  const header = document.getElementById('topic-header');
-  header.style.display = '';
-  document.getElementById('th-icon').textContent = topic.icon || '📋';
-  document.getElementById('th-name').textContent = topic.name;
-  document.getElementById('th-desc').textContent = topic.description || '';
-  const dims = topic.dimensions || [];
-  document.getElementById('th-dims').innerHTML =
-    dims.map(d => `<span class="dim-chip-small">${esc(d.name)}</span>`).join('') +
-    `<span class="meta-chip">🛠 ${(topic.apps||[]).length} apps</span>`;
-
-  if (activeView === 'apps') renderApps();
-  else if (activeView === 'matrix') renderMatrix();
-  else if (activeView === 'screenshots') renderScreenshots();
+  document.getElementById('topbar-icon').textContent   = topic.icon || '📋';
+  document.getElementById('topbar-title').textContent  = topic.name;
+  document.getElementById('topbar-sub').textContent    = `${(topic.apps||[]).length} apps compared`;
 }
 
+// ── SWITCH VIEW ───────────────────────────────────────────────────────────────
 function switchView(v) {
   activeView = v;
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === v));
-  document.getElementById('view-apps').style.display       = v === 'apps'        ? '' : 'none';
-  document.getElementById('view-matrix').style.display     = v === 'matrix'      ? '' : 'none';
-  document.getElementById('view-screenshots').style.display = v === 'screenshots' ? '' : 'none';
-  if (topic) {
-    if (v === 'apps') renderApps();
-    else if (v === 'matrix') renderMatrix();
-    else if (v === 'screenshots') renderScreenshots();
+  document.querySelectorAll('.viewtabs button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  document.getElementById('view-tools').classList.toggle('hidden',   v !== 'tools');
+  document.getElementById('view-matrix').classList.toggle('hidden',  v !== 'matrix');
+  document.getElementById('view-charts').classList.toggle('hidden',  v !== 'charts');
+  document.getElementById('view-gallery').classList.toggle('hidden', v !== 'gallery');
+  if (!topic) return;
+  if (v === 'tools')   { renderFilters(); renderGrid(); renderDetail(); }
+  if (v === 'matrix')  renderMatrix();
+  if (v === 'charts')  renderCharts();
+  if (v === 'gallery') renderGallery();
+}
+
+// ── TOOL DEEP-DIVE ────────────────────────────────────────────────────────────
+function categories() {
+  const cats = new Set((topic.apps || []).map(a => a.category).filter(Boolean));
+  return [...cats];
+}
+
+function renderFilters() {
+  const apps = topic.apps || [];
+  const cats = categories();
+  const filtersEl = document.getElementById('tool-filters');
+  if (cats.length === 0) { filtersEl.innerHTML = ''; return; }
+  filtersEl.innerHTML =
+    `<button class="${activeFilter==='all'?'active':''}" onclick="setFilter('all')">All (${apps.length})</button>` +
+    cats.map(c => {
+      const n = apps.filter(a => a.category === c).length;
+      return `<button class="${activeFilter===c?'active':''}" onclick="setFilter('${esc(c)}')">${esc(c)} (${n})</button>`;
+    }).join('');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  const visible = visibleApps();
+  if (!visible.find(a => a.id === activeTool)) activeTool = visible[0]?.id || null;
+  renderFilters();
+  renderGrid();
+  renderDetail();
+}
+
+function visibleApps() {
+  const apps = topic.apps || [];
+  if (activeFilter === 'all') return apps;
+  return apps.filter(a => a.category === activeFilter);
+}
+
+function renderGrid() {
+  const apps = topic.apps || [];
+  const dims = topic.dimensions || [];
+  const visible = visibleApps();
+  if (!activeTool && visible.length > 0) activeTool = visible[0].id;
+
+  document.getElementById('toolgrid').innerHTML =
+    visible.map(app => {
+      const hasShots = false; // determined at render time; screenshots are async — skip for grid
+      return `<div class="toolcard${app.id===activeTool?' selected':''}" onclick="selectTool('${app.id}')">
+        <div class="tc-name">${esc(app.name)}</div>
+        <div class="tc-cat">${esc(app.category||'')}</div>
+        ${app.pricing ? `<div class="tc-pricing">${esc(app.pricing)}</div>` : ''}
+      </div>`;
+    }).join('') +
+    `<div class="add-tool-card" onclick="openAppModal()"><div class="plus">+</div><div>Add app</div></div>`;
+
+  if (apps.length === 0) {
+    document.getElementById('tool-detail').innerHTML = `<div class="empty"><div class="icon">🛠</div><p>No apps yet. Add the first one.</p></div>`;
   }
 }
 
-// ── APPS VIEW ─────────────────────────────────────────────────────────────────
-function renderApps() {
-  const apps = topic.apps || [];
+function selectTool(id) {
+  activeTool = id;
+  renderGrid();
+  renderDetail();
+  document.getElementById('tool-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderDetail() {
+  const detailEl = document.getElementById('tool-detail');
+  if (!activeTool) { detailEl.innerHTML = ''; return; }
+  const app  = (topic.apps || []).find(a => a.id === activeTool);
+  if (!app) { detailEl.innerHTML = ''; return; }
   const dims = topic.dimensions || [];
-  const el = document.getElementById('view-apps');
 
-  if (apps.length === 0) {
-    el.innerHTML = `
-      <div class="app-grid">
-        <div class="empty" style="grid-column:1/-1">
-          <div class="icon">🛠</div>
-          <p>No apps yet. Add the first one to start benchmarking.</p>
-        </div>
-        <div class="add-app-card" onclick="openAppModal()"><div class="plus">+</div><div>Add App</div></div>
-      </div>`;
-    return;
-  }
+  const dimCols = dims.map(d => {
+    const f = (app.findings || {})[d.id] || {};
+    const v = f.verdict || 'none';
+    const vLabel = f.verdictLabel || '';
+    const keyline = f.keyline || '';
+    const bullets = f.bullets || [];
 
-  const cards = apps.map(app => {
-    const dimRows = dims.map(d => {
-      const f = (app.findings || {})[d.id] || {};
-      const v = f.verdict || 'none';
-      return `<div class="app-dim-row">
-        <span class="app-dim-label" title="${esc(d.name)}">${esc(d.name)}</span>
-        <button class="verdict-badge ${v}" onclick="openFindingModal('${app.id}','${d.id}')">${verdictLabel(v)}</button>
-      </div>`;
-    }).join('');
+    const body = (keyline || bullets.length > 0)
+      ? `<div class="d-body">
+          ${vLabel ? `<div class="verdict ${v}">${esc(vLabel)}</div>` : `<div class="verdict neutral">Not rated</div>`}
+          ${keyline ? `<div class="keyline">${esc(keyline)}</div>` : ''}
+          ${bullets.length > 0 ? `<ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+        </div>`
+      : `<div class="dim-empty">Not rated yet.</div>`;
 
-    return `<div class="app-card">
-      <div class="app-card-head">
-        <div class="app-avatar">${initials(app.name)}</div>
-        <div style="flex:1;min-width:0">
-          <div class="app-name">${esc(app.name)}</div>
-          ${app.url ? `<div class="app-url"><a href="${esc(app.url)}" target="_blank" rel="noopener">${esc(app.url)}</a></div>` : ''}
-        </div>
-      </div>
-      <div class="app-card-body">
-        ${dimRows || '<div style="color:var(--mute2);font-size:12px">No dimensions defined yet.</div>'}
-      </div>
-      <div class="app-card-actions">
-        <button class="btn btn-ghost btn-sm" onclick="openAppModal('${app.id}')">Edit</button>
-        <button class="btn btn-ghost btn-sm" onclick="switchView('screenshots');highlightApp('${app.id}')">📷 Screenshots</button>
-      </div>
+    return `<div class="dim">
+      <h3>${esc(d.name)} <button class="dim-rate-btn" onclick="openFindingModal('${app.id}','${d.id}')">Rate →</button></h3>
+      ${body}
     </div>`;
   }).join('');
 
-  el.innerHTML = `<div class="app-grid">${cards}
-    <div class="add-app-card" onclick="openAppModal()"><div class="plus">+</div><div>Add App</div></div>
+  const sources = (app.sources || []).map(s =>
+    `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a>`
+  ).join('');
+
+  detailEl.innerHTML = `<div class="detail">
+    <div class="d-head">
+      <div>
+        <h2>${esc(app.name)}</h2>
+        ${app.summary ? `<p class="d-summary">${esc(app.summary)}</p>` : ''}
+      </div>
+      <div class="d-head-right">
+        <button class="shot-btn" onclick="switchView('gallery');scrollToApp('${app.id}')">View screenshots →</button>
+        ${app.pricing ? `<span class="pricing-chip">${esc(app.pricing)}</span>` : ''}
+        <button class="edit-app-btn" onclick="openAppModal('${app.id}')">✏️ Edit app</button>
+      </div>
+    </div>
+    ${dims.length > 0 ? `<div class="dimensions">${dimCols}</div>` : '<div style="padding:24px;color:var(--mute2);font-size:13px">No dimensions defined yet. Edit the topic to add some.</div>'}
+    ${sources ? `<div class="sources"><span class="src-label">Sources:</span>${sources}</div>` : ''}
   </div>`;
 }
 
-// ── MATRIX VIEW ───────────────────────────────────────────────────────────────
+// ── COMPARISON MATRIX ─────────────────────────────────────────────────────────
 function renderMatrix() {
   const apps = topic.apps || [];
   const dims = topic.dimensions || [];
-  const el = document.getElementById('view-matrix');
 
-  if (apps.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="icon">📊</div><p>Add apps first to see the matrix.</p></div>';
-    return;
-  }
+  document.getElementById('matrix-intro').textContent =
+    `Each cell shows the verdict for that app's dimension. Click a row to jump to the tool deep-dive.`;
+
+  const head = document.getElementById('matrix-head');
+  head.innerHTML = `<th style="width:200px">App</th>` +
+    dims.map(d => `<th>${esc(d.name)}</th>`).join('') +
+    `<th>Score</th>`;
 
   const maxScore = dims.length * 3;
+  const body = document.getElementById('matrix-body');
+  body.innerHTML = '';
 
-  const dimHeaders = dims.map(d => `<th>${esc(d.name)}</th>`).join('');
-
-  const rows = apps.map(app => {
+  apps.forEach(app => {
     const findings = app.findings || {};
     let score = 0;
     const dimCells = dims.map(d => {
       const f = findings[d.id] || {};
       const v = f.verdict || 'none';
-      if (v === 'good') score += 3;
-      else if (v === 'warn') score += 2;
-      else if (v === 'bad') score += 1;
-      const note = f.notes ? `title="${esc(f.notes)}"` : '';
-      return `<td><button class="verdict-badge ${v}" ${note} onclick="openFindingModal('${app.id}','${d.id}')">${verdictLabel(v)}</button></td>`;
+      score += (SCORE[v] || 0);
+      const kl = f.keyline ? `<div style="font-size:12px;color:var(--mute);margin-top:4px">${esc(f.keyline.slice(0, 80))}${f.keyline.length > 80 ? '…' : ''}</div>` : '';
+      const label = f.verdictLabel || (v === 'none' ? '–' : v);
+      return `<td><span class="badge ${v}">${esc(label)}</span>${kl}</td>`;
     }).join('');
 
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    const color = pct >= 80 ? 'var(--good)' : pct >= 55 ? 'var(--warn)' : 'var(--bad)';
 
-    return `<tr>
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
       <td>
-        <div class="matrix-app-cell">
-          <div class="app-avatar" style="width:28px;height:28px;font-size:12px">${initials(app.name)}</div>
-          <div>
-            <div style="font-weight:600;font-size:13px">${esc(app.name)}</div>
-            ${app.category ? `<div style="font-size:11px;color:var(--mute2)">${esc(app.category)}</div>` : ''}
-          </div>
-        </div>
+        <div class="tname">${esc(app.name)}</div>
+        ${app.category ? `<div class="tcat">${esc(app.category)}</div>` : ''}
       </td>
       ${dimCells}
       <td>
-        <div class="score-bar-wrap">
-          <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="height:6px;border-radius:3px;background:var(--line);flex:1;min-width:50px">
+            <div style="height:100%;border-radius:3px;background:${color};width:${pct}%"></div>
+          </div>
           <span style="font-size:12px;color:var(--mute);white-space:nowrap">${score}/${maxScore}</span>
         </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  el.innerHTML = `<div class="matrix-wrap"><table class="matrix">
-    <thead><tr>
-      <th style="min-width:160px">App</th>
-      ${dimHeaders}
-      <th style="min-width:120px">Score</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table></div>`;
-}
-
-// ── SCREENSHOTS VIEW ──────────────────────────────────────────────────────────
-async function renderScreenshots() {
-  const apps = topic.apps || [];
-  const el = document.getElementById('view-screenshots');
+      </td>`;
+    tr.onclick = () => { activeTool = app.id; switchView('tools'); };
+    body.appendChild(tr);
+  });
 
   if (apps.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="icon">📷</div><p>Add apps first to manage screenshots.</p></div>';
+    body.innerHTML = `<tr><td colspan="${dims.length + 2}" style="text-align:center;padding:40px;color:var(--mute2)">No apps yet.</td></tr>`;
+  }
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+function barColor(pct) {
+  if (pct >= 88) return '#16A34A';
+  if (pct >= 66) return '#65A30D';
+  if (pct >= 44) return '#D97706';
+  return '#DC2626';
+}
+
+function hbarRow(label, score, max, pips) {
+  const pct = max > 0 ? Math.round((score / max) * 100) : 0;
+  const color = barColor(pct);
+  const pipHtml = (pips || []).map(p => `<span class="hbar-pip ${p.v}">${esc(p.label)}</span>`).join('');
+  return `<div class="hbar-row">
+    <span class="hbar-label" title="${esc(label)}">${esc(label)}</span>
+    <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%;background:${color}"></div></div>
+    <span class="hbar-val">${score}</span>
+    <div class="hbar-badges">${pipHtml}</div>
+  </div>`;
+}
+
+function renderCharts() {
+  const apps = topic.apps || [];
+  const dims = topic.dimensions || [];
+  const maxScore = dims.length * 3;
+
+  const getScore = (app) => dims.reduce((s, d) => s + (SCORE[(app.findings||{})[d.id]?.verdict] || 0), 0);
+
+  // stat cards
+  const scores = apps.map(getScore);
+  const maxPossible = maxScore;
+  const perfect = scores.filter(s => s === maxPossible).length;
+  const avg = apps.length > 0 ? (scores.reduce((a,b)=>a+b,0)/apps.length).toFixed(1) : '–';
+  const top = apps.length > 0 ? [...apps].sort((a,b)=>getScore(b)-getScore(a))[0].name : '–';
+  const lowCount = scores.filter(s => s < maxPossible * 0.44).length;
+  document.getElementById('stat-cards').innerHTML = `
+    <div class="stat-card"><div class="sc-num">${apps.length}</div><div class="sc-label">Apps benchmarked</div></div>
+    <div class="stat-card"><div class="sc-num">${perfect}</div><div class="sc-label">Apps with a perfect score</div></div>
+    <div class="stat-card"><div class="sc-num">${avg}</div><div class="sc-label">Average score (max ${maxPossible})</div></div>
+    <div class="stat-card"><div class="sc-num">${lowCount}</div><div class="sc-label">Apps scoring below 44%</div></div>`;
+
+  document.getElementById('charts-intro').textContent =
+    `Scores derived from verdicts across ${dims.length} dimension${dims.length!==1?'s':''}: good = 3 · warn = 2 · bad = 1 · none = 0. Max possible: ${maxPossible}.`;
+  document.getElementById('chart-overall-title').textContent = `Overall UX score — ${apps.length} apps ranked`;
+  document.getElementById('chart-overall-sub').textContent = `Sorted by total score across all dimensions`;
+
+  // overall bar chart
+  const sorted = [...apps].sort((a,b) => getScore(b)-getScore(a));
+  document.getElementById('chart-overall').innerHTML = sorted.map(app => {
+    const s = getScore(app);
+    const pips = dims.map(d => ({ v: (app.findings||{})[d.id]?.verdict || 'none', label: d.name.slice(0, 8) }));
+    return hbarRow(app.name, s, maxPossible, pips);
+  }).join('');
+
+  // per-dimension charts
+  const dimsRow = document.getElementById('chart-dims-row');
+  dimsRow.innerHTML = dims.map(d => {
+    const dimSorted = [...apps].sort((a,b) => {
+      const vs = v => SCORE[(a.findings||{})[d.id]?.verdict] || 0;
+      return (SCORE[(b.findings||{})[d.id]?.verdict]||0) - (SCORE[(a.findings||{})[d.id]?.verdict]||0);
+    });
+    const bars = dimSorted.map(app => {
+      const v = (app.findings||{})[d.id]?.verdict || 'none';
+      return hbarRow(app.name, SCORE[v]||0, 3, []);
+    }).join('');
+    return `<div class="chart-panel">
+      <h3>${esc(d.name)}</h3>
+      <p class="chart-sub">Scores per app for this dimension</p>
+      ${bars}
+    </div>`;
+  }).join('');
+
+  // heatmap
+  const heatmap = document.getElementById('chart-heatmap');
+  if (dims.length === 0 || apps.length === 0) {
+    heatmap.innerHTML = '<tr><td style="padding:20px;color:var(--mute2);text-align:center">Add apps and dimensions to see the heatmap.</td></tr>';
+  } else {
+    const dimHeaders = dims.map(d => `<th>${esc(d.name.slice(0,14))}</th>`).join('');
+    const rows = apps.map(app => {
+      const cells = dims.map(d => {
+        const f = (app.findings||{})[d.id] || {};
+        const v = f.verdict || 'none';
+        const label = f.verdictLabel || v;
+        return `<td><span class="hm-cell ${v}">${esc(label.slice(0,18))}</span></td>`;
+      }).join('');
+      return `<tr><td class="tool-td">${esc(app.name)}</td>${cells}</tr>`;
+    }).join('');
+    heatmap.innerHTML = `<thead><tr><th class="tool-th">App</th>${dimHeaders}</tr></thead><tbody>${rows}</tbody>`;
+  }
+
+  chartsRendered = true;
+}
+
+// ── GALLERY (Screenshots) ─────────────────────────────────────────────────────
+async function renderGallery() {
+  const apps = topic.apps || [];
+  const sidebar = document.getElementById('gallery-sidebar');
+  const main    = document.getElementById('gallery-main');
+
+  if (apps.length === 0) {
+    sidebar.innerHTML = '';
+    main.innerHTML = '<div class="empty"><div class="icon">📷</div><p>Add apps first.</p></div>';
     return;
   }
 
-  el.innerHTML = '<div class="loading">Loading screenshots…</div>';
+  // group by category for sidebar
+  const byCat = {};
+  apps.forEach(a => {
+    const c = a.category || 'Other';
+    (byCat[c] = byCat[c] || []).push(a);
+  });
 
-  const sections = await Promise.all(apps.map(app => buildScreenshotSection(app)));
-  el.innerHTML = sections.join('');
+  sidebar.innerHTML = Object.entries(byCat).map(([cat, catApps]) => `
+    <div class="gs-label">${esc(cat)}</div>
+    ${catApps.map(a => `
+      <div class="gs-item" id="gs-${a.id}" onclick="scrollToApp('${a.id}')">
+        ${esc(a.name)}
+      </div>`).join('')}
+  `).join('');
 
-  // wire up drop zones
+  main.innerHTML = '<div style="color:var(--mute2);padding:20px 0">Loading screenshots…</div>';
+
+  const sections = await Promise.all(apps.map(app => buildGallerySection(app)));
+  main.innerHTML = sections.join('');
+
+  // wire drop zones + lightbox
   apps.forEach(app => initDropZone(app));
-  // wire lightbox clicks
-  wireImageClicks(el);
+  wireImageClicks(main);
+
+  galleryRendered = true;
 }
 
-async function buildScreenshotSection(app) {
+async function buildGallerySection(app) {
+  const dims = topic.dimensions || [];
   let shots = [];
-  try {
-    shots = await apiFetch(`/api/topics/${TOPIC_ID}/apps/${app.id}/screenshots`);
-  } catch(_) {}
+  try { shots = await apiFetch(`/api/topics/${TOPIC_ID}/apps/${app.id}/screenshots`); } catch(_) {}
+
+  const dimCards = dims.map(d => {
+    const f = (app.findings||{})[d.id] || {};
+    const v = f.verdict || 'none';
+    const label = f.verdictLabel || (v !== 'none' ? v : 'Not rated');
+    return `<div class="dim-summary-card">
+      <div class="ds-label">${esc(d.name)}</div>
+      <span class="badge ${v}" style="margin:0">${esc(label)}</span>
+      ${f.keyline ? `<div class="ds-notes">${esc(f.keyline)}</div>` : ''}
+    </div>`;
+  }).join('');
 
   const figures = shots.map(s => shotFig(app.id, s)).join('');
 
-  return `<div class="app-screenshot-section" id="ss-${app.id}">
-    <div class="app-screenshot-title">
-      <div class="app-avatar" style="width:28px;height:28px;font-size:12px">${initials(app.name)}</div>
-      ${esc(app.name)}
-      <span class="screenshot-count">${shots.length} screenshot${shots.length !== 1 ? 's' : ''}</span>
+  return `<div class="gallery-section" id="section-${app.id}">
+    <div class="gallery-section-head">
+      <h2>${esc(app.name)}</h2>
+      ${app.category ? `<span class="cat-chip">${esc(app.category)}</span>` : ''}
+      ${app.summary ? `<span class="summary-text">${esc(app.summary.slice(0, 120))}${app.summary.length > 120 ? '…' : ''}</span>` : ''}
+    </div>
+    ${dims.length > 0 ? `<div class="dim-summary-row">${dimCards}</div>` : ''}
+    <div class="your-shots-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Your screenshots <span style="font-weight:400;color:var(--mute2)">(${shots.length})</span>
     </div>
     <div class="shot-figures" id="sf-${app.id}">${figures}</div>
     <div class="drop-zone" id="dz-${app.id}" onclick="document.getElementById('fi-${app.id}').click()">
       <input type="file" id="fi-${app.id}" accept="image/*" multiple>
-      Drop screenshots here or click to upload
+      <div class="dz-icon">⬆</div>
+      Drag & drop images here, or click to browse
     </div>
   </div>`;
 }
 
 function shotFig(appId, shot) {
-  return `<div class="shot-fig" data-url="${esc(shot.url)}" data-file="${esc(shot.file)}" data-app="${appId}">
+  return `<div class="shot-fig" data-url="${esc(shot.url)}" data-file="${esc(shot.file)}" data-appid="${appId}">
     <img src="${esc(shot.url)}" alt="${esc(shot.file)}" loading="lazy">
     <button class="shot-del" onclick="deleteShot(event,'${appId}','${esc(shot.file)}')">×</button>
   </div>`;
@@ -697,30 +1017,30 @@ function initDropZone(app) {
   const dz = document.getElementById(`dz-${app.id}`);
   const fi = document.getElementById(`fi-${app.id}`);
   if (!dz || !fi) return;
-
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
   dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
   dz.addEventListener('drop', e => {
     e.preventDefault(); dz.classList.remove('drag-over');
     uploadFiles(app.id, [...e.dataTransfer.files]);
   });
-  fi.addEventListener('change', () => {
-    if (fi.files.length) uploadFiles(app.id, [...fi.files]);
-    fi.value = '';
-  });
+  fi.addEventListener('change', () => { if (fi.files.length) uploadFiles(app.id, [...fi.files]); fi.value=''; });
 }
 
 async function uploadFiles(appId, files) {
   const fd = new FormData();
   files.forEach(f => fd.append('files', f));
   try {
-    const res = await fetch(`/api/topics/${TOPIC_ID}/apps/${appId}/screenshots`, { method: 'POST', body: fd });
+    const res  = await fetch(`/api/topics/${TOPIC_ID}/apps/${appId}/screenshots`, { method: 'POST', body: fd });
     const data = await res.json();
-    // refresh that section
-    const sf = document.getElementById(`sf-${appId}`);
+    const sf   = document.getElementById(`sf-${appId}`);
     if (sf && data.screenshots) {
       sf.innerHTML = data.screenshots.map(s => shotFig(appId, s)).join('');
       wireImageClicks(sf);
+      // update sidebar badge
+      const gsItem = document.getElementById(`gs-${appId}`);
+      if (gsItem && data.screenshots.length > 0 && !gsItem.querySelector('.gs-shots')) {
+        gsItem.innerHTML += `<span class="gs-shots">SHOTS</span>`;
+      }
     }
   } catch(e) { alert('Upload failed: ' + e.message); }
 }
@@ -735,114 +1055,177 @@ async function deleteShot(e, appId, file) {
 }
 
 function wireImageClicks(container) {
-  const figs = [...(container.querySelectorAll ? container : document).querySelectorAll('.shot-fig')];
-  figs.forEach((fig, i) => {
+  const figs = [...container.querySelectorAll('.shot-fig')];
+  figs.forEach(fig => {
     fig.onclick = (e) => {
       if (e.target.classList.contains('shot-del')) return;
-      const parent = fig.closest('.shot-figures') || document;
-      const siblings = [...parent.querySelectorAll('.shot-fig')];
-      const idx = siblings.indexOf(fig);
-      const images = siblings.map(f => ({
-        url: f.querySelector('img').src,
-        cap: f.dataset.app ? `${f.dataset.app} — ${f.dataset.file}` : f.dataset.file || ''
-      }));
-      lbOpen(images, Math.max(0, idx));
+      const parent   = fig.closest('.shot-figures');
+      const siblings = parent ? [...parent.querySelectorAll('.shot-fig')] : [fig];
+      const idx      = siblings.indexOf(fig);
+      lbOpen(siblings.map(f => ({ url: f.querySelector('img').src, cap: f.dataset.file || '' })), idx);
     };
   });
 }
 
-function highlightApp(appId) {
-  // called after switching to screenshots view
+function scrollToApp(appId) {
+  if (activeView !== 'gallery') { switchView('gallery'); }
   setTimeout(() => {
-    const el = document.getElementById(`ss-${appId}`);
+    const el = document.getElementById(`section-${appId}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+    // highlight sidebar item
+    document.querySelectorAll('.gs-item').forEach(i => i.classList.remove('active'));
+    const gs = document.getElementById(`gs-${appId}`);
+    if (gs) gs.classList.add('active');
+  }, galleryRendered ? 50 : 800);
 }
 
 // ── LIGHTBOX ──────────────────────────────────────────────────────────────────
-function lbOpen(images, idx) {
-  lbImages = images;
-  lbIdx = idx;
-  document.getElementById('lb').classList.add('open');
-  lbShow();
-}
-
-function lbClose() {
-  document.getElementById('lb').classList.remove('open');
-}
-
-function lbMove(dir) {
-  lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
-  lbShow();
-}
-
+function lbOpen(images, idx) { lbImages = images; lbIdx = idx; document.getElementById('lb').classList.add('open'); lbShow(); }
+function lbClose() { document.getElementById('lb').classList.remove('open'); }
+function lbMove(dir) { lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length; lbShow(); }
 function lbShow() {
   const img = document.getElementById('lb-img');
-  img.style.opacity = '0';
-  img.src = lbImages[lbIdx].url;
+  img.style.opacity = '0'; img.src = lbImages[lbIdx].url;
   img.onload = () => { img.style.opacity = '1'; };
-  document.getElementById('lb-cap').textContent = lbImages[lbIdx].cap || '';
-  document.getElementById('lb-count').textContent = `${lbIdx + 1} / ${lbImages.length}`;
-  document.getElementById('lb-prev').style.display = lbImages.length < 2 ? 'none' : '';
-  document.getElementById('lb-next').style.display = lbImages.length < 2 ? 'none' : '';
+  document.getElementById('lb-cap').textContent = `${lbImages[lbIdx].cap}  ${lbIdx+1} / ${lbImages.length}`;
+  ['lb-prev','lb-next'].forEach(id => document.getElementById(id).style.display = lbImages.length < 2 ? 'none' : '');
 }
-
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lb').classList.contains('open')) return;
   if (e.key === 'Escape') lbClose();
-  else if (e.key === 'ArrowLeft') lbMove(-1);
+  else if (e.key === 'ArrowLeft')  lbMove(-1);
   else if (e.key === 'ArrowRight') lbMove(1);
 });
+
+// ── FINDING MODAL ─────────────────────────────────────────────────────────────
+function openFindingModal(appId, dimId) {
+  findingCtx = { appId, dimId };
+  const app  = (topic.apps||[]).find(a => a.id === appId);
+  const dim  = (topic.dimensions||[]).find(d => d.id === dimId);
+  document.getElementById('finding-modal-title').textContent = dim ? dim.name : dimId;
+  document.getElementById('finding-modal-sub').textContent = app ? app.name : '';
+  const f = (app?.findings||{})[dimId] || {};
+  findingVerdict  = f.verdict || 'none';
+  findingBullets  = [...(f.bullets || [])];
+  document.getElementById('f-verdict-label').value = f.verdictLabel || '';
+  document.getElementById('f-keyline').value = f.keyline || '';
+  document.getElementById('f-bullet-input').value = '';
+  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === findingVerdict));
+  renderBullets();
+  document.getElementById('finding-modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-verdict-label').focus(), 50);
+}
+
+function closeFindingModal() { document.getElementById('finding-modal').classList.remove('open'); findingCtx = null; }
+
+function selectVerdict(v) {
+  findingVerdict = v;
+  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === v));
+}
+
+function addBullet() {
+  const input = document.getElementById('f-bullet-input');
+  const v = input.value.trim();
+  if (!v) return;
+  findingBullets.push(v);
+  input.value = '';
+  renderBullets();
+}
+
+function removeBullet(i) { findingBullets.splice(i, 1); renderBullets(); }
+
+function renderBullets() {
+  document.getElementById('bullets-list').innerHTML = findingBullets.map((b, i) => `
+    <div class="bullet-row">
+      <input type="text" value="${esc(b)}" oninput="findingBullets[${i}]=this.value">
+      <button onclick="removeBullet(${i})" title="Remove">×</button>
+    </div>`).join('');
+}
+
+async function saveFinding() {
+  if (!findingCtx) return;
+  const { appId, dimId } = findingCtx;
+  const verdictLabel = document.getElementById('f-verdict-label').value.trim();
+  const keyline      = document.getElementById('f-keyline').value.trim();
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ findings: { [dimId]: { verdict: findingVerdict, verdictLabel, keyline, bullets: findingBullets } } })
+    });
+    closeFindingModal();
+    await loadTopic();
+  } catch(e) { alert('Error: ' + e.message); }
+}
 
 // ── APP MODAL ─────────────────────────────────────────────────────────────────
 function openAppModal(appId) {
   editingAppId = appId || null;
-  const app = appId ? (topic.apps || []).find(a => a.id === appId) : null;
+  const app = appId ? (topic.apps||[]).find(a => a.id === appId) : null;
+  appSources = app ? [...(app.sources||[])] : [];
   document.getElementById('app-modal-title').textContent = appId ? 'Edit App' : 'Add App';
-  document.getElementById('f-app-name').value = app ? app.name : '';
-  document.getElementById('f-app-url').value = app ? (app.url || '') : '';
-  document.getElementById('f-app-cat').value = app ? (app.category || '') : '';
-  document.getElementById('app-save-btn').textContent = appId ? 'Save Changes' : 'Add App';
+  document.getElementById('f-app-name').value    = app?.name || '';
+  document.getElementById('f-app-cat').value     = app?.category || '';
+  document.getElementById('f-app-pricing').value = app?.pricing || '';
+  document.getElementById('f-app-url').value     = app?.url || '';
+  document.getElementById('f-app-summary').value = app?.summary || '';
+  document.getElementById('f-src-label').value   = '';
+  document.getElementById('f-src-url').value     = '';
+  document.getElementById('app-save-btn').textContent = appId ? 'Save changes' : 'Add App';
   document.getElementById('app-delete-btn').style.display = appId ? '' : 'none';
+  renderSources();
   document.getElementById('app-modal').classList.add('open');
   setTimeout(() => document.getElementById('f-app-name').focus(), 50);
 }
 
-function closeAppModal() {
-  document.getElementById('app-modal').classList.remove('open');
-  editingAppId = null;
+function closeAppModal() { document.getElementById('app-modal').classList.remove('open'); editingAppId = null; }
+
+function addSource() {
+  const label = document.getElementById('f-src-label').value.trim();
+  const url   = document.getElementById('f-src-url').value.trim();
+  if (!label || !url) return;
+  appSources.push({ label, url });
+  document.getElementById('f-src-label').value = '';
+  document.getElementById('f-src-url').value = '';
+  renderSources();
+}
+
+function removeSource(i) { appSources.splice(i, 1); renderSources(); }
+
+function renderSources() {
+  document.getElementById('sources-list').innerHTML = appSources.map((s, i) => `
+    <div class="source-row">
+      <input type="text" value="${esc(s.label)}" oninput="appSources[${i}].label=this.value">
+      <input type="url"  value="${esc(s.url)}"   oninput="appSources[${i}].url=this.value">
+      <button onclick="removeSource(${i})" title="Remove">×</button>
+    </div>`).join('');
 }
 
 async function saveApp() {
-  const name = document.getElementById('f-app-name').value.trim();
+  const name    = document.getElementById('f-app-name').value.trim();
   if (!name) { document.getElementById('f-app-name').focus(); return; }
-  const url = document.getElementById('f-app-url').value.trim();
   const category = document.getElementById('f-app-cat').value.trim();
+  const pricing  = document.getElementById('f-app-pricing').value.trim();
+  const url      = document.getElementById('f-app-url').value.trim();
+  const summary  = document.getElementById('f-app-summary').value.trim();
   const btn = document.getElementById('app-save-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
-
   try {
     if (editingAppId) {
       await apiFetch(`/api/topics/${TOPIC_ID}/apps/${editingAppId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, url, category })
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category, pricing, url, summary, sources: appSources })
       });
     } else {
       await apiFetch(`/api/topics/${TOPIC_ID}/apps`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, url, category })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category, pricing, url, summary, sources: appSources })
       });
     }
     closeAppModal();
     await loadTopic();
-  } catch(e) {
-    alert('Error: ' + e.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = editingAppId ? 'Save Changes' : 'Add App';
-  }
+  } catch(e) { alert('Error: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = editingAppId ? 'Save changes' : 'Add App'; }
 }
 
 async function deleteApp() {
@@ -850,46 +1233,7 @@ async function deleteApp() {
   try {
     await apiFetch(`/api/topics/${TOPIC_ID}/apps/${editingAppId}`, { method: 'DELETE' });
     closeAppModal();
-    await loadTopic();
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
-// ── FINDING MODAL ─────────────────────────────────────────────────────────────
-function openFindingModal(appId, dimId) {
-  findingCtx = { appId, dimId };
-  const app = (topic.apps || []).find(a => a.id === appId);
-  const dim = (topic.dimensions || []).find(d => d.id === dimId);
-  document.getElementById('finding-modal-title').textContent =
-    `${app ? app.name : appId} — ${dim ? dim.name : dimId}`;
-  const f = (app && app.findings && app.findings[dimId]) || {};
-  findingVerdict = f.verdict || 'none';
-  document.getElementById('f-finding-notes').value = f.notes || '';
-  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === findingVerdict));
-  document.getElementById('finding-modal').classList.add('open');
-  setTimeout(() => document.getElementById('f-finding-notes').focus(), 50);
-}
-
-function closeFindingModal() {
-  document.getElementById('finding-modal').classList.remove('open');
-  findingCtx = null;
-}
-
-function selectVerdict(v) {
-  findingVerdict = v;
-  document.querySelectorAll('.vpick').forEach(b => b.classList.toggle('selected', b.dataset.v === v));
-}
-
-async function saveFinding() {
-  if (!findingCtx) return;
-  const { appId, dimId } = findingCtx;
-  const notes = document.getElementById('f-finding-notes').value.trim();
-  try {
-    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ findings: { [dimId]: { verdict: findingVerdict, notes } } })
-    });
-    closeFindingModal();
+    activeTool = null;
     await loadTopic();
   } catch(e) { alert('Error: ' + e.message); }
 }
@@ -899,48 +1243,41 @@ function openEditModal() {
   document.getElementById('ef-icon').value = topic.icon || '📋';
   document.getElementById('ef-name').value = topic.name || '';
   document.getElementById('ef-desc').value = topic.description || '';
-  editDims = (topic.dimensions || []).map(d => ({ ...d }));
+  editDims = (topic.dimensions||[]).map(d => ({...d}));
   renderEditDims();
   document.getElementById('edit-modal').classList.add('open');
 }
 
-function closeEditModal() {
-  document.getElementById('edit-modal').classList.remove('open');
-}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
 
 function editAddDim() {
   const input = document.getElementById('ef-dim-input');
   const v = input.value.trim();
   if (!v) return;
-  const id = v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40);
+  const id = v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40);
   editDims.push({ id, name: v });
   input.value = '';
   renderEditDims();
 }
 
-function editRemoveDim(i) {
-  editDims.splice(i, 1);
-  renderEditDims();
-}
+function editRemoveDim(i) { editDims.splice(i,1); renderEditDims(); }
 
 function renderEditDims() {
-  document.getElementById('ef-dims-list').innerHTML = editDims.map((d, i) => `
+  document.getElementById('ef-dims-list').innerHTML = editDims.map((d,i) => `
     <div style="display:flex;align-items:center;gap:4px;background:var(--purple-soft);color:var(--purple);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500">
       ${esc(d.name)}
       <button style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--purple);padding:0" onclick="editRemoveDim(${i})">×</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 async function saveEditTopic() {
   const name = document.getElementById('ef-name').value.trim();
   if (!name) { document.getElementById('ef-name').focus(); return; }
-  const icon = document.getElementById('ef-icon').value.trim() || '📋';
+  const icon        = document.getElementById('ef-icon').value.trim() || '📋';
   const description = document.getElementById('ef-desc').value.trim();
   try {
     await apiFetch(`/api/topics/${TOPIC_ID}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, icon, description, dimensions: editDims })
     });
     closeEditModal();
@@ -950,25 +1287,15 @@ async function saveEditTopic() {
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function initials(name) {
-  return (name || '?').split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function verdictLabel(v) {
-  return { good: '✅ Good', warn: '⚠️ Warn', bad: '❌ Bad', none: '– Rate' }[v] || '– Rate';
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-async function init() {
-  await Promise.all([loadTopic(), loadAllTopics()]);
-  // render initial view
-  renderApps();
-}
-
-init();
+loadTopic().then(() => {
+  renderFilters();
+  renderGrid();
+  renderDetail();
+});
 </script>
 </body>
 </html>
