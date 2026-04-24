@@ -152,6 +152,17 @@
     padding: 2px 7px; border-radius: 10px;
     background: var(--purple-soft); color: var(--purple);
   }
+  .topic-card-actions {
+    display: flex; gap: 6px; margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .card-action-btn {
+    flex: 1; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line-strong);
+    background: transparent; font: 12px 'Inter', sans-serif; font-weight: 500;
+    cursor: pointer; transition: background .12s, color .12s; color: var(--mute);
+  }
+  .card-action-btn:hover { background: var(--bg); color: var(--text); }
+  .card-action-btn.danger:hover { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
 
   /* ── ADD CARD ── */
   .topic-add-card {
@@ -277,6 +288,45 @@
   </div>
 </div>
 
+<!-- EDIT TOPIC MODAL -->
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal">
+    <h2>Edit Topic</h2>
+    <p class="subtitle">Changes apply immediately.</p>
+
+    <div class="field field-row">
+      <div>
+        <label>Icon</label>
+        <input type="text" id="ef-icon" maxlength="4">
+      </div>
+      <div>
+        <label>Name</label>
+        <input type="text" id="ef-name">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea id="ef-desc"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Dimensions</label>
+      <div class="dim-add">
+        <input type="text" id="ef-dim-input" placeholder="Add dimension…" onkeydown="if(event.key==='Enter'){event.preventDefault();editAddDim();}">
+        <button class="btn btn-ghost" onclick="editAddDim()">Add</button>
+      </div>
+      <div class="dims-list" id="ef-dims-list"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="margin-right:auto;color:#DC2626;border-color:#FECACA" onclick="deleteTopic(editingTopicId, document.getElementById('ef-name').value)">Delete topic</button>
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditTopic()">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- NEW TOPIC MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -335,6 +385,22 @@ async function apiCreateTopic(data) {
   return r.json();
 }
 
+async function apiUpdateTopic(id, data) {
+  const r = await fetch(`${BASE}/api/topics/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function apiDeleteTopic(id) {
+  const r = await fetch(`${BASE}/api/topics/${id}`, { method: 'DELETE' });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
 // ── RENDER ──────────────────────────────────────
 function renderTopics(list) {
   const grid = document.getElementById('topic-grid');
@@ -355,7 +421,13 @@ function renderTopics(list) {
   `).join('');
 
   // grid cards
-  const cards = list.map(t => `
+  const cards = list.map(t => {
+    const actions = t.builtIn ? '' : `
+      <div class="topic-card-actions" onclick="event.preventDefault();event.stopPropagation()">
+        <button class="card-action-btn" onclick="openEditModal('${t.id}')">Edit</button>
+        <button class="card-action-btn danger" onclick="deleteTopic('${t.id}','${esc(t.name)}')">Delete</button>
+      </div>`;
+    return `
     <a class="topic-card" href="${topicUrl(t)}">
       ${t.builtIn ? '<span class="topic-card-badge">Built-in</span>' : ''}
       <div class="topic-card-icon">${t.icon || '📋'}</div>
@@ -365,8 +437,9 @@ function renderTopics(list) {
         <span>🛠 ${t.appCount || 0} apps</span>
         <span>📐 ${t.dimensionCount || 0} dimensions</span>
       </div>
-    </a>
-  `).join('');
+      ${actions}
+    </a>`;
+  }).join('');
 
   grid.innerHTML = cards + `
     <div class="topic-add-card" onclick="openModal()">
@@ -439,6 +512,79 @@ async function createTopic() {
     btn.disabled = false;
     btn.textContent = 'Create Topic';
     alert('Failed to create topic: ' + e.message);
+  }
+}
+
+// ── EDIT MODAL ───────────────────────────────────
+let editingTopicId = null;
+let editDims = [];
+
+function openEditModal(id) {
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  editingTopicId = id;
+  document.getElementById('ef-icon').value = t.icon || '📋';
+  document.getElementById('ef-name').value = t.name || '';
+  document.getElementById('ef-desc').value = t.description || '';
+  // load full topic to get dimensions
+  fetch(`/api/topics/${id}`).then(r => r.json()).then(full => {
+    editDims = (full.dimensions || []).map(d => ({ ...d }));
+    renderEditDims();
+  });
+  document.getElementById('edit-modal').classList.add('open');
+  setTimeout(() => document.getElementById('ef-name').focus(), 50);
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  editingTopicId = null;
+}
+
+function editAddDim() {
+  const input = document.getElementById('ef-dim-input');
+  const v = input.value.trim();
+  if (!v) return;
+  const id = v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40);
+  editDims.push({ id, name: v });
+  input.value = '';
+  renderEditDims();
+}
+
+function editRemoveDim(i) { editDims.splice(i, 1); renderEditDims(); }
+
+function renderEditDims() {
+  document.getElementById('ef-dims-list').innerHTML = editDims.map((d, i) => `
+    <div class="dim-chip">${esc(d.name)}<button onclick="editRemoveDim(${i})">×</button></div>
+  `).join('');
+}
+
+async function saveEditTopic() {
+  const name = document.getElementById('ef-name').value.trim();
+  if (!name) { document.getElementById('ef-name').focus(); return; }
+  const icon = document.getElementById('ef-icon').value.trim() || '📋';
+  const description = document.getElementById('ef-desc').value.trim();
+  const btn = document.querySelector('#edit-modal .btn-primary');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await apiUpdateTopic(editingTopicId, { name, icon, description, dimensions: editDims });
+    closeEditModal();
+    topics = await apiTopics();
+    renderTopics(topics);
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save changes';
+  }
+}
+
+async function deleteTopic(id, name) {
+  if (!confirm(`Delete "${name}"? This removes all apps and findings for this topic. Screenshots on disk are not deleted.`)) return;
+  try {
+    await apiDeleteTopic(id);
+    topics = await apiTopics();
+    renderTopics(topics);
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
   }
 }
 

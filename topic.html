@@ -592,6 +592,7 @@
       <div id="ef-dims-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
     <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" style="margin-right:auto" onclick="deleteTopic()">Delete topic</button>
       <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveEditTopic()">Save changes</button>
     </div>
@@ -1283,6 +1284,15 @@ async function saveEditTopic() {
     closeEditModal();
     await loadTopic();
   } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteTopic() {
+  const name = topic?.name || 'this topic';
+  if (!confirm(`Delete "${name}"? All apps and findings will be removed. This cannot be undone.`)) return;
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}`, { method: 'DELETE' });
+    window.location.href = 'platform.html';
+  } catch(e) { alert('Delete failed: ' + e.message); }
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
