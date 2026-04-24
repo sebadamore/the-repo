@@ -417,6 +417,7 @@
   </div>
   <div class="top-bar-right">
     <button class="top-bar-btn top-bar-btn-ghost" onclick="openEditModal()">Edit topic</button>
+    <button class="top-bar-btn top-bar-btn-ghost" id="research-btn" onclick="runResearch()" title="Auto-research all tools with Claude">🔬 Run research</button>
     <button class="top-bar-btn top-bar-btn-primary" onclick="openAppModal()">+ Add app</button>
   </div>
 </header>
@@ -487,6 +488,25 @@
   <div class="lb-img-wrap"><img id="lb-img" src="" alt=""></div>
   <button class="lb-arrow next" id="lb-next" onclick="lbMove(1)">›</button>
   <div class="lb-caption" id="lb-cap"></div>
+</div>
+
+<!-- RESEARCH PROGRESS OVERLAY -->
+<div class="modal-overlay" id="research-overlay" style="z-index:400;backdrop-filter:blur(4px);background:rgba(10,10,25,.82)">
+  <div class="modal" style="background:var(--sidebar);width:560px;max-height:82vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <div style="padding:22px 24px 16px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px" id="ro-title">Researching…</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.4)" id="ro-sub"></div>
+      <div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:14px">
+        <div id="ro-bar" style="height:100%;border-radius:2px;background:var(--purple);transition:width .4s;width:0%"></div>
+      </div>
+    </div>
+    <div id="ro-current" style="padding:10px 24px;font-size:12px;color:var(--purple-mid);border-bottom:1px solid rgba(255,255,255,.06);min-height:36px"></div>
+    <div id="ro-log" style="flex:1;overflow-y:auto;padding:10px 24px;display:flex;flex-direction:column;gap:4px;font-size:12px"></div>
+    <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between">
+      <span id="ro-status" style="font-size:13px;color:rgba(255,255,255,.45)">Starting…</span>
+      <button id="ro-close-btn" class="top-bar-btn top-bar-btn-ghost" onclick="closeResearchOverlay()" style="display:none">Close</button>
+    </div>
+  </div>
 </div>
 
 <!-- FINDING MODAL -->
@@ -1298,6 +1318,101 @@ async function deleteTopic() {
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── RESEARCH ─────────────────────────────────────────────────────────────────
+function closeResearchOverlay() {
+  document.getElementById('research-overlay').classList.remove('open');
+}
+
+function runResearch() {
+  const overlay   = document.getElementById('research-overlay');
+  const logEl     = document.getElementById('ro-log');
+  const barEl     = document.getElementById('ro-bar');
+  const currentEl = document.getElementById('ro-current');
+  const statusEl  = document.getElementById('ro-status');
+  const closeBtn  = document.getElementById('ro-close-btn');
+
+  document.getElementById('ro-title').textContent = `Researching "${topic?.name || ''}"`;
+  document.getElementById('ro-sub').textContent   = 'Claude is looking up each tool × dimension.';
+  logEl.innerHTML = '';
+  barEl.style.width = '0%';
+  currentEl.textContent = 'Connecting…';
+  statusEl.style.color = 'rgba(255,255,255,.45)';
+  statusEl.textContent = 'Starting…';
+  closeBtn.style.display = 'none';
+  overlay.classList.add('open');
+
+  document.getElementById('research-btn').disabled = true;
+
+  const verdictIcon = { good: '✅', warn: '⚠️', bad: '❌' };
+
+  const es = new EventSource(`/api/topics/${TOPIC_ID}/research/stream`);
+
+  es.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+
+    if (msg.type === 'start') {
+      currentEl.textContent = `Researching ${msg.tools} tools × ${msg.dims} dimensions…`;
+      statusEl.textContent  = `0 / ${msg.total} findings`;
+    }
+
+    if (msg.type === 'progress') {
+      currentEl.textContent = `${msg.tool} → ${msg.dim}…`;
+    }
+
+    if (msg.type === 'finding') {
+      barEl.style.width = Math.round((msg.done / msg.total) * 100) + '%';
+      statusEl.textContent = `${msg.done} / ${msg.total} findings`;
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.6)';
+      row.innerHTML = `
+        <span style="font-size:13px;width:18px;text-align:center;flex-shrink:0">${verdictIcon[msg.verdict]||'–'}</span>
+        <span style="font-weight:600;color:rgba(255,255,255,.85);flex-shrink:0">${esc(msg.tool)}</span>
+        <span style="color:rgba(255,255,255,.35);flex:1">${esc(msg.dim)}</span>
+        <span style="font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;background:${msg.verdict==='good'?'#DCFCE7':msg.verdict==='warn'?'#FEF3C7':'#FEE2E2'};color:${msg.verdict==='good'?'#16A34A':msg.verdict==='warn'?'#D97706':'#DC2626'}">${esc(msg.verdictLabel||msg.verdict)}</span>`;
+      logEl.appendChild(row);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    if (msg.type === 'finding-error') {
+      barEl.style.width = Math.round((msg.done / msg.total) * 100) + '%';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:3px 0;color:rgba(255,255,255,.4)';
+      row.innerHTML = `<span style="width:18px;text-align:center">⚠️</span><span style="font-weight:600;color:rgba(255,255,255,.7)">${esc(msg.tool)}</span><span style="flex:1">${esc(msg.dim)}</span><span style="font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;background:#FEE2E2;color:#DC2626">error</span>`;
+      logEl.appendChild(row);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    if (msg.type === 'error') {
+      es.close();
+      currentEl.textContent = '';
+      statusEl.style.color  = '#FDA4A4';
+      statusEl.textContent  = msg.message;
+      closeBtn.style.display = '';
+      document.getElementById('research-btn').disabled = false;
+    }
+
+    if (msg.type === 'done') {
+      es.close();
+      barEl.style.width     = '100%';
+      currentEl.textContent = 'Research complete.';
+      statusEl.style.color  = '#86EFAC';
+      statusEl.textContent  = `All ${msg.total} findings saved.`;
+      closeBtn.style.display = '';
+      document.getElementById('research-btn').disabled = false;
+      // reload topic data and re-render
+      setTimeout(() => { closeResearchOverlay(); loadTopic(); }, 1200);
+    }
+  };
+
+  es.onerror = () => {
+    es.close();
+    statusEl.style.color = '#FDA4A4';
+    statusEl.textContent = 'Connection lost.';
+    closeBtn.style.display = '';
+    document.getElementById('research-btn').disabled = false;
+  };
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────

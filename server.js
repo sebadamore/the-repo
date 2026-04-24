@@ -4,6 +4,17 @@ const path    = require('path');
 const fs      = require('fs');
 const crypto  = require('crypto');
 
+// lightweight .env loader — no package required
+try {
+  fs.readFileSync(path.join(__dirname, '.env'), 'utf8').split('\n').forEach(line => {
+    const eq = line.indexOf('=');
+    if (eq < 1) return;
+    const k = line.slice(0, eq).trim();
+    const v = line.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    if (k && !process.env[k]) process.env[k] = v;
+  });
+} catch (_) {}
+
 const app  = express();
 const PORT = process.env.PORT || 3344;
 const ROOT = __dirname;
@@ -274,6 +285,178 @@ app.delete('/api/topics/:id/apps/:appId/screenshots/:file', (req, res) => {
   if (!target.startsWith(path.resolve(dir))) return res.status(400).json({ error: 'bad path' });
   try { fs.unlinkSync(target); res.json({ ok: true }); }
   catch { res.status(404).json({ error: 'not found' }); }
+});
+
+// ─────────────────────────────────────────────
+// AI research
+// ─────────────────────────────────────────────
+
+/** Collect every unique app across all non-builtIn topics, excluding `skipId`. */
+function getCanonicalTools(skipId) {
+  const list = topicsIndex();
+  const seen = new Map(); // name.toLowerCase() → app data
+  for (const t of list) {
+    if (t.builtIn || t.id === skipId) continue;
+    const full = loadTopic(t.id);
+    if (!full) continue;
+    for (const a of (full.apps || [])) {
+      const key = a.name.toLowerCase().trim();
+      if (!seen.has(key)) {
+        seen.set(key, {
+          name:     a.name,
+          url:      a.url      || '',
+          category: a.category || '',
+          pricing:  a.pricing  || '',
+          summary:  a.summary  || '',
+          sources:  a.sources  || []
+        });
+      }
+    }
+  }
+  return [...seen.values()];
+}
+
+/** Call the Anthropic Messages API and return the text content. */
+async function claudeComplete(apiKey, userPrompt) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:  'POST',
+    headers: {
+      'x-api-key':         apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type':      'application/json'
+    },
+    body: JSON.stringify({
+      model:      'claude-opus-4-5',
+      max_tokens: 900,
+      messages:   [{ role: 'user', content: userPrompt }]
+    })
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${r.status}`);
+  }
+  const data = await r.json();
+  return data.content[0].text.trim();
+}
+
+/** Research one tool × dimension, return a finding object. */
+async function researchFinding(apiKey, topic, tool, dim) {
+  const prompt = `You are populating a UX benchmark database with factual, specific research.
+
+TOPIC:     ${topic.name}
+CONTEXT:   ${topic.description || topic.name}
+DIMENSION: ${dim.name}
+TOOL:      ${tool.name}
+CATEGORY:  ${tool.category || 'SaaS tool'}
+URL:       ${tool.url || 'N/A'}
+
+Based on your knowledge of ${tool.name}, evaluate how it performs on "${dim.name}" in the context of "${topic.name}".
+
+Return ONLY valid JSON — no markdown fences, no explanation, nothing else:
+{
+  "verdict": "good" | "warn" | "bad",
+  "verdictLabel": "3-6 word label (e.g. 'Clean 3-role model')",
+  "keyline": "1-2 factual sentences summarising the key finding.",
+  "bullets": [
+    "Specific concrete observation 1.",
+    "Specific concrete observation 2.",
+    "Specific concrete observation 3.",
+    "Specific concrete observation 4."
+  ]
+}
+
+Rules:
+- verdict must be exactly one of: good, warn, bad
+- verdictLabel is 3-6 words, descriptive of the approach
+- keyline is 1-2 sentences, specific and factual, no vague adjectives
+- bullets is 3-5 items, each a concrete observation with specifics`;
+
+  const text = await claudeComplete(apiKey, prompt);
+
+  // strip any accidental markdown fences
+  const clean = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+  return JSON.parse(clean);
+}
+
+/** SSE research stream — GET /api/topics/:id/research/stream */
+app.get('/api/topics/:id/research/stream', async (req, res) => {
+  res.setHeader('Content-Type',  'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection',    'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.flushHeaders();
+
+  const send = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    send({ type: 'error', message: 'ANTHROPIC_API_KEY is not set. Add it to a .env file or export it in your shell.' });
+    return res.end();
+  }
+
+  const topic = loadTopic(req.params.id);
+  if (!topic) {
+    send({ type: 'error', message: 'Topic not found.' });
+    return res.end();
+  }
+
+  const dims = topic.dimensions || [];
+  if (dims.length === 0) {
+    send({ type: 'error', message: 'This topic has no dimensions. Add at least one dimension before running research.' });
+    return res.end();
+  }
+
+  const tools = getCanonicalTools(topic.id);
+  if (tools.length === 0) {
+    send({ type: 'error', message: 'No tools found in other topics to research. Create the sign-up or sharing topic first so the tool list can be detected.' });
+    return res.end();
+  }
+
+  const total = tools.length * dims.length;
+  send({ type: 'start', tools: tools.length, dims: dims.length, total });
+
+  let done = 0;
+
+  for (const tool of tools) {
+    // Ensure the app exists in this topic
+    let appIdx = (topic.apps || []).findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
+    if (appIdx === -1) {
+      const appId = safeId(tool.name) + '-' + crypto.randomBytes(3).toString('hex');
+      const newApp = {
+        id: appId, name: tool.name, url: tool.url, category: tool.category,
+        pricing: tool.pricing, summary: tool.summary, sources: tool.sources,
+        findings: {}, createdAt: new Date().toISOString()
+      };
+      topic.apps = [...(topic.apps || []), newApp];
+      appIdx = topic.apps.length - 1;
+      saveTopic(topic);
+    }
+
+    for (const dim of dims) {
+      send({ type: 'progress', tool: tool.name, dim: dim.name, done, total });
+
+      try {
+        const finding = await researchFinding(apiKey, topic, tool, dim);
+        // Re-read topic in case something else mutated it
+        const fresh = loadTopic(topic.id);
+        const idx   = fresh.apps.findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
+        if (idx !== -1) {
+          fresh.apps[idx].findings = { ...fresh.apps[idx].findings, [dim.id]: finding };
+          saveTopic(fresh);
+          // keep our working copy in sync
+          topic.apps = fresh.apps;
+        }
+        done++;
+        send({ type: 'finding', tool: tool.name, dim: dim.name, verdict: finding.verdict, verdictLabel: finding.verdictLabel, done, total });
+      } catch (e) {
+        done++;
+        send({ type: 'finding-error', tool: tool.name, dim: dim.name, message: e.message, done, total });
+      }
+    }
+  }
+
+  send({ type: 'done', total: done });
+  res.end();
 });
 
 app.listen(PORT, () => {

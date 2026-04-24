@@ -227,6 +227,64 @@
   }
   .empty .icon { font-size: 40px; margin-bottom: 12px; }
   .empty p { font-size: 14px; margin: 0; }
+
+  /* ── RESEARCH PROGRESS OVERLAY ── */
+  .research-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,10,25,.82); z-index: 500;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .research-overlay.open { display: flex; }
+  .research-panel {
+    background: var(--sidebar); border-radius: 16px;
+    width: 560px; max-width: calc(100vw - 32px); max-height: 80vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,.5);
+    overflow: hidden;
+  }
+  .research-header {
+    padding: 22px 24px 18px; border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .research-header h3 { margin: 0 0 4px; color: #fff; font-size: 16px; font-weight: 700; }
+  .research-header p { margin: 0; color: rgba(255,255,255,.45); font-size: 13px; }
+  .research-progress-bar {
+    height: 3px; background: rgba(255,255,255,.1); margin: 14px 24px 0; border-radius: 2px;
+  }
+  .research-progress-fill {
+    height: 100%; border-radius: 2px; background: var(--purple);
+    transition: width .4s ease; width: 0%;
+  }
+  .research-current {
+    padding: 12px 24px 10px; font-size: 12px;
+    color: var(--purple-mid); min-height: 36px; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .research-log {
+    flex: 1; overflow-y: auto; padding: 12px 24px;
+    font-size: 12px; display: flex; flex-direction: column; gap: 5px;
+  }
+  .log-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 0; color: rgba(255,255,255,.6);
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .log-row .log-icon { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+  .log-row .log-tool { font-weight: 600; color: rgba(255,255,255,.85); flex-shrink: 0; }
+  .log-row .log-dim  { color: rgba(255,255,255,.4); flex: 1; }
+  .log-row .log-badge {
+    font-size: 10px; font-weight: 700; border-radius: 4px; padding: 1px 6px; flex-shrink: 0;
+  }
+  .log-badge.good { background: var(--good-soft); color: var(--good); }
+  .log-badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .log-badge.bad  { background: var(--bad-soft);  color: var(--bad); }
+  .log-badge.err  { background: #FEE2E2; color: #DC2626; }
+  .research-footer {
+    padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .research-status { font-size: 13px; color: rgba(255,255,255,.5); }
+  .research-status.done { color: #86EFAC; }
+  .research-status.err  { color: #FDA4A4; }
 </style>
 </head>
 <body>
@@ -284,6 +342,23 @@
           <p>Loading topics…</p>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESEARCH PROGRESS OVERLAY -->
+<div class="research-overlay" id="research-overlay">
+  <div class="research-panel">
+    <div class="research-header">
+      <h3 id="ro-title">Researching…</h3>
+      <p id="ro-sub">Claude is looking up each tool across your dimensions.</p>
+    </div>
+    <div class="research-progress-bar"><div class="research-progress-fill" id="ro-bar"></div></div>
+    <div class="research-current" id="ro-current">Starting…</div>
+    <div class="research-log" id="ro-log"></div>
+    <div class="research-footer">
+      <span class="research-status" id="ro-status">Connecting…</span>
+      <a class="btn btn-primary" id="ro-open-btn" href="#" style="display:none">Open topic →</a>
     </div>
   </div>
 </div>
@@ -497,7 +572,7 @@ function renderDims() {
 async function createTopic() {
   const name = document.getElementById('f-name').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
-  const icon = document.getElementById('f-icon').value.trim() || '📋';
+  const icon        = document.getElementById('f-icon').value.trim() || '📋';
   const description = document.getElementById('f-desc').value.trim();
 
   const btn = event.target;
@@ -507,12 +582,108 @@ async function createTopic() {
   try {
     const topic = await apiCreateTopic({ name, icon, description, dimensions: dims });
     closeModal();
-    window.location.href = `topic.html?id=${topic.id}`;
+    startResearch(topic);
   } catch (e) {
     btn.disabled = false;
     btn.textContent = 'Create Topic';
     alert('Failed to create topic: ' + e.message);
   }
+}
+
+function startResearch(topic) {
+  const overlay  = document.getElementById('research-overlay');
+  const logEl    = document.getElementById('ro-log');
+  const barEl    = document.getElementById('ro-bar');
+  const currentEl = document.getElementById('ro-current');
+  const statusEl = document.getElementById('ro-status');
+  const openBtn  = document.getElementById('ro-open-btn');
+  const topicUrl = `topic.html?id=${topic.id}`;
+
+  document.getElementById('ro-title').textContent = `Researching "${topic.name}"`;
+  document.getElementById('ro-sub').textContent   = 'Claude is looking up each tool across your dimensions.';
+  logEl.innerHTML = '';
+  barEl.style.width = '0%';
+  currentEl.textContent = 'Connecting to research stream…';
+  statusEl.className = 'research-status';
+  statusEl.textContent = 'Starting…';
+  openBtn.style.display = 'none';
+  openBtn.href = topicUrl;
+  overlay.classList.add('open');
+
+  const verdictIcon = { good: '✅', warn: '⚠️', bad: '❌' };
+
+  const es = new EventSource(`/api/topics/${topic.id}/research/stream`);
+
+  es.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+
+    if (msg.type === 'start') {
+      statusEl.textContent = `0 / ${msg.total} findings`;
+      currentEl.textContent = `Researching ${msg.tools} tools × ${msg.dims} dimensions…`;
+    }
+
+    if (msg.type === 'progress') {
+      currentEl.textContent = `Researching ${msg.tool} → ${msg.dim}…`;
+    }
+
+    if (msg.type === 'finding') {
+      const pct = Math.round((msg.done / msg.total) * 100);
+      barEl.style.width = pct + '%';
+      statusEl.textContent = `${msg.done} / ${msg.total} findings`;
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      row.innerHTML = `
+        <span class="log-icon">${verdictIcon[msg.verdict] || '–'}</span>
+        <span class="log-tool">${esc(msg.tool)}</span>
+        <span class="log-dim">${esc(msg.dim)}</span>
+        <span class="log-badge ${msg.verdict}">${esc(msg.verdictLabel || msg.verdict)}</span>`;
+      logEl.appendChild(row);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    if (msg.type === 'finding-error') {
+      const pct = Math.round((msg.done / msg.total) * 100);
+      barEl.style.width = pct + '%';
+      const row = document.createElement('div');
+      row.className = 'log-row';
+      row.innerHTML = `
+        <span class="log-icon">⚠️</span>
+        <span class="log-tool">${esc(msg.tool)}</span>
+        <span class="log-dim">${esc(msg.dim)}</span>
+        <span class="log-badge err">error</span>`;
+      logEl.appendChild(row);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    if (msg.type === 'error') {
+      es.close();
+      currentEl.textContent = '';
+      statusEl.className = 'research-status err';
+      statusEl.textContent = msg.message;
+      openBtn.style.display = '';
+      openBtn.textContent = 'Open topic anyway →';
+    }
+
+    if (msg.type === 'done') {
+      es.close();
+      barEl.style.width = '100%';
+      currentEl.textContent = 'Research complete.';
+      statusEl.className = 'research-status done';
+      statusEl.textContent = `All ${msg.total} findings saved.`;
+      openBtn.style.display = '';
+      openBtn.textContent = 'Open topic →';
+      // auto-redirect after a short pause
+      setTimeout(() => { window.location.href = topicUrl; }, 1800);
+    }
+  };
+
+  es.onerror = () => {
+    es.close();
+    statusEl.className = 'research-status err';
+    statusEl.textContent = 'Connection lost.';
+    openBtn.style.display = '';
+    openBtn.textContent = 'Open topic →';
+  };
 }
 
 // ── EDIT MODAL ───────────────────────────────────
