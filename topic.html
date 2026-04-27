@@ -552,7 +552,7 @@
 <!-- TOP BAR -->
 <header class="top-bar">
   <div class="top-bar-left">
-    <a class="top-bar-back" href="platform.html">← All Topics</a>
+    <a class="top-bar-back" href="/platform.html">← All Topics</a>
     <span class="top-bar-sep">/</span>
     <span class="top-bar-icon" id="topbar-icon">📋</span>
     <span class="top-bar-title" id="topbar-title">Loading…</span>
@@ -788,9 +788,10 @@
 
 <script>
 // ── STATE ─────────────────────────────────────────────────────────────────────
-const params    = new URLSearchParams(location.search);
-const TOPIC_ID  = params.get('id');
-if (!TOPIC_ID) { location.href = 'platform.html'; }
+// Support both /topics/:id (clean URL) and ?id= (legacy)
+const _pathMatch = location.pathname.match(/\/topics\/([^\/]+)$/);
+const TOPIC_ID   = _pathMatch ? _pathMatch[1] : new URLSearchParams(location.search).get('id');
+if (!TOPIC_ID) { location.href = '/platform.html'; }
 
 let topic       = null;
 let activeView  = 'tools';
@@ -1546,7 +1547,7 @@ async function deleteTopic() {
   if (!confirm(`Delete "${name}"? All apps and findings will be removed. This cannot be undone.`)) return;
   try {
     await apiFetch(`/api/topics/${TOPIC_ID}`, { method: 'DELETE' });
-    window.location.href = 'platform.html';
+    window.location.href = '/platform.html';
   } catch(e) { alert('Delete failed: ' + e.message); }
 }
 

@@ -718,7 +718,7 @@ function renderTopics(list) {
 function topicUrl(t) {
   if (t.galleryUrl) return t.galleryUrl;
   if (t.builtIn && t.builtInUrl) return t.builtInUrl;
-  return `topic.html?id=${t.id}`;
+  return `/topics/${t.id}`;
 }
 
 function esc(s) {

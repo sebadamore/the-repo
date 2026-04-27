@@ -50,9 +50,11 @@ app.use(express.json());
 // Redirect bare root to the platform home before static middleware intercepts it
 app.get('/', (_req, res) => res.redirect('/platform.html'));
 
-// Topic gallery pages — serve the static HTML gallery for each topic that has one.
-// /topics/sharing → index.html (Sharing UX Visual Gallery)
+// /topics/sharing → visual gallery (index.html)
 app.get('/topics/sharing', (_req, res) => res.sendFile(path.join(ROOT, 'index.html')));
+
+// /topics/:id → topic research view (topic.html), ID passed via path
+app.get('/topics/:id', (_req, res) => res.sendFile(path.join(ROOT, 'topic.html')));
 
 app.use(express.static(ROOT));
 
