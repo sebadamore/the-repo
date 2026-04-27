@@ -258,7 +258,9 @@ app.post('/api/topics', (req, res) => {
 app.get('/api/topics/:id', (req, res) => {
   const topic = loadTopic(req.params.id);
   if (!topic) return res.status(404).json({ error: 'not found' });
-  res.json(topic);
+  // Merge index-level fields (e.g. galleryUrl, readOnly) into the full topic response
+  const indexEntry = topicsIndex().find(t => t.id === req.params.id) || {};
+  res.json({ ...indexEntry, ...topic });
 });
 
 app.put('/api/topics/:id', (req, res) => {
