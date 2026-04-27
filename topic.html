@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Topic — UX Research Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -246,7 +247,8 @@
   .stat-card .sc-label { font-size: 11px; color: var(--mute); margin-top: 4px; line-height: 1.4; }
 
   /* ── GALLERY (Screenshots tab) ── */
-  .gallery-layout { display: flex; gap: 0; min-height: calc(100vh - 112px); margin: -24px -28px -80px; }
+  .gallery-section-wrap { margin: -24px -28px -80px; }
+  .gallery-layout { display: flex; gap: 0; min-height: calc(100vh - 112px); }
   .gallery-sidebar {
     width: 200px; flex-shrink: 0; background: var(--sidebar);
     padding: 20px 0; overflow-y: auto; position: sticky; top: 112px;
@@ -402,6 +404,147 @@
   .hidden { display: none !important; }
   .empty { text-align: center; padding: 60px 20px; color: var(--mute); }
   .empty .icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* ── RESPONSIVE ── */
+
+  /* tablet */
+  @media (max-width: 1024px) {
+    .toolgrid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    .stat-cards { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+  }
+
+  /* mobile */
+  @media (max-width: 768px) {
+    /* topbar */
+    header.top-bar {
+      padding: 0 14px; gap: 8px; height: auto; min-height: 52px; flex-wrap: wrap;
+    }
+    .top-bar-left { flex: 1; min-width: 0; gap: 8px; }
+    .top-bar-title { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+    .top-bar-sub { display: none; }
+    .top-bar-sep { display: none; }
+    /* hide secondary actions — accessible via Edit topic from detail panel */
+    .top-bar-btn-ghost { display: none; }
+    .top-bar-btn-primary { padding: 6px 12px; font-size: 12px; }
+
+    /* show mobile-only edit menu */
+    .mob-menu-btn { display: flex !important; }
+
+    /* tabs */
+    .viewtabs {
+      padding: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .viewtabs::-webkit-scrollbar { display: none; }
+    .viewtabs button { padding: 12px 14px; font-size: 12px; white-space: nowrap; }
+
+    /* main */
+    main { padding: 14px 14px 80px; }
+
+    /* tool grid */
+    .toolgrid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
+    .toolcard { padding: 11px 10px 9px; }
+    .toolcard .tc-name { font-size: 13px; }
+    .add-tool-card { min-height: 70px; }
+
+    /* detail panel */
+    .detail .d-head {
+      padding: 16px; flex-direction: column; align-items: flex-start; gap: 12px;
+    }
+    .detail .d-head h2 { font-size: 17px; }
+    .detail .d-head-right {
+      flex-direction: row; flex-wrap: wrap; gap: 8px; width: 100%; align-items: center;
+    }
+    .shot-btn { font-size: 11px; padding: 6px 10px; }
+    .pricing-chip { font-size: 11px; }
+    .edit-app-btn { font-size: 11px; }
+
+    /* dimensions: single column */
+    .dimensions { grid-template-columns: 1fr; }
+    .dim { padding: 16px; }
+
+    /* sources */
+    .sources { padding: 12px 16px; font-size: 11px; }
+
+    /* matrix */
+    .matrix { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table.mtx { min-width: 500px; }
+    table.mtx th, table.mtx td { padding: 10px 12px; }
+
+    /* charts */
+    .stat-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card { padding: 12px 14px; }
+    .stat-card .sc-num { font-size: 22px; }
+    .charts-row { grid-template-columns: 1fr; }
+    .chart-panel { padding: 16px 14px; }
+    .hbar-label { width: 80px; font-size: 11px; }
+
+    /* gallery — hide sidebar, full width */
+    .gallery-section-wrap { margin: -14px -14px -80px; }
+    .gallery-layout { flex-direction: column; }
+    .gallery-sidebar { display: none; }
+    .gallery-main { padding: 16px; overflow-y: visible; }
+    .gallery-section-head h2 { font-size: 15px; }
+    .dim-summary-row { grid-template-columns: 1fr 1fr; }
+    .shot-figures { gap: 8px; }
+    .shot-fig img { width: 150px; height: 100px; }
+
+    /* modals */
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    .modal {
+      border-radius: 16px 16px 0 0; padding: 20px 16px;
+      width: 100%; max-width: 100%; max-height: 92vh;
+    }
+    .modal h2 { font-size: 15px; }
+
+    /* verdict picker */
+    .verdict-picker { gap: 6px; }
+    .vpick { padding: 7px 4px; font-size: 11px; }
+
+    /* research overlay */
+    .modal-overlay#research-overlay { align-items: center; }
+    .modal-overlay#research-overlay .modal {
+      border-radius: 12px; max-width: calc(100vw - 20px); width: 100%;
+    }
+
+    /* lightbox arrows closer on mobile */
+    .lb-arrow.prev { left: 4px; }
+    .lb-arrow.next { right: 4px; }
+  }
+
+  @media (max-width: 480px) {
+    .top-bar-title { max-width: 100px; }
+    .stat-cards { grid-template-columns: 1fr; }
+    .dim-summary-row { grid-template-columns: 1fr; }
+    .shot-fig img { width: 130px; height: 88px; }
+    .hbar-label { width: 70px; }
+    .hbar-badges { display: none; } /* too cramped on very small screens */
+  }
+
+  /* ── AI SOURCE BADGE ── */
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 9px; font-weight: 700; letter-spacing: .04em;
+    background: #EFF6FF; color: #2563EB; border-radius: 4px;
+    padding: 1px 6px; margin-left: 6px; vertical-align: middle;
+    cursor: pointer; border: 1px solid #BFDBFE; transition: background .12s;
+  }
+  .ai-badge:hover { background: #DBEAFE; }
+  .ai-badge.reviewed { background: var(--good-soft); color: var(--good); border-color: #86EFAC; cursor: default; }
+
+  /* ── DIM EMPTY CTA ── */
+  .dim-empty-cta {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 4px 0;
+  }
+  .dim-empty-cta .no-rating { color: var(--mute2); font-size: 12px; font-style: italic; }
+  .dim-rate-cta {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--purple); color: white;
+    padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; font-family: inherit; transition: background .12s;
+  }
+  .dim-rate-cta:hover { background: var(--purple-dark); }
 </style>
 </head>
 <body>
@@ -419,6 +562,28 @@
     <button class="top-bar-btn top-bar-btn-ghost" onclick="openEditModal()">Edit topic</button>
     <button class="top-bar-btn top-bar-btn-ghost" id="research-btn" onclick="runResearch()" title="Auto-research all tools with Claude">🔬 Run research</button>
     <button class="top-bar-btn top-bar-btn-primary" onclick="openAppModal()">+ Add app</button>
+    <!-- mobile overflow menu -->
+    <div style="position:relative">
+      <button class="top-bar-btn top-bar-btn-ghost mob-menu-btn"
+              style="display:none;padding:6px 10px;font-size:18px;line-height:1"
+              onclick="toggleMobMenu()" aria-label="More options">⋯</button>
+      <div id="mob-menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;
+           background:#fff;border:1px solid var(--line);border-radius:10px;
+           box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:160px;overflow:hidden;z-index:200">
+        <button onclick="openEditModal();closeMobMenu()"
+                style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;
+                       border:none;background:none;font:13px 'Inter',sans-serif;color:var(--text);
+                       cursor:pointer;text-align:left" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">
+          ✏️ Edit topic
+        </button>
+        <button onclick="runResearch();closeMobMenu()"
+                style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;
+                       border:none;background:none;font:13px 'Inter',sans-serif;color:var(--text);
+                       cursor:pointer;text-align:left;border-top:1px solid var(--line)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">
+          🔬 Run research
+        </button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -472,7 +637,7 @@
   </section>
 
   <!-- SCREENSHOTS GALLERY -->
-  <section id="view-gallery" class="hidden" style="margin:-24px -28px -80px">
+  <section id="view-gallery" class="hidden gallery-section-wrap">
     <div class="gallery-layout">
       <div class="gallery-sidebar" id="gallery-sidebar"></div>
       <div class="gallery-main" id="gallery-main"></div>
@@ -502,8 +667,9 @@
     </div>
     <div id="ro-current" style="padding:10px 24px;font-size:12px;color:var(--purple-mid);border-bottom:1px solid rgba(255,255,255,.06);min-height:36px"></div>
     <div id="ro-log" style="flex:1;overflow-y:auto;padding:10px 24px;display:flex;flex-direction:column;gap:4px;font-size:12px"></div>
-    <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between">
-      <span id="ro-status" style="font-size:13px;color:rgba(255,255,255,.45)">Starting…</span>
+    <div style="padding:14px 24px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <span id="ro-status" style="font-size:13px;color:rgba(255,255,255,.45);flex:1">Starting…</span>
+      <button id="ro-force-btn" class="top-bar-btn top-bar-btn-ghost" onclick="closeResearchOverlay();runResearch(true)" style="display:none;font-size:11px">↻ Re-research all</button>
       <button id="ro-close-btn" class="top-bar-btn top-bar-btn-ghost" onclick="closeResearchOverlay()" style="display:none">Close</button>
     </div>
   </div>
@@ -673,6 +839,19 @@ function updateTopbar() {
   document.getElementById('topbar-icon').textContent   = topic.icon || '📋';
   document.getElementById('topbar-title').textContent  = topic.name;
   document.getElementById('topbar-sub').textContent    = `${(topic.apps||[]).length} apps compared`;
+
+  const researchBtn = document.getElementById('research-btn');
+  if (researchBtn) {
+    if (topic.researchInProgress) {
+      researchBtn.disabled = true;
+      researchBtn.title = 'Research is already running in another session';
+      researchBtn.textContent = '⏳ Research running…';
+    } else {
+      researchBtn.disabled = false;
+      researchBtn.title = 'Auto-research all tools with Claude';
+      researchBtn.innerHTML = '🔬 Run research';
+    }
+  }
 }
 
 // ── SWITCH VIEW ───────────────────────────────────────────────────────────────
@@ -732,7 +911,6 @@ function renderGrid() {
 
   document.getElementById('toolgrid').innerHTML =
     visible.map(app => {
-      const hasShots = false; // determined at render time; screenshots are async — skip for grid
       return `<div class="toolcard${app.id===activeTool?' selected':''}" onclick="selectTool('${app.id}')">
         <div class="tc-name">${esc(app.name)}</div>
         <div class="tc-cat">${esc(app.category||'')}</div>
@@ -766,17 +944,26 @@ function renderDetail() {
     const vLabel = f.verdictLabel || '';
     const keyline = f.keyline || '';
     const bullets = f.bullets || [];
+    const isAi = f.source === 'ai';
+    const isReviewed = f.source === 'manual';
+
+    const aiBadge = isAi
+      ? `<span class="ai-badge" title="AI-generated — click to mark as reviewed" onclick="markReviewed('${app.id}','${d.id}')">✦ AI</span>`
+      : (isReviewed && v !== 'none' ? `<span class="ai-badge reviewed">✓ Reviewed</span>` : '');
 
     const body = (keyline || bullets.length > 0)
       ? `<div class="d-body">
-          ${vLabel ? `<div class="verdict ${v}">${esc(vLabel)}</div>` : `<div class="verdict neutral">Not rated</div>`}
+          ${vLabel ? `<div class="verdict ${v}">${esc(vLabel)}${aiBadge}</div>` : `<div class="verdict neutral">Not rated${aiBadge}</div>`}
           ${keyline ? `<div class="keyline">${esc(keyline)}</div>` : ''}
           ${bullets.length > 0 ? `<ul>${bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
         </div>`
-      : `<div class="dim-empty">Not rated yet.</div>`;
+      : `<div class="dim-empty-cta">
+          <span class="no-rating">Not rated yet.</span>
+          <button class="dim-rate-cta" onclick="openFindingModal('${app.id}','${d.id}')">+ Add rating</button>
+        </div>`;
 
     return `<div class="dim">
-      <h3>${esc(d.name)} <button class="dim-rate-btn" onclick="openFindingModal('${app.id}','${d.id}')">Rate →</button></h3>
+      <h3>${esc(d.name)} <button class="dim-rate-btn" onclick="openFindingModal('${app.id}','${d.id}')">Edit →</button></h3>
       ${body}
     </div>`;
   }).join('');
@@ -942,7 +1129,9 @@ function renderCharts() {
         const label = f.verdictLabel || v;
         return `<td><span class="hm-cell ${v}">${esc(label.slice(0,18))}</span></td>`;
       }).join('');
-      return `<tr><td class="tool-td">${esc(app.name)}</td>${cells}</tr>`;
+      return `<tr style="cursor:pointer" title="View ${esc(app.name)} deep-dive" onclick="activeTool='${app.id}';switchView('tools')">
+        <td class="tool-td">${esc(app.name)}</td>${cells}
+      </tr>`;
     }).join('');
     heatmap.innerHTML = `<thead><tr><th class="tool-th">App</th>${dimHeaders}</tr></thead><tbody>${rows}</tbody>`;
   }
@@ -1172,9 +1361,24 @@ async function saveFinding() {
     await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ findings: { [dimId]: { verdict: findingVerdict, verdictLabel, keyline, bullets: findingBullets } } })
+      body: JSON.stringify({ findings: { [dimId]: { verdict: findingVerdict, verdictLabel, keyline, bullets: findingBullets, source: 'manual' } } })
     });
     closeFindingModal();
+    await loadTopic();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function markReviewed(appId, dimId) {
+  const app = (topic.apps||[]).find(a => a.id === appId);
+  if (!app) return;
+  const f = (app.findings||{})[dimId];
+  if (!f) return;
+  try {
+    await apiFetch(`/api/topics/${TOPIC_ID}/apps/${appId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ findings: { [dimId]: { ...f, source: 'manual' } } })
+    });
     await loadTopic();
   } catch(e) { alert('Error: ' + e.message); }
 }
@@ -1285,9 +1489,14 @@ function editRemoveDim(i) { editDims.splice(i,1); renderEditDims(); }
 
 function renderEditDims() {
   document.getElementById('ef-dims-list').innerHTML = editDims.map((d,i) => `
-    <div style="display:flex;align-items:center;gap:4px;background:var(--purple-soft);color:var(--purple);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500">
-      ${esc(d.name)}
-      <button style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--purple);padding:0" onclick="editRemoveDim(${i})">×</button>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <input type="text" value="${esc(d.name)}"
+             oninput="editDims[${i}].name=this.value"
+             style="flex:1;border:1px solid var(--line-strong);border-radius:6px;padding:5px 9px;font:13px 'Inter',sans-serif;background:var(--bg);color:var(--text);outline:none"
+             onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+      <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--mute2);padding:0 4px;line-height:1;transition:color .12s"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='var(--mute2)'"
+              onclick="editRemoveDim(${i})" title="Remove dimension">×</button>
     </div>`).join('');
 }
 
@@ -1296,6 +1505,21 @@ async function saveEditTopic() {
   if (!name) { document.getElementById('ef-name').focus(); return; }
   const icon        = document.getElementById('ef-icon').value.trim() || '📋';
   const description = document.getElementById('ef-desc').value.trim();
+
+  // Warn if removing a dimension that already has findings
+  const oldIds = new Set((topic.dimensions||[]).map(d => d.id));
+  const newIds = new Set(editDims.map(d => d.id));
+  const removed = [...oldIds].filter(id => !newIds.has(id));
+  if (removed.length > 0) {
+    const hasFindings = removed.some(id =>
+      (topic.apps||[]).some(a => (a.findings||{})[id]?.verdict && (a.findings||{})[id].verdict !== 'none')
+    );
+    if (hasFindings) {
+      const names = removed.map(id => (topic.dimensions||[]).find(d => d.id === id)?.name || id);
+      if (!confirm(`Removing "${names.join('", "')}" will hide existing findings for that dimension (the data stays on disk but won't be shown). Continue?`)) return;
+    }
+  }
+
   try {
     await apiFetch(`/api/topics/${TOPIC_ID}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -1315,6 +1539,16 @@ async function deleteTopic() {
   } catch(e) { alert('Delete failed: ' + e.message); }
 }
 
+// ── MOBILE MENU ───────────────────────────────────────────────────────────────
+function toggleMobMenu() {
+  const m = document.getElementById('mob-menu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+function closeMobMenu() { document.getElementById('mob-menu').style.display = 'none'; }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.mob-menu-btn') && !e.target.closest('#mob-menu')) closeMobMenu();
+});
+
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1325,7 +1559,7 @@ function closeResearchOverlay() {
   document.getElementById('research-overlay').classList.remove('open');
 }
 
-function runResearch() {
+function runResearch(force = false) {
   const overlay   = document.getElementById('research-overlay');
   const logEl     = document.getElementById('ro-log');
   const barEl     = document.getElementById('ro-bar');
@@ -1333,8 +1567,18 @@ function runResearch() {
   const statusEl  = document.getElementById('ro-status');
   const closeBtn  = document.getElementById('ro-close-btn');
 
+  // Count how many dims already have manual findings so we can show savings
+  const apps = topic?.apps || [];
+  const dims = topic?.dimensions || [];
+  const manualCount = apps.reduce((n, app) =>
+    n + dims.filter(d => app.findings?.[d.id]?.source === 'manual').length, 0);
+  const totalSlots  = apps.length * dims.length;
+  const skipMsg     = (!force && manualCount > 0)
+    ? ` Skipping ${manualCount} manually-reviewed finding${manualCount > 1 ? 's' : ''}.`
+    : '';
+
   document.getElementById('ro-title').textContent = `Researching "${topic?.name || ''}"`;
-  document.getElementById('ro-sub').textContent   = 'Claude is looking up each tool × dimension.';
+  document.getElementById('ro-sub').textContent   = `Claude is looking up each tool × dimension.${skipMsg}`;
   logEl.innerHTML = '';
   barEl.style.width = '0%';
   currentEl.textContent = 'Connecting…';
@@ -1347,7 +1591,8 @@ function runResearch() {
 
   const verdictIcon = { good: '✅', warn: '⚠️', bad: '❌' };
 
-  const es = new EventSource(`/api/topics/${TOPIC_ID}/research/stream`);
+  const streamUrl = `/api/topics/${TOPIC_ID}/research/stream${force ? '?force=1' : ''}`;
+  const es = new EventSource(streamUrl);
 
   es.onmessage = (e) => {
     const msg = JSON.parse(e.data);
@@ -1365,12 +1610,22 @@ function runResearch() {
       barEl.style.width = Math.round((msg.done / msg.total) * 100) + '%';
       statusEl.textContent = `${msg.done} / ${msg.total} findings`;
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.6)';
-      row.innerHTML = `
-        <span style="font-size:13px;width:18px;text-align:center;flex-shrink:0">${verdictIcon[msg.verdict]||'–'}</span>
-        <span style="font-weight:600;color:rgba(255,255,255,.85);flex-shrink:0">${esc(msg.tool)}</span>
-        <span style="color:rgba(255,255,255,.35);flex:1">${esc(msg.dim)}</span>
-        <span style="font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;background:${msg.verdict==='good'?'#DCFCE7':msg.verdict==='warn'?'#FEF3C7':'#FEE2E2'};color:${msg.verdict==='good'?'#16A34A':msg.verdict==='warn'?'#D97706':'#DC2626'}">${esc(msg.verdictLabel||msg.verdict)}</span>`;
+      if (msg.skipped) {
+        // Skipped (manual finding preserved) — show dimmed
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);opacity:.4';
+        row.innerHTML = `
+          <span style="font-size:13px;width:18px;text-align:center;flex-shrink:0">↩</span>
+          <span style="font-weight:600;color:rgba(255,255,255,.7);flex-shrink:0">${esc(msg.tool)}</span>
+          <span style="color:rgba(255,255,255,.35);flex:1">${esc(msg.dim)}</span>
+          <span style="font-size:10px;font-weight:600;border-radius:4px;padding:1px 6px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)">kept</span>`;
+      } else {
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.6)';
+        row.innerHTML = `
+          <span style="font-size:13px;width:18px;text-align:center;flex-shrink:0">${verdictIcon[msg.verdict]||'–'}</span>
+          <span style="font-weight:600;color:rgba(255,255,255,.85);flex-shrink:0">${esc(msg.tool)}</span>
+          <span style="color:rgba(255,255,255,.35);flex:1">${esc(msg.dim)}</span>
+          <span style="font-size:10px;font-weight:700;border-radius:4px;padding:1px 6px;background:${msg.verdict==='good'?'#DCFCE7':msg.verdict==='warn'?'#FEF3C7':'#FEE2E2'};color:${msg.verdict==='good'?'#16A34A':msg.verdict==='warn'?'#D97706':'#DC2626'}">${esc(msg.verdictLabel||msg.verdict)}</span>`;
+      }
       logEl.appendChild(row);
       logEl.scrollTop = logEl.scrollHeight;
     }
@@ -1399,10 +1654,14 @@ function runResearch() {
       currentEl.textContent = 'Research complete.';
       statusEl.style.color  = '#86EFAC';
       statusEl.textContent  = `All ${msg.total} findings saved.`;
+      closeBtn.textContent = 'Close & reload';
+      closeBtn.onclick = () => { closeResearchOverlay(); loadTopic(); };
       closeBtn.style.display = '';
+      // Show force button if we skipped any manual findings this run
+      if (!force && manualCount > 0) {
+        document.getElementById('ro-force-btn').style.display = '';
+      }
       document.getElementById('research-btn').disabled = false;
-      // reload topic data and re-render
-      setTimeout(() => { closeResearchOverlay(); loadTopic(); }, 1200);
     }
   };
 

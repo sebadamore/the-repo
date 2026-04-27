@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>UX Research Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,7 +49,7 @@
   }
   .sidebar-brand .brand-name { color: #fff; font-weight: 600; font-size: 14px; }
   .sidebar-brand .brand-sub { color: var(--purple-mid); font-size: 11px; margin-top: 1px; }
-  .sidebar-nav { padding: 12px 0; flex: 1; }
+  .sidebar-nav { padding: 12px 0; flex: 1; display: flex; flex-direction: column; }
   .nav-label {
     padding: 8px 20px 4px;
     font-size: 10px; font-weight: 600; letter-spacing: .08em;
@@ -285,13 +286,106 @@
   .research-status { font-size: 13px; color: rgba(255,255,255,.5); }
   .research-status.done { color: #86EFAC; }
   .research-status.err  { color: #FDA4A4; }
+
+  /* ── HAMBURGER ── */
+  .hamburger {
+    display: none; flex-direction: column; justify-content: center; gap: 5px;
+    background: none; border: none; cursor: pointer; padding: 4px; margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .hamburger span {
+    display: block; width: 20px; height: 2px;
+    background: var(--text); border-radius: 2px; transition: all .2s;
+  }
+
+  /* ── SIDEBAR OVERLAY ── */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 99;
+  }
+  .sidebar-overlay.open { display: block; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    /* sidebar becomes off-canvas */
+    aside.sidebar {
+      transform: translateX(-100%);
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      z-index: 200;
+    }
+    aside.sidebar.open { transform: translateX(0); }
+
+    .hamburger { display: flex; }
+
+    .main { margin-left: 0; }
+
+    .topbar { padding: 0 16px; }
+
+    .ai-banner { padding: 10px 16px; font-size: 12px; }
+
+    .content { padding: 16px; }
+
+    .hero {
+      flex-direction: column; padding: 24px 20px; gap: 16px;
+      border-radius: 12px; margin-bottom: 20px;
+    }
+    .hero-text h1 { font-size: 20px; }
+    .hero-text p  { font-size: 13px; margin-bottom: 16px; }
+    .hero-icon { display: none; }
+    .hero-stats { gap: 20px; }
+    .hero-stat .n { font-size: 22px; }
+
+    .section-header { margin-bottom: 12px; }
+
+    .topic-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .topic-add-card { min-height: 80px; }
+
+    /* modals full-width on mobile */
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    .modal {
+      width: 100%; max-width: 100%; border-radius: 16px 16px 0 0;
+      padding: 24px 20px; max-height: 90vh; overflow-y: auto;
+    }
+    .modal h2 { font-size: 16px; }
+
+    /* research overlay */
+    .research-panel { width: calc(100vw - 16px); max-height: 88vh; border-radius: 12px; }
+
+    /* edit modal dims */
+    .dims-list { gap: 4px; }
+  }
+
+  @media (max-width: 480px) {
+    .btn { padding: 7px 12px; font-size: 12px; }
+    .topbar-title { font-size: 14px; }
+  }
+
+  /* ── AI STATUS BANNER ── */
+  .ai-banner {
+    display: none; background: #FEF3C7; border-bottom: 1px solid #FDE68A;
+    padding: 10px 28px; font-size: 13px; color: #92400E;
+    align-items: center; gap: 10px;
+  }
+  .ai-banner.visible { display: flex; }
+  .ai-banner strong { font-weight: 600; }
+  .ai-banner code {
+    background: #FDE68A; border-radius: 4px; padding: 1px 6px;
+    font-family: ui-monospace, monospace; font-size: 12px;
+  }
 </style>
 </head>
 <body>
 <div class="layout">
 
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="logo">R</div>
       <div>
@@ -306,12 +400,24 @@
       </a>
       <div class="nav-label" style="margin-top:12px">Quick access</div>
       <div id="sidebar-topics"></div>
+      <div style="margin-top:auto;padding:16px 12px 8px">
+        <button class="nav-item" style="width:100%;background:none;border:none;text-align:left;cursor:pointer;font:inherit" onclick="openToolsModal()">
+          <span class="icon">🧰</span> Manage Tools
+        </button>
+      </div>
     </nav>
   </aside>
 
   <!-- MAIN -->
   <div class="main">
+    <div class="ai-banner" id="ai-banner">
+      <span>⚠️</span>
+      <span><strong>AI research is not configured.</strong> Add <code>ANTHROPIC_API_KEY=sk-ant-…</code> to a <code>.env</code> file in the project root, then restart the server. New topics can still be created and filled in manually.</span>
+    </div>
     <div class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <span class="topbar-title">UX Research Platform</span>
       <button class="btn btn-primary" onclick="openModal()">+ New Topic</button>
     </div>
@@ -402,6 +508,72 @@
   </div>
 </div>
 
+<!-- TOOLS REGISTRY MODAL -->
+<div class="modal-overlay" id="tools-modal" onclick="if(event.target===this)closeToolsModal()" style="display:none">
+  <div class="modal" style="max-width:640px;width:100%">
+    <h2>Tool Registry</h2>
+    <p class="subtitle">These tools are available when running AI research across all topics.</p>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="tool-search" placeholder="Search tools…" oninput="renderToolsList()"
+             style="flex:1;border:1px solid var(--line-strong);border-radius:6px;padding:7px 10px;font:13px 'Inter',sans-serif;background:var(--bg);color:var(--text);outline:none"
+             onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+      <button class="btn btn-primary" onclick="openAddToolForm()" style="flex-shrink:0">+ Add tool</button>
+    </div>
+
+    <div id="tools-list" style="max-height:320px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg)"></div>
+
+    <!-- Add/edit tool form (hidden by default) -->
+    <div id="tool-form" style="display:none;margin-top:16px;border-top:1px solid var(--line);padding-top:16px">
+      <h3 style="margin:0 0 12px;font-size:14px;font-weight:600" id="tool-form-title">Add tool</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">ID <span style="font-weight:400;color:var(--mute2)">(slug)</span></label>
+          <input type="text" id="tf-id" placeholder="e.g. notion" style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none"
+                 onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">Name</label>
+          <input type="text" id="tf-name" placeholder="e.g. Notion" style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none"
+                 onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'"
+                 oninput="if(!tfEditMode){document.getElementById('tf-id').value=this.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40)}">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">Category</label>
+          <input type="text" id="tf-category" placeholder="e.g. Whiteboard" style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none"
+                 onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">URL</label>
+          <input type="url" id="tf-url" placeholder="https://…" style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none"
+                 onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">Pricing</label>
+          <input type="text" id="tf-pricing" placeholder="e.g. Free / Pro" style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none"
+                 onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:4px">Summary <span style="font-weight:400;color:var(--mute2)">(optional — helps AI research)</span></label>
+        <textarea id="tf-summary" rows="2" placeholder="One-sentence description of the tool's key characteristic…"
+                  style="width:100%;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font:13px 'Inter',sans-serif;background:var(--panel);color:var(--text);outline:none;resize:vertical"
+                  onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="cancelToolForm()">Cancel</button>
+        <button class="btn btn-primary" id="tf-save-btn" onclick="saveToolForm()">Add tool</button>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="padding-top:12px;margin-top:4px">
+      <span style="font-size:12px;color:var(--mute2)" id="tools-count-label"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" onclick="closeToolsModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- NEW TOPIC MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -433,6 +605,9 @@
       <div class="dims-list" id="dims-list"></div>
     </div>
 
+    <div id="modal-ai-note" style="display:none;font-size:12px;color:#92400E;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:9px 12px;margin-top:4px">
+      ⚠️ AI research won't run — no API key configured. The topic will be created and you can fill in findings manually.
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="createTopic()">Create Topic</button>
@@ -444,6 +619,21 @@
 const BASE = '';
 let topics = [];
 let dims = [];
+
+// ── SIDEBAR TOGGLE (mobile) ──────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+// Close sidebar when a nav link is clicked on mobile
+document.addEventListener('click', e => {
+  const link = e.target.closest('.nav-item');
+  if (link && window.innerWidth <= 768) closeSidebar();
+});
 
 // ── API ──────────────────────────────────────────
 async function apiTopics() {
@@ -497,14 +687,15 @@ function renderTopics(list) {
 
   // grid cards
   const cards = list.map(t => {
-    const actions = t.builtIn ? '' : `
+    const isLocked = t.builtIn || t.readOnly;
+    const actions = isLocked ? '' : `
       <div class="topic-card-actions" onclick="event.preventDefault();event.stopPropagation()">
         <button class="card-action-btn" onclick="openEditModal('${t.id}')">Edit</button>
         <button class="card-action-btn danger" onclick="deleteTopic('${t.id}','${esc(t.name)}')">Delete</button>
       </div>`;
     return `
     <a class="topic-card" href="${topicUrl(t)}">
-      ${t.builtIn ? '<span class="topic-card-badge">Built-in</span>' : ''}
+      ${isLocked ? '<span class="topic-card-badge">Read-only</span>' : ''}
       <div class="topic-card-icon">${t.icon || '📋'}</div>
       <div class="topic-card-name">${esc(t.name)}</div>
       <div class="topic-card-desc">${esc(t.description || 'No description yet.')}</div>
@@ -672,8 +863,6 @@ function startResearch(topic) {
       statusEl.textContent = `All ${msg.total} findings saved.`;
       openBtn.style.display = '';
       openBtn.textContent = 'Open topic →';
-      // auto-redirect after a short pause
-      setTimeout(() => { window.location.href = topicUrl; }, 1800);
     }
   };
 
@@ -682,7 +871,9 @@ function startResearch(topic) {
     statusEl.className = 'research-status err';
     statusEl.textContent = 'Connection lost.';
     openBtn.style.display = '';
-    openBtn.textContent = 'Open topic →';
+    openBtn.textContent = 'Open topic anyway →';
+    // Refresh topic list in background so the new topic appears
+    apiTopics().then(list => { topics = list; renderTopics(list); }).catch(() => {});
   };
 }
 
@@ -725,7 +916,15 @@ function editRemoveDim(i) { editDims.splice(i, 1); renderEditDims(); }
 
 function renderEditDims() {
   document.getElementById('ef-dims-list').innerHTML = editDims.map((d, i) => `
-    <div class="dim-chip">${esc(d.name)}<button onclick="editRemoveDim(${i})">×</button></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <input type="text" value="${esc(d.name)}"
+             oninput="editDims[${i}].name=this.value"
+             style="flex:1;border:1px solid var(--line-strong);border-radius:6px;padding:5px 9px;font:13px 'Inter',sans-serif;background:var(--bg);color:var(--text);outline:none"
+             onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--line-strong)'">
+      <button style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--mute2);padding:0 4px;line-height:1;transition:color .12s"
+              onmouseover="this.style.color='#DC2626'" onmouseout="this.style.color='var(--mute2)'"
+              onclick="editRemoveDim(${i})" title="Remove">×</button>
+    </div>
   `).join('');
 }
 
@@ -759,8 +958,176 @@ async function deleteTopic(id, name) {
   }
 }
 
+// ── TOOLS REGISTRY ──────────────────────────────
+let allTools = [];
+let tfEditMode = false;
+let tfEditId = null;
+
+async function openToolsModal() {
+  document.getElementById('tools-modal').style.display = 'flex';
+  document.getElementById('tool-form').style.display = 'none';
+  document.getElementById('tool-search').value = '';
+  await refreshTools();
+}
+
+function closeToolsModal() {
+  document.getElementById('tools-modal').style.display = 'none';
+}
+
+async function refreshTools() {
+  try {
+    const r = await fetch('/api/tools');
+    allTools = await r.json();
+    renderToolsList();
+  } catch (e) {
+    document.getElementById('tools-list').innerHTML = `<div style="padding:16px;color:var(--mute)">Failed to load tools: ${esc(e.message)}</div>`;
+  }
+}
+
+function renderToolsList() {
+  const q = (document.getElementById('tool-search').value || '').toLowerCase();
+  const filtered = q
+    ? allTools.filter(t => t.name.toLowerCase().includes(q) || (t.category||'').toLowerCase().includes(q))
+    : allTools;
+
+  document.getElementById('tools-count-label').textContent = `${filtered.length} of ${allTools.length} tools`;
+
+  if (filtered.length === 0) {
+    document.getElementById('tools-list').innerHTML = `<div style="padding:20px;text-align:center;color:var(--mute)">No tools match "${esc(q)}"</div>`;
+    return;
+  }
+
+  document.getElementById('tools-list').innerHTML = filtered.map(t => `
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--panel)">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:600;font-size:13px">${esc(t.name)}</span>
+          ${t.category ? `<span style="font-size:11px;padding:1px 7px;border-radius:12px;background:var(--chip-bg);color:var(--purple);font-weight:600">${esc(t.category)}</span>` : ''}
+        </div>
+        ${t.url ? `<a href="${esc(t.url)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--mute2)">${esc(t.url)}</a>` : ''}
+        ${t.summary ? `<div style="font-size:12px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.summary)}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="openEditToolForm('${esc(t.id)}')"
+                style="background:none;border:1px solid var(--line-strong);border-radius:5px;padding:3px 9px;font:12px 'Inter',sans-serif;cursor:pointer;color:var(--mute);transition:all .12s"
+                onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--purple)'"
+                onmouseout="this.style.borderColor='var(--line-strong)';this.style.color='var(--mute)'">Edit</button>
+        <button onclick="deleteTool('${esc(t.id)}','${esc(t.name)}')"
+                style="background:none;border:1px solid #FECACA;border-radius:5px;padding:3px 9px;font:12px 'Inter',sans-serif;cursor:pointer;color:#DC2626;transition:all .12s"
+                onmouseover="this.style.background='#FEE2E2'"
+                onmouseout="this.style.background='none'">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddToolForm() {
+  tfEditMode = false;
+  tfEditId = null;
+  document.getElementById('tool-form-title').textContent = 'Add tool';
+  document.getElementById('tf-save-btn').textContent = 'Add tool';
+  document.getElementById('tf-id').value = '';
+  document.getElementById('tf-name').value = '';
+  document.getElementById('tf-category').value = '';
+  document.getElementById('tf-url').value = '';
+  document.getElementById('tf-pricing').value = '';
+  document.getElementById('tf-summary').value = '';
+  document.getElementById('tf-id').readOnly = false;
+  document.getElementById('tool-form').style.display = '';
+  setTimeout(() => document.getElementById('tf-name').focus(), 50);
+}
+
+function openEditToolForm(id) {
+  const t = allTools.find(x => x.id === id);
+  if (!t) return;
+  tfEditMode = true;
+  tfEditId = id;
+  document.getElementById('tool-form-title').textContent = `Edit "${t.name}"`;
+  document.getElementById('tf-save-btn').textContent = 'Save changes';
+  document.getElementById('tf-id').value = t.id;
+  document.getElementById('tf-name').value = t.name || '';
+  document.getElementById('tf-category').value = t.category || '';
+  document.getElementById('tf-url').value = t.url || '';
+  document.getElementById('tf-pricing').value = t.pricing || '';
+  document.getElementById('tf-summary').value = t.summary || '';
+  document.getElementById('tf-id').readOnly = true;
+  document.getElementById('tool-form').style.display = '';
+  setTimeout(() => document.getElementById('tf-name').focus(), 50);
+}
+
+function cancelToolForm() {
+  document.getElementById('tool-form').style.display = 'none';
+  tfEditMode = false;
+  tfEditId = null;
+}
+
+async function saveToolForm() {
+  const id       = document.getElementById('tf-id').value.trim();
+  const name     = document.getElementById('tf-name').value.trim();
+  const category = document.getElementById('tf-category').value.trim();
+  const url      = document.getElementById('tf-url').value.trim();
+  const pricing  = document.getElementById('tf-pricing').value.trim();
+  const summary  = document.getElementById('tf-summary').value.trim();
+
+  if (!id)   { document.getElementById('tf-id').focus(); return; }
+  if (!name) { document.getElementById('tf-name').focus(); return; }
+
+  const btn = document.getElementById('tf-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    if (tfEditMode) {
+      await fetch(`/api/tools/${tfEditId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, category, url, pricing, summary })
+      }).then(r => { if (!r.ok) throw new Error('Save failed'); });
+    } else {
+      const r = await fetch('/api/tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, category, url, pricing, summary })
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to add tool');
+      }
+    }
+    document.getElementById('tool-form').style.display = 'none';
+    tfEditMode = false;
+    tfEditId = null;
+    await refreshTools();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = tfEditMode ? 'Save changes' : 'Add tool';
+  }
+}
+
+async function deleteTool(id, name) {
+  if (!confirm(`Remove "${name}" from the tool registry?\n\nExisting findings in topics are not deleted.`)) return;
+  try {
+    const r = await fetch(`/api/tools/${id}`, { method: 'DELETE' });
+    if (!r.ok) throw new Error('Delete failed');
+    await refreshTools();
+  } catch (e) {
+    alert('Failed to remove tool: ' + e.message);
+  }
+}
+
 // ── INIT ────────────────────────────────────────
 async function init() {
+  // Check AI availability early — surface setup issues before anything else
+  try {
+    const status = await fetch('/api/status').then(r => r.json());
+    if (!status.aiEnabled) {
+      document.getElementById('ai-banner').classList.add('visible');
+      document.getElementById('modal-ai-note').style.display = '';
+    }
+  } catch (_) {}
+
   try {
     topics = await apiTopics();
     renderTopics(topics);

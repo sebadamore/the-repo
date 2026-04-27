@@ -3,23 +3,12 @@
     "id": "sharing",
     "name": "Sharing & Permissions",
     "icon": "🔗",
-    "description": "How apps handle sharing, permissions, and external-guest collaboration. 12 tools compared across 3 dimensions.",
+    "description": "How 12 collaborative tools handle sharing — permission models, public/anonymous links, and external guest access.",
+    "readOnly": true,
     "appCount": 12,
     "dimensionCount": 3,
-    "builtIn": true,
-    "builtInUrl": "/artifact/index.html",
-    "createdAt": "2024-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "sign-up",
-    "name": "Sign up",
-    "icon": "📋",
-    "description": "",
-    "builtIn": false,
-    "appCount": 1,
-    "dimensionCount": 0,
-    "createdAt": "2026-04-24T13:18:38.645Z",
-    "updatedAt": "2026-04-24T13:18:51.522Z"
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2026-04-27T12:48:28.825Z"
   },
   {
     "id": "sign-up-sign-in",

@@ -20,15 +20,36 @@ const PORT = process.env.PORT || 3344;
 const ROOT = __dirname;
 const DATA = path.join(ROOT, 'data');
 
-const ALLOWED_TOOLS = [
-  'stormboard','miro','figjam','lucidspark','whimsical',
-  'tldraw','notion','evernote','canva','lovable','perplexity','claude'
-];
 const ALLOWED_EXTS = new Set(['.png','.jpg','.jpeg','.webp','.gif']);
 
 fs.mkdirSync(DATA, { recursive: true });
 
+// ─── ATOMIC WRITE + PER-TOPIC MUTEX ─────────────────────────────────────────
+// Write to a temp file then rename — prevents truncated JSON on crash.
+function atomicWrite(filePath, content) {
+  const tmp = filePath + '.tmp.' + process.pid;
+  fs.writeFileSync(tmp, content, 'utf8');
+  fs.renameSync(tmp, filePath);
+}
+
+// Serialize async operations on the same topic so concurrent SSE streams
+// can't interleave their read-modify-write cycles.
+const topicLocks = new Map();
+async function withTopicLock(topicId, fn) {
+  const prev = topicLocks.get(topicId) || Promise.resolve();
+  let release;
+  const lock = new Promise(r => { release = r; });
+  topicLocks.set(topicId, lock);
+  await prev;
+  try   { return await fn(); }
+  finally { release(); if (topicLocks.get(topicId) === lock) topicLocks.delete(topicId); }
+}
+
 app.use(express.json());
+
+// Redirect bare root to the platform home before static middleware intercepts it
+app.get('/', (_req, res) => res.redirect('/platform.html'));
+
 app.use(express.static(ROOT));
 
 // ─────────────────────────────────────────────
@@ -46,7 +67,20 @@ function topicsIndex() {
 }
 
 function saveTopicsIndex(list) {
-  fs.writeFileSync(path.join(DATA, 'topics.json'), JSON.stringify(list, null, 2));
+  atomicWrite(path.join(DATA, 'topics.json'), JSON.stringify(list, null, 2));
+}
+
+// ─── TOOL REGISTRY ───────────────────────────────────────────────────────────
+function toolsFile() { return path.join(DATA, 'tools.json'); }
+
+function loadTools() {
+  const f = toolsFile();
+  if (!fs.existsSync(f)) return [];
+  return JSON.parse(fs.readFileSync(f, 'utf8'));
+}
+
+function saveTools(list) {
+  atomicWrite(toolsFile(), JSON.stringify(list, null, 2));
 }
 
 function topicFile(id) { return path.join(DATA, `topic-${id}.json`); }
@@ -59,7 +93,7 @@ function loadTopic(id) {
 
 function saveTopic(topic) {
   topic.updatedAt = new Date().toISOString();
-  fs.writeFileSync(topicFile(topic.id), JSON.stringify(topic, null, 2));
+  atomicWrite(topicFile(topic.id), JSON.stringify(topic, null, 2));
   // sync index
   const list = topicsIndex();
   const idx  = list.findIndex(t => t.id === topic.id);
@@ -100,11 +134,19 @@ function nextSlot(dir) {
 // legacy sharing benchmark screenshots
 // ─────────────────────────────────────────────
 
+function isKnownLegacyTool(tool) {
+  // For legacy screenshot routes: check registry or allow any safe slug
+  const tools = loadTools();
+  if (tools.some(t => t.id === tool)) return true;
+  // Fallback: allow safe slugs (letters, numbers, hyphens only)
+  return /^[a-z0-9-]{1,40}$/.test(tool);
+}
+
 const legacyUpload = multer({
   storage: multer.diskStorage({
     destination(req, _res, cb) {
       const tool = req.params.tool;
-      if (!ALLOWED_TOOLS.includes(tool)) return cb(new Error('unknown tool'));
+      if (!isKnownLegacyTool(tool)) return cb(new Error('unknown tool'));
       const dir = path.join(ROOT, 'user-screenshots', tool);
       fs.mkdirSync(dir, { recursive: true });
       cb(null, dir);
@@ -128,7 +170,7 @@ app.post('/api/screenshots/:tool', legacyUpload.array('files', 40), (req, res) =
 
 app.delete('/api/screenshots/:tool/:file', (req, res) => {
   const { tool, file } = req.params;
-  if (!ALLOWED_TOOLS.includes(tool)) return res.status(400).json({ error: 'unknown tool' });
+  if (!isKnownLegacyTool(tool)) return res.status(400).json({ error: 'unknown tool' });
   const ext = path.extname(file).toLowerCase();
   if (!ALLOWED_EXTS.has(ext)) return res.status(400).json({ error: 'bad extension' });
   const target  = path.resolve(path.join(ROOT, 'user-screenshots', tool, file));
@@ -140,7 +182,7 @@ app.delete('/api/screenshots/:tool/:file', (req, res) => {
 
 app.get('/api/screenshots/:tool', (req, res) => {
   const { tool } = req.params;
-  if (!ALLOWED_TOOLS.includes(tool)) return res.status(400).json({ error: 'unknown tool' });
+  if (!isKnownLegacyTool(tool)) return res.status(400).json({ error: 'unknown tool' });
   const dir = path.join(ROOT, 'user-screenshots', tool);
   if (!fs.existsSync(dir)) return res.json([]);
   const files = fs.readdirSync(dir)
@@ -153,6 +195,41 @@ app.get('/api/screenshots/:tool', (req, res) => {
 // ─────────────────────────────────────────────
 // topics
 // ─────────────────────────────────────────────
+
+app.get('/api/status', (_req, res) => {
+  res.json({ aiEnabled: !!process.env.ANTHROPIC_API_KEY });
+});
+
+// ─── TOOL REGISTRY ────────────────────────────────────────────────────────────
+app.get('/api/tools', (_req, res) => res.json(loadTools()));
+
+app.post('/api/tools', (req, res) => {
+  const { name, category = '', pricing = '', url = '', summary = '' } = req.body;
+  if (!name) return res.status(400).json({ error: 'name required' });
+  const tools = loadTools();
+  const id = safeId(name);
+  if (tools.some(t => t.id === id)) return res.status(409).json({ error: 'tool id already exists' });
+  const tool = { id, name, category, pricing, url, summary };
+  saveTools([...tools, tool]);
+  res.status(201).json(tool);
+});
+
+app.put('/api/tools/:id', (req, res) => {
+  const tools = loadTools();
+  const idx = tools.findIndex(t => t.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'not found' });
+  const updated = { ...tools[idx], ...req.body, id: tools[idx].id }; // id immutable
+  const newList = [...tools.slice(0, idx), updated, ...tools.slice(idx + 1)];
+  saveTools(newList);
+  res.json(updated);
+});
+
+app.delete('/api/tools/:id', (req, res) => {
+  const tools = loadTools();
+  if (!tools.some(t => t.id === req.params.id)) return res.status(404).json({ error: 'not found' });
+  saveTools(tools.filter(t => t.id !== req.params.id));
+  res.json({ ok: true });
+});
 
 app.get('/api/topics', (_req, res) => res.json(topicsIndex()));
 
@@ -183,6 +260,7 @@ app.get('/api/topics/:id', (req, res) => {
 app.put('/api/topics/:id', (req, res) => {
   const topic = loadTopic(req.params.id);
   if (!topic) return res.status(404).json({ error: 'not found' });
+  if (topic.readOnly) return res.status(403).json({ error: 'Topic is read-only' });
   const { name, icon, description, dimensions } = req.body;
   if (name)        topic.name        = name;
   if (icon)        topic.icon        = icon;
@@ -195,6 +273,8 @@ app.put('/api/topics/:id', (req, res) => {
 app.delete('/api/topics/:id', (req, res) => {
   const f = topicFile(req.params.id);
   if (!fs.existsSync(f)) return res.status(404).json({ error: 'not found' });
+  const topic = loadTopic(req.params.id);
+  if (topic && topic.readOnly) return res.status(403).json({ error: 'Topic is read-only' });
   fs.unlinkSync(f);
   const list = topicsIndex().filter(t => t.id !== req.params.id);
   saveTopicsIndex(list);
@@ -230,7 +310,12 @@ app.put('/api/topics/:id/apps/:appId', (req, res) => {
   if (pricing !== undefined) app.pricing = pricing;
   if (summary !== undefined) app.summary = summary;
   if (sources  !== undefined) app.sources = sources;
-  if (findings) app.findings = { ...app.findings, ...findings };
+  if (findings) {
+    const stamped = Object.fromEntries(
+      Object.entries(findings).map(([k, v]) => [k, { ...v, source: v.source || 'manual' }])
+    );
+    app.findings = { ...app.findings, ...stamped };
+  }
   topic.apps = [...topic.apps.slice(0, idx), app, ...topic.apps.slice(idx + 1)];
   saveTopic(topic);
   res.json(app);
@@ -291,33 +376,16 @@ app.delete('/api/topics/:id/apps/:appId/screenshots/:file', (req, res) => {
 // AI research
 // ─────────────────────────────────────────────
 
-/** Collect every unique app across all non-builtIn topics, excluding `skipId`. */
-function getCanonicalTools(skipId) {
-  const list = topicsIndex();
-  const seen = new Map(); // name.toLowerCase() → app data
-  for (const t of list) {
-    if (t.builtIn || t.id === skipId) continue;
-    const full = loadTopic(t.id);
-    if (!full) continue;
-    for (const a of (full.apps || [])) {
-      const key = a.name.toLowerCase().trim();
-      if (!seen.has(key)) {
-        seen.set(key, {
-          name:     a.name,
-          url:      a.url      || '',
-          category: a.category || '',
-          pricing:  a.pricing  || '',
-          summary:  a.summary  || '',
-          sources:  a.sources  || []
-        });
-      }
-    }
-  }
-  return [...seen.values()];
+/** Get all tools from the registry for use in research. */
+function getCanonicalTools() {
+  return loadTools();
 }
 
-/** Call the Anthropic Messages API and return the text content. */
-async function claudeComplete(apiKey, userPrompt) {
+/** Call the Anthropic Messages API and return the text content.
+ *  Uses claude-haiku-4-5 by default — same factual quality at ~15× lower cost.
+ *  max_tokens is sized to fit all dimensions in one batched response.
+ */
+async function claudeComplete(apiKey, userPrompt, maxTokens = 500) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method:  'POST',
     headers: {
@@ -326,8 +394,8 @@ async function claudeComplete(apiKey, userPrompt) {
       'content-type':      'application/json'
     },
     body: JSON.stringify({
-      model:      'claude-opus-4-5',
-      max_tokens: 900,
+      model:      process.env.CLAUDE_RESEARCH_MODEL || 'claude-haiku-4-5',
+      max_tokens: maxTokens,
       messages:   [{ role: 'user', content: userPrompt }]
     })
   });
@@ -339,41 +407,46 @@ async function claudeComplete(apiKey, userPrompt) {
   return data.content[0].text.trim();
 }
 
-/** Research one tool × dimension, return a finding object. */
-async function researchFinding(apiKey, topic, tool, dim) {
+/**
+ * Research ALL dimensions for one tool in a single API call.
+ * Returns a map of { [dimId]: findingObject }.
+ * Dims already covered by a manual finding are passed as skipIds and excluded.
+ */
+async function researchToolAllDims(apiKey, topic, tool, dims) {
+  // Build a compact dimension list for the prompt
+  const dimList = dims.map((d, i) => `${i + 1}. id="${d.id}" name="${d.name}"`).join('\n');
+
   const prompt = `You are populating a UX benchmark database with factual, specific research.
 
-TOPIC:     ${topic.name}
-CONTEXT:   ${topic.description || topic.name}
-DIMENSION: ${dim.name}
-TOOL:      ${tool.name}
-CATEGORY:  ${tool.category || 'SaaS tool'}
-URL:       ${tool.url || 'N/A'}
+TOPIC:    ${topic.name}
+CONTEXT:  ${topic.description || topic.name}
+TOOL:     ${tool.name}
+CATEGORY: ${tool.category || 'SaaS tool'}
+URL:      ${tool.url || 'N/A'}
+${tool.summary ? `SUMMARY:  ${tool.summary}` : ''}
 
-Based on your knowledge of ${tool.name}, evaluate how it performs on "${dim.name}" in the context of "${topic.name}".
+Evaluate ${tool.name} on each of these dimensions:
+${dimList}
 
-Return ONLY valid JSON — no markdown fences, no explanation, nothing else:
+Return ONLY a valid JSON object keyed by dimension id — no markdown, no extra text:
 {
-  "verdict": "good" | "warn" | "bad",
-  "verdictLabel": "3-6 word label (e.g. 'Clean 3-role model')",
-  "keyline": "1-2 factual sentences summarising the key finding.",
-  "bullets": [
-    "Specific concrete observation 1.",
-    "Specific concrete observation 2.",
-    "Specific concrete observation 3.",
-    "Specific concrete observation 4."
-  ]
+  "<dim-id>": {
+    "verdict": "good" | "warn" | "bad",
+    "verdictLabel": "2-5 word label",
+    "keyline": "1-2 factual sentences.",
+    "bullets": ["Concrete observation.", "Concrete observation.", "Concrete observation."]
+  }
 }
 
 Rules:
-- verdict must be exactly one of: good, warn, bad
-- verdictLabel is 3-6 words, descriptive of the approach
-- keyline is 1-2 sentences, specific and factual, no vague adjectives
-- bullets is 3-5 items, each a concrete observation with specifics`;
+- verdict is exactly one of: good, warn, bad
+- verdictLabel is 2-5 words describing the approach
+- keyline is 1-2 sentences, specific and factual
+- bullets is 2-4 items, each a concrete detail`;
 
-  const text = await claudeComplete(apiKey, prompt);
-
-  // strip any accidental markdown fences
+  // Allow ~140 tokens per dimension for a batched response
+  const maxTokens = dims.length * 140 + 80;
+  const text = await claudeComplete(apiKey, prompt, maxTokens);
   const clean = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
   return JSON.parse(clean);
 }
@@ -386,7 +459,7 @@ app.get('/api/topics/:id/research/stream', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.flushHeaders();
 
-  const send = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+  const send = (obj) => { try { res.write(`data: ${JSON.stringify(obj)}\n\n`); } catch (_) {} };
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -400,63 +473,146 @@ app.get('/api/topics/:id/research/stream', async (req, res) => {
     return res.end();
   }
 
-  const dims = topic.dimensions || [];
-  if (dims.length === 0) {
-    send({ type: 'error', message: 'This topic has no dimensions. Add at least one dimension before running research.' });
+  // ── run lock: prevent duplicate research streams ───────────────────────────
+  if (topic.researchInProgress) {
+    const age = topic.researchStartedAt
+      ? Math.round((Date.now() - new Date(topic.researchStartedAt).getTime()) / 1000)
+      : '?';
+    send({ type: 'error', message: `Research is already running (started ${age}s ago). Wait for it to finish or restart the server to clear the lock.` });
     return res.end();
   }
 
-  const tools = getCanonicalTools(topic.id);
-  if (tools.length === 0) {
-    send({ type: 'error', message: 'No tools found in other topics to research. Create the sign-up or sharing topic first so the tool list can be detected.' });
+  const dims = topic.dimensions || [];
+  if (dims.length === 0) {
+    send({ type: 'error', message: 'This topic has no dimensions. Add at least one before running research.' });
     return res.end();
   }
+
+  const tools = getCanonicalTools();
+  if (tools.length === 0) {
+    send({ type: 'error', message: 'No tools in registry. Run scripts/migrate-2x.js to initialise data/tools.json.' });
+    return res.end();
+  }
+
+  // Force-refresh flag lets the caller re-research dims already marked manual.
+  const forceAll = req.query.force === '1';
+
+  // set run lock
+  topic.researchInProgress = true;
+  topic.researchStartedAt  = new Date().toISOString();
+  saveTopic(topic);
 
   const total = tools.length * dims.length;
   send({ type: 'start', tools: tools.length, dims: dims.length, total });
 
   let done = 0;
 
-  for (const tool of tools) {
-    // Ensure the app exists in this topic
-    let appIdx = (topic.apps || []).findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
-    if (appIdx === -1) {
-      const appId = safeId(tool.name) + '-' + crypto.randomBytes(3).toString('hex');
-      const newApp = {
-        id: appId, name: tool.name, url: tool.url, category: tool.category,
-        pricing: tool.pricing, summary: tool.summary, sources: tool.sources,
-        findings: {}, createdAt: new Date().toISOString()
-      };
-      topic.apps = [...(topic.apps || []), newApp];
-      appIdx = topic.apps.length - 1;
-      saveTopic(topic);
-    }
+  const clearLock = () => {
+    try {
+      const t = loadTopic(topic.id);
+      if (t) { t.researchInProgress = false; t.researchStartedAt = null; saveTopic(t); }
+    } catch (_) {}
+  };
 
-    for (const dim of dims) {
-      send({ type: 'progress', tool: tool.name, dim: dim.name, done, total });
+  // Abort if client disconnects
+  let aborted = false;
+  res.on('close', () => { aborted = true; clearLock(); });
 
-      try {
-        const finding = await researchFinding(apiKey, topic, tool, dim);
-        // Re-read topic in case something else mutated it
-        const fresh = loadTopic(topic.id);
-        const idx   = fresh.apps.findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
-        if (idx !== -1) {
-          fresh.apps[idx].findings = { ...fresh.apps[idx].findings, [dim.id]: finding };
-          saveTopic(fresh);
-          // keep our working copy in sync
-          topic.apps = fresh.apps;
+  try {
+    for (const tool of tools) {
+      if (aborted) break;
+
+      // Ensure app exists — do this under the topic lock
+      let existingFindings = {};
+      await withTopicLock(topic.id, async () => {
+        const t   = loadTopic(topic.id);
+        const idx = (t.apps || []).findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
+        if (idx === -1) {
+          const appId = safeId(tool.name) + '-' + crypto.randomBytes(3).toString('hex');
+          t.apps = [...(t.apps || []), {
+            id: appId, name: tool.name, url: tool.url || '', category: tool.category || '',
+            pricing: tool.pricing || '', summary: tool.summary || '', sources: tool.sources || [],
+            findings: {}, createdAt: new Date().toISOString()
+          }];
+          saveTopic(t);
+        } else {
+          existingFindings = t.apps[idx].findings || {};
         }
+      });
+
+      // Skip dims that already have a manual finding (unless force=1)
+      const dimsToResearch = forceAll
+        ? dims
+        : dims.filter(d => {
+            const f = existingFindings[d.id];
+            return !f || f.source !== 'manual';
+          });
+
+      // Emit skipped dims as synthetic findings so the progress counter is accurate
+      const skippedDims = dims.filter(d => !dimsToResearch.includes(d));
+      for (const dim of skippedDims) {
         done++;
-        send({ type: 'finding', tool: tool.name, dim: dim.name, verdict: finding.verdict, verdictLabel: finding.verdictLabel, done, total });
+        const f = existingFindings[dim.id];
+        send({ type: 'finding', tool: tool.name, dim: dim.name, verdict: f.verdict, verdictLabel: f.verdictLabel, done, total, skipped: true });
+      }
+
+      if (dimsToResearch.length === 0) continue;
+
+      send({ type: 'progress', tool: tool.name, dims: dimsToResearch.length });
+
+      // ── One batched API call for all pending dims of this tool ─────────────
+      let batchResult = null;
+      let batchError  = null;
+      try {
+        batchResult = await researchToolAllDims(apiKey, topic, tool, dimsToResearch);
       } catch (e) {
+        batchError = e;
+      }
+
+      // ── Write all findings for this tool in one locked operation ───────────
+      if (batchResult) {
+        await withTopicLock(topic.id, async () => {
+          const fresh = loadTopic(topic.id);
+          const idx   = (fresh.apps || []).findIndex(a => a.name.toLowerCase() === tool.name.toLowerCase());
+          if (idx !== -1) {
+            for (const dim of dimsToResearch) {
+              const finding = batchResult[dim.id];
+              if (finding) {
+                fresh.apps[idx].findings = {
+                  ...fresh.apps[idx].findings,
+                  [dim.id]: { ...finding, source: 'ai' }
+                };
+              }
+            }
+            saveTopic(fresh);
+          }
+        });
+      }
+
+      // ── Emit events for this tool's findings ───────────────────────────────
+      for (const dim of dimsToResearch) {
         done++;
-        send({ type: 'finding-error', tool: tool.name, dim: dim.name, message: e.message, done, total });
+        if (batchError) {
+          send({ type: 'finding-error', tool: tool.name, dim: dim.name, message: batchError.message, done, total });
+        } else {
+          const finding = batchResult && batchResult[dim.id];
+          if (finding) {
+            send({ type: 'finding', tool: tool.name, dim: dim.name, verdict: finding.verdict, verdictLabel: finding.verdictLabel, done, total });
+          } else {
+            send({ type: 'finding-error', tool: tool.name, dim: dim.name, message: 'No result returned for this dimension', done, total });
+          }
+        }
       }
     }
+  } catch (e) {
+    send({ type: 'error', message: e.message });
+  } finally {
+    if (!aborted) {
+      clearLock();
+      send({ type: 'done', total: done });
+      res.end();
+    }
   }
-
-  send({ type: 'done', total: done });
-  res.end();
 });
 
 app.listen(PORT, () => {

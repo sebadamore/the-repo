@@ -1,0 +1,98 @@
+[
+  {
+    "id": "stormboard",
+    "name": "Stormboard",
+    "category": "Whiteboard",
+    "pricing": "Free / Business / Enterprise",
+    "url": "https://stormboard.com",
+    "summary": "Data-first digital whiteboard. Conservative auth posture: email + password only on standard plans, SAML SSO gated to Enterprise. No OAuth providers for individual users."
+  },
+  {
+    "id": "miro",
+    "name": "Miro",
+    "category": "Whiteboard",
+    "pricing": "Free / Starter / Business",
+    "url": "https://miro.com",
+    "summary": "Market-leading infinite canvas. Strong real-time collab."
+  },
+  {
+    "id": "figjam",
+    "name": "FigJam (Figma)",
+    "category": "Whiteboard",
+    "pricing": "Free / Pro / Org / Enterprise",
+    "url": "https://figma.com/figjam",
+    "summary": "Inherits Figma's mature auth stack: Google, GitHub, and SSO. Signup includes a role survey and team setup before reaching the canvas, which adds steps but also personalises the experience."
+  },
+  {
+    "id": "lucidspark",
+    "name": "Lucidspark",
+    "category": "Whiteboard",
+    "pricing": "Free / Individual / Team / Enterprise",
+    "url": "https://lucidspark.com",
+    "summary": "Part of the Lucid suite. Google and Microsoft OAuth on all plans. Sign-up is straightforward, and the template-first onboarding is a strength — though workspace configuration adds extra steps."
+  },
+  {
+    "id": "whimsical",
+    "name": "Whimsical",
+    "category": "Whiteboard",
+    "pricing": "Free / Pro / Business / Enterprise",
+    "url": "https://whimsical.com",
+    "summary": "Minimalist tool with a clean, low-friction signup. Google and Microsoft OAuth. Post-signup experience is lean — drops to workspace with minimal hand-holding."
+  },
+  {
+    "id": "tldraw",
+    "name": "tldraw",
+    "category": "Whiteboard",
+    "pricing": "Free web app / SDK",
+    "url": "https://tldraw.com",
+    "summary": "Open-source canvas that requires no account to use. GitHub OAuth for account features. The zero-friction anonymous start is unmatched in the category."
+  },
+  {
+    "id": "notion",
+    "name": "Notion",
+    "category": "Docs & notes",
+    "pricing": "Free / Plus / Business / Enterprise",
+    "url": "https://notion.so",
+    "summary": "Sets the bar for post-signup onboarding in the productivity category. Magic link login, Google and Apple OAuth, and a use-case wizard that personalises the workspace before first use."
+  },
+  {
+    "id": "evernote",
+    "name": "Evernote",
+    "category": "Docs & notes",
+    "pricing": "Free / Personal / Professional / Teams",
+    "url": "https://evernote.com",
+    "summary": "Veteran note-taking app with Google and Apple OAuth. The signup is functional but dated, and the post-signup experience pushes users toward paid plans early."
+  },
+  {
+    "id": "canva",
+    "name": "Canva",
+    "category": "Design",
+    "pricing": "Free / Pro / Teams / Enterprise",
+    "url": "https://canva.com",
+    "summary": "The broadest OAuth coverage in this benchmark. Canva's signup is fast, the use-case picker is smart, and the path from account to designing something is the shortest in the category."
+  },
+  {
+    "id": "lovable",
+    "name": "Lovable",
+    "category": "AI Builder",
+    "pricing": "Free / Pro / Business / Enterprise",
+    "url": "https://lovable.dev",
+    "summary": "AI-powered app builder. GitHub OAuth is the primary auth path, which creates a structural barrier for non-developer users. Once past signup, the prompt-driven onboarding is fast."
+  },
+  {
+    "id": "perplexity",
+    "name": "Perplexity",
+    "category": "AI Research",
+    "pricing": "Free / Pro / Enterprise",
+    "url": "https://perplexity.ai",
+    "summary": "AI search tool with very low signup friction. Google, Apple, and Microsoft OAuth all available. Post-signup drops directly to the search interface with no onboarding wizard."
+  },
+  {
+    "id": "claude",
+    "name": "Claude",
+    "category": "AI Assistant",
+    "pricing": "Free / Pro / Team / Enterprise",
+    "url": "https://claude.ai",
+    "summary": "Anthropic's Claude.ai. Google and Apple OAuth, plus email. Enterprise SSO on Enterprise plan. Phone verification in some regions adds friction not seen in competitors."
+  }
+]

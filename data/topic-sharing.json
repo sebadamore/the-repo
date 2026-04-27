@@ -1,0 +1,691 @@
+{
+  "id": "sharing",
+  "name": "Sharing & Permissions",
+  "icon": "🔗",
+  "description": "How 12 collaborative tools handle sharing — permission models, public/anonymous links, and external guest access.",
+  "dimensions": [
+    {
+      "id": "permissions",
+      "name": "Permissions model"
+    },
+    {
+      "id": "public-link",
+      "name": "Public / anonymous link"
+    },
+    {
+      "id": "external-guest",
+      "name": "External & guest collaboration"
+    }
+  ],
+  "apps": [
+    {
+      "id": "stormboard-93e147",
+      "name": "Stormboard",
+      "url": "https://stormboard.com",
+      "category": "Whiteboard",
+      "pricing": "Free / Business / Enterprise",
+      "summary": "Data-first digital whiteboard. Conservative sharing posture: no public URLs, email-only invites, strict Member / Guest license separation.",
+      "sources": [
+        {
+          "label": "Share / invite a Storm",
+          "url": "https://help.stormboard.com/en/articles/436503-how-do-i-share-invite-people-to-a-storm"
+        },
+        {
+          "label": "External collaborators",
+          "url": "https://help.stormboard.com/en/articles/11455837-can-i-have-external-collaborators"
+        },
+        {
+          "label": "What is a Guest?",
+          "url": "https://help.stormboard.com/en/articles/11492871-what-is-a-guest"
+        },
+        {
+          "label": "Guest Contributors launch",
+          "url": "https://stormboard.com/blog/product-launch-guest-users"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "warn",
+          "verdictLabel": "Split role model",
+          "keyline": "Two axes: Team role (Member = paid seat, Guest = free) × Storm role (Administrator, Contributor, Viewer, Guest Contributor).",
+          "bullets": [
+            "Storm Administrator has full edit + invite rights within a Storm.",
+            "Members occupy a paid license; Guests don't.",
+            "Enterprise only: Guest Contributor can use a 'Guest Pass' — contribute in one Storm at a time.",
+            "Member Invitation Privilege (per-user setting) gates who can promote invitees to Member status."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "bad",
+          "verdictLabel": "No true public link",
+          "keyline": "Stormboard does not publish anonymous / 'anyone with the link' URLs. All external access goes through an email-invited Guest account.",
+          "bullets": [
+            "Share options are: invite link (for team members), Storm ID + Key, or email.",
+            "Invited Guests must create a Stormboard account to enter.",
+            "Invite link can be refreshed — old links stop working immediately."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Guests via email only",
+          "keyline": "External users are invited by email; they become Guests who don't take a paid seat. Contribution requires Enterprise.",
+          "bullets": [
+            "Business plan: Guests limited to Viewer; max 10 Guests per Storm.",
+            "Enterprise: no Guest limit; Guest Contributors can activate Guest Pass in one Storm at a time.",
+            "Guests can request to become a Member — triggers admin approval.",
+            "Guests can't create Storms, manage users, generate reports, or access Substorms."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.823Z"
+    },
+    {
+      "id": "miro-c65975",
+      "name": "Miro",
+      "url": "https://miro.com",
+      "category": "Whiteboard",
+      "pricing": "Free / Starter / Business / Enterprise",
+      "summary": "Category leader. Mature, familiar Google-Docs-style sharing. 3 roles, anonymous public links, Visitors that don't need an account.",
+      "sources": [
+        {
+          "label": "Board access rights",
+          "url": "https://help.miro.com/hc/en-us/articles/360017572194-Board-access-rights"
+        },
+        {
+          "label": "Sharing boards & inviting",
+          "url": "https://help.miro.com/hc/en-us/articles/360017730813-Sharing-boards-and-inviting-collaborators"
+        },
+        {
+          "label": "Collaboration with Visitors",
+          "url": "https://help.miro.com/hc/en-us/articles/360012524559-Collaboration-with-Visitors"
+        },
+        {
+          "label": "Enterprise sharing policy",
+          "url": "https://help.miro.com/hc/en-us/articles/360017730133-Sharing-policy-on-Enterprise-Plan"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "Clean 3-role model",
+          "keyline": "Editor / Commenter / Viewer — applied per-board or set as default for team and company.",
+          "bullets": [
+            "Editor: full canvas edit, upload, delete.",
+            "Commenter: view + comment.",
+            "Viewer: read-only.",
+            "'Default sharing settings' let admins pre-configure the access every new board inherits."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Anyone with the link, multiple levels",
+          "keyline": "Toggle 'Anyone with the link' → pick Can view / Can comment / Can edit. Password protection optional.",
+          "bullets": [
+            "Public-link comment/edit is paid-plan-only; Free plan caps at view.",
+            "Visitors follow the link with no Miro registration required.",
+            "Enterprise admins can disable public sharing org-wide via Sharing Policy."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "good",
+          "verdictLabel": "Visitors + external team-mates",
+          "keyline": "Two pathways: Visitors (link-based, no account) and 'sharing with users outside your team' (explicit external collaborators).",
+          "bullets": [
+            "Visitors via public link are effectively unlimited on paid plans.",
+            "External sharing setting controls whether members can invite non-team emails.",
+            "Board Admin role can gate who edits the sharing settings themselves."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "figjam-26f4e0",
+      "name": "FigJam (Figma)",
+      "url": "https://figma.com/figjam",
+      "category": "Whiteboard",
+      "pricing": "Free / Pro / Org / Enterprise",
+      "summary": "Inherits Figma's battle-tested sharing dialog. Public links with password, admin-level kill-switch, open-session controls.",
+      "sources": [
+        {
+          "label": "Guide to sharing & permissions",
+          "url": "https://help.figma.com/hc/en-us/articles/1500007609322-Guide-to-sharing-and-permissions"
+        },
+        {
+          "label": "Manage public links & open sessions",
+          "url": "https://help.figma.com/hc/en-us/articles/5726756336791-Manage-public-link-sharing-and-open-sessions"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "Role + scope model",
+          "keyline": "View / Edit at the file level; organization scopes (anyone, team-only, org-only) set audience before role.",
+          "bullets": [
+            "File- and project-level permissions inherit from team, with explicit overrides.",
+            "Can edit vs. can view is the primary axis.",
+            "Restrict Copying & Sharing toggle on a file disables copy / export for Viewers."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Anyone with the link + password",
+          "keyline": "'Anyone with the link' is on by default for org users. Passwords disable plain link access in favour of link+password.",
+          "bullets": [
+            "Org admins can disable public links entirely — every file becomes private.",
+            "Open-session controls cap how many anonymous editors can co-edit a file.",
+            "Links can be scoped to 'people in your organization' or 'people invited' instead of fully public."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "good",
+          "verdictLabel": "Link-based + explicit invites",
+          "keyline": "External collaborators can join through public links (no Figma seat) or explicit email invites (may consume a seat depending on role).",
+          "bullets": [
+            "Viewers are free on most plans; Editor seats cost money.",
+            "Open sessions let non-signed-in collaborators edit in FigJam.",
+            "Org-level admin toggles govern both external link-sharing and guest-invite flows."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "lucidspark-50ecb6",
+      "name": "Lucidspark",
+      "url": "https://lucidspark.com",
+      "category": "Whiteboard",
+      "pricing": "Free / Individual / Team / Enterprise",
+      "summary": "Lucid's whiteboard. Notable for its 'Guest Collaborator link' — unique in letting non-account holders edit on Enterprise.",
+      "sources": [
+        {
+          "label": "Guest Collaborators in Lucid",
+          "url": "https://help.lucid.co/hc/en-us/articles/13592910415380-Guest-Collaborators-in-Lucid"
+        },
+        {
+          "label": "8 ways to share Lucidspark boards",
+          "url": "https://lucid.co/blog/ways-to-share"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "4 permission levels",
+          "keyline": "View / Comment / Edit / Edit and Share — more granular than Miro's 3.",
+          "bullets": [
+            "'Edit and Share' grants edit rights plus the ability to re-share the board.",
+            "Per-board, assignable via email invite or link.",
+            "Licensing tiers govern who can assign which permission."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "warn",
+          "verdictLabel": "Link-based, Enterprise for edit",
+          "keyline": "Shareable link with configurable permission level. Anonymous editing requires Enterprise's Guest Collaborator link.",
+          "bullets": [
+            "Not every chart / board exposes the 'Anyone with the link' option — depends on account type.",
+            "Guest Collaborator link is Lucidspark-only.",
+            "Join ID flow provides a lighter-weight session entry."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "good",
+          "verdictLabel": "No-account editing (Enterprise)",
+          "keyline": "Guest Collaborator link is the only URL in this set that lets a non-account user fully edit — without consuming a paid seat.",
+          "bullets": [
+            "Enterprise feature: create a Guest Collaborator link for a Lucidspark board.",
+            "Guests don't need a licence or an account.",
+            "Licensing impact depends on permission level granted."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "whimsical-af2d4c",
+      "name": "Whimsical",
+      "url": "https://whimsical.com",
+      "category": "Whiteboard",
+      "pricing": "Free / Pro / Business / Enterprise",
+      "summary": "Light, IA-focused collaboration tool. Anonymous comments/edits via toggle, hard guest caps as a pricing lever.",
+      "sources": [
+        {
+          "label": "Sharing files & access",
+          "url": "https://whimsical.com/learn/faqs/sharing"
+        },
+        {
+          "label": "Guest access",
+          "url": "https://help.whimsical.com/workspaces/guests"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "Viewer / Commenter / Editor",
+          "keyline": "Standard 3-role model, set per-file or per-folder. Inheritance from folder → file unless overridden.",
+          "bullets": [
+            "Member roles (Admin / Member / Guest) govern workspace-level privileges.",
+            "File-level permissions can override folder inheritance.",
+            "Folder-level sharing propagates to contained files."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Shareable link + password",
+          "keyline": "Airplane icon → Get Shareable Link. Toggle anyone-with-link to view / comment / edit, add password, pin a board view.",
+          "bullets": [
+            "'Allow anonymous comments and updates' toggle lets non-account users interact.",
+            "'Include board position' opens the link at a specific view.",
+            "Password protection supported."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Hard guest caps per file",
+          "keyline": "Free: 10 / Pro: 50 / Business: 100 / Enterprise: 200 guests per file or folder.",
+          "bullets": [
+            "Guest invites are email-based, named.",
+            "Guest counts are per-file/folder, not workspace-wide.",
+            "Request-access flow for users who hit a private file."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "tldraw-1caaa2",
+      "name": "tldraw",
+      "url": "https://tldraw.com",
+      "category": "Whiteboard",
+      "pricing": "Free web app / SDK",
+      "summary": "Lowest-friction whiteboard in the set. No login, no accounts — drawings are shared by URL, room-based real-time collaboration.",
+      "sources": [
+        {
+          "label": "tldraw: Collaboration docs",
+          "url": "https://tldraw.dev/docs/collaboration"
+        },
+        {
+          "label": "Announcing tldraw sync",
+          "url": "https://tldraw.substack.com/p/announcing-tldraw-sync"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "warn",
+          "verdictLabel": "Minimal in hosted app",
+          "keyline": "Hosted tldraw.com has near-zero permission surface — whoever has the URL can edit. The SDK exposes editor/viewer roles programmatically.",
+          "bullets": [
+            "Hosted app: URL holders co-edit in real time, no account needed.",
+            "Self-hosted / SDK: define editor vs viewer via your own auth layer.",
+            "Rooms identified by ID; up to ~50 concurrent collaborators per room."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "URL is the permission",
+          "keyline": "Every drawing has a unique URL. Sharing the URL grants access; no separate 'share' dialog.",
+          "bullets": [
+            "No authentication required to view or edit on tldraw.com.",
+            "SDK consumers can layer password / auth atop the real-time sync.",
+            "No first-party expiry / password / audit flows in the hosted product."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "good",
+          "verdictLabel": "Everyone is a guest",
+          "keyline": "All collaborators are de-facto guests. Enterprise-style permissioning is a self-host concern.",
+          "bullets": [
+            "Anyone with the URL is a peer collaborator.",
+            "No seat accounting.",
+            "Privacy depends on keeping the URL secret — no admin controls."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "notion-71f190",
+      "name": "Notion",
+      "url": "https://notion.so",
+      "category": "Docs & notes",
+      "pricing": "Free / Plus / Business / Enterprise",
+      "summary": "Docs + database hybrid. Most granular permission model in the set — 4 tiers, page-level inheritance, and link expiry built-in.",
+      "sources": [
+        {
+          "label": "Sharing & permissions",
+          "url": "https://www.notion.com/help/sharing-and-permissions"
+        },
+        {
+          "label": "Manage members & guests",
+          "url": "https://www.notion.com/help/add-members-admins-guests-and-groups"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "4 levels + Full access",
+          "keyline": "Full access / Can edit / Can comment / Can view. Permissions inherit from parent page; child pages can override.",
+          "bullets": [
+            "Full access = Edit + ability to re-share the page.",
+            "Page-level; propagates through nested pages.",
+            "Teamspaces provide a middle layer between workspace and page."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Web link with expiry",
+          "keyline": "'Anyone on the web with link' toggle → view / comment / edit. Optional expiry datetime.",
+          "bullets": [
+            "Comment/edit require the anonymous user to sign into Notion.",
+            "Link expiry is unusual in this category — Notion was an early mover.",
+            "Publish-to-web generates SEO-indexable pages with custom domains (paid)."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Powerful, footgun-prone",
+          "keyline": "Invite guests by email with any of the 4 roles. Guest with Full Access can remove Workspace Owners from a page.",
+          "bullets": [
+            "Guests don't consume a paid Member seat.",
+            "Guests appear in the workspace member list but scoped to invited pages only.",
+            "Admin audit of guest-granted permissions is less surfaced than enterprise-grade tools."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "evernote-18812a",
+      "name": "Evernote",
+      "url": "https://evernote.com",
+      "category": "Docs & notes",
+      "pricing": "Free / Personal / Professional / Teams",
+      "summary": "Legacy note app. Note-level public links work; notebook-level public links do not — meaningful asymmetry for sharing workflows.",
+      "sources": [
+        {
+          "label": "Share notes",
+          "url": "https://help.evernote.com/hc/en-us/articles/34377080881939-Share-notes"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "warn",
+          "verdictLabel": "Per-note simple, per-notebook restricted",
+          "keyline": "Notes: view / edit, anonymous or invited. Notebooks: invited-only, no public URL.",
+          "bullets": [
+            "Note permissions: Can view / Can edit / Can edit & invite (for notes).",
+            "Notebook permissions: same role set but recipients need Evernote accounts.",
+            "Shared content appears in invitees' 'Shared with Me' section."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "warn",
+          "verdictLabel": "Notes only, no notebook URL",
+          "keyline": "Each note gets a unique URL — anonymous view or anonymous edit via the Lite editor. Notebooks cannot be shared publicly.",
+          "bullets": [
+            "Anonymous access opens in a reduced 'Lite' editor.",
+            "No password or expiry on note public links.",
+            "Notebook-level sharing is invite-only."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "bad",
+          "verdictLabel": "Account required for notebooks",
+          "keyline": "External users can view / edit individual notes anonymously, but notebook collaboration requires an Evernote account.",
+          "bullets": [
+            "No guest-role economics (no free-guest tier to call out).",
+            "External collaborators on notebooks count as regular invitees.",
+            "Less modern than peers on role granularity."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "canva-3afc1e",
+      "name": "Canva",
+      "url": "https://canva.com",
+      "category": "Design",
+      "pricing": "Free / Pro / Teams / Enterprise",
+      "summary": "Design surface with the broadest consumer footprint. Sharing feels like Google Docs but layered with team-discovery and brand controls.",
+      "sources": [
+        {
+          "label": "Share your Canva design",
+          "url": "https://www.canva.com/help/collaborate-with-anyone/"
+        },
+        {
+          "label": "Roles and permissions",
+          "url": "https://www.canva.com/help/roles-and-permissions/"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "3-role + scope + discovery",
+          "keyline": "Can edit / Can comment / Can view across scopes: Only you / Only your team / Anyone with the link. Team-discovery toggle controls search visibility.",
+          "bullets": [
+            "Team plan: Admin / Member / Template Designer roles for team-level governance.",
+            "Per-design sharing overrides default team visibility.",
+            "Restrict Design Sharing controls prevent members from re-sharing externally."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Anyone with the link (edit-capable)",
+          "keyline": "Unusual for a design tool: anonymous users can edit a shared design with no Canva account.",
+          "bullets": [
+            "Team discovery: opt in to show the design in search, or require the link.",
+            "Design can be published (template / website / social post) independent of editor sharing.",
+            "Enterprise restricts external sharing from central admin."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Generous but category-confused",
+          "keyline": "External collaboration primarily flows through public links — no dedicated 'Guest' role surface like whiteboard tools.",
+          "bullets": [
+            "No seat cost for link-based collaborators.",
+            "Teams plan required for team-level sharing scopes.",
+            "Secure-sharing guidance is a separate documentation pillar."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "lovable-82ad27",
+      "name": "Lovable",
+      "url": "https://lovable.dev",
+      "category": "AI Builder",
+      "pricing": "Free / Pro / Business / Enterprise",
+      "summary": "AI app builder. Clean split between 'publish the app' (public URL, no code access) and 'share the project' (editor access for collaborators).",
+      "sources": [
+        {
+          "label": "Collaboration docs",
+          "url": "https://docs.lovable.dev/features/collaboration"
+        },
+        {
+          "label": "Project visibility",
+          "url": "https://docs.lovable.dev/features/project-visibility"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "4 roles: Viewer / Editor / Admin / Owner",
+          "keyline": "Published permission matrix in docs. Clear escalation — Owners transfer/delete, Admins manage settings, Editors build.",
+          "bullets": [
+            "Only Editors+ can publish, edit, change visibility.",
+            "Only Admins+ can manage settings, disconnect Supabase, transfer/delete.",
+            "Only Owners can add/remove other owners.",
+            "Project-level and Workspace-level role matrices are documented separately."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "Published URL ≠ editor access",
+          "keyline": "Publishing exposes the running app at a public URL but doesn't leak source or editor rights.",
+          "bullets": [
+            "Published app URL is end-user facing; viewers can't see the code.",
+            "Editor sharing happens via email invite with seat accounting.",
+            "Enterprise: restrict external publishing to Admins & Owners, or Owners only."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Email invite + paid roles",
+          "keyline": "No free-guest tier. External collaborators are invited by email into a workspace or a specific project.",
+          "bullets": [
+            "Project-level invite = scoped access to one build.",
+            "Workspace-level invite = access to every project in the workspace.",
+            "Collaborators draw credits from the project/workspace owner."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "perplexity-65e8f4",
+      "name": "Perplexity",
+      "url": "https://perplexity.ai",
+      "category": "AI Research",
+      "pricing": "Free / Pro / Enterprise",
+      "summary": "AI answer engine. Two distinct primitives — Thread (single Q&A, link-shareable) and Space (invited collaborators with roles).",
+      "sources": [
+        {
+          "label": "What are Spaces?",
+          "url": "https://www.perplexity.ai/help-center/en/articles/10352961-what-are-spaces"
+        },
+        {
+          "label": "What is a Thread?",
+          "url": "https://www.perplexity.ai/help-center/en/articles/10354769-what-is-a-thread"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "Thread vs Space",
+          "keyline": "Threads: link-based. Spaces: Viewer / Contributor roles with email invite or link share.",
+          "bullets": [
+            "Threads are private by default; become public only on explicit share.",
+            "Space Contributor: can start threads and ask follow-ups.",
+            "Space Viewer: read-only.",
+            "Enterprise org permissions add admin / member / read-only layers."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "good",
+          "verdictLabel": "'Sharable' toggle per thread",
+          "keyline": "Click Share on a Thread → 'Sharable' toggle generates a link anyone can view. Link also re-shareable by recipients.",
+          "bullets": [
+            "Thread public view is anonymous — no Perplexity account needed.",
+            "No view / edit split for Threads — public means viewable only.",
+            "Spaces shared via link can grant Viewer or Contributor role."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "warn",
+          "verdictLabel": "Space-scoped only",
+          "keyline": "External users can view shared Threads anonymously or be invited to Spaces with Viewer / Contributor role.",
+          "bullets": [
+            "Space membership controlled by role, not billing.",
+            "Thread sharing in a Space defaults to 'shared' to keep members aligned.",
+            "Enterprise adds org-level permission scaffolding."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    },
+    {
+      "id": "claude-6697be",
+      "name": "Claude",
+      "url": "https://claude.ai",
+      "category": "AI Assistant",
+      "pricing": "Free / Pro / Team / Enterprise",
+      "summary": "Projects bound to the organisation. 'Public' means org-visible — never open internet. Individual chats shareable via private links.",
+      "sources": [
+        {
+          "label": "Manage project visibility and sharing",
+          "url": "https://support.claude.com/en/articles/9519189-manage-project-visibility-and-sharing"
+        },
+        {
+          "label": "Sharing and unsharing chats",
+          "url": "https://support.claude.com/en/articles/10593882-sharing-and-unsharing-chats"
+        }
+      ],
+      "findings": {
+        "permissions": {
+          "verdict": "good",
+          "verdictLabel": "Can use / Can edit",
+          "keyline": "Project members hold Can use or Can edit. Can edit modifies instructions, knowledge, and membership.",
+          "bullets": [
+            "Can use: see contents, knowledge, instructions; chat within the project.",
+            "Can edit: all of the above plus modify project, add/remove members.",
+            "Project visibility: Private (invited only) or Public (everyone in org).",
+            "Team / Enterprise plans only — Free / Pro don't expose project sharing."
+          ],
+          "source": "manual"
+        },
+        "public-link": {
+          "verdict": "warn",
+          "verdictLabel": "'Public' is org-scoped",
+          "keyline": "No anonymous-on-the-internet sharing. 'Public project' = visible to everyone in your organisation; individual chats can be shared via private link.",
+          "bullets": [
+            "Chat share link is private — requires knowledge of URL, no auth flow to view.",
+            "Projects are never exposed to the open internet.",
+            "Enterprise controls shape who in the org can make projects public."
+          ],
+          "source": "manual"
+        },
+        "external-guest": {
+          "verdict": "bad",
+          "verdictLabel": "No external-guest model",
+          "keyline": "Claude doesn't offer a guest-collaborator surface. All collaborators are org members.",
+          "bullets": [
+            "External sharing = sending the private chat link out-of-band.",
+            "No concept of a free-guest seat or scoped external collaborator.",
+            "Project membership bound to org identity."
+          ],
+          "source": "manual"
+        }
+      },
+      "createdAt": "2026-04-27T12:48:28.824Z"
+    }
+  ],
+  "readOnly": true,
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2026-04-27T12:48:28.824Z"
+}
