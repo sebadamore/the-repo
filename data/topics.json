@@ -5,6 +5,7 @@
     "icon": "🔗",
     "description": "How 12 collaborative tools handle sharing — permission models, public/anonymous links, and external guest access.",
     "readOnly": true,
+    "galleryUrl": "/index.html",
     "appCount": 12,
     "dimensionCount": 3,
     "createdAt": "2024-01-01T00:00:00.000Z",
