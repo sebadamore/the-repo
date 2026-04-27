@@ -192,7 +192,7 @@ app.get('/api/screenshots/:tool', (req, res) => {
   const files = fs.readdirSync(dir)
     .filter(f => ALLOWED_EXTS.has(path.extname(f).toLowerCase()))
     .sort()
-    .map(f => ({ file: f, url: `user-screenshots/${tool}/${f}` }));
+    .map(f => ({ file: f, url: `/user-screenshots/${tool}/${f}` }));
   res.json(files);
 });
 

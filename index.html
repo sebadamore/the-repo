@@ -1033,7 +1033,7 @@ async function probeList(toolId) {
   for (let i = 1; i <= 20; i++) {
     const prefix = String(i).padStart(2,'0');
     for (const ext of exts) {
-      const url = `user-screenshots/${toolId}/${prefix}.${ext}`;
+      const url = `/user-screenshots/${toolId}/${prefix}.${ext}`;
       if (await probe(url)) { results.push({ file: `${prefix}.${ext}`, url }); break; }
     }
   }
