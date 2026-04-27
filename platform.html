@@ -789,7 +789,7 @@ function startResearch(topic) {
   const currentEl = document.getElementById('ro-current');
   const statusEl = document.getElementById('ro-status');
   const openBtn  = document.getElementById('ro-open-btn');
-  const topicUrl = `topic.html?id=${topic.id}`;
+  const topicUrl = `/topics/${topic.id}/research`;
 
   document.getElementById('ro-title').textContent = `Researching "${topic.name}"`;
   document.getElementById('ro-sub').textContent   = 'Claude is looking up each tool across your dimensions.';

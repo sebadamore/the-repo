@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7B46F6;
+    --purple-dark: #6030E0;
+    --purple-soft: #F0EBFF;
+    --purple-mid: #C4B0FB;
+    --bg: #F7F6FB;
+    --panel: #FFFFFF;
+    --sidebar: #1A1A2E;
+    --sidebar-hover: #252540;
+    --line: #E8E5F0;
+    --text: #1A1A2E;
+    --mute: #6B6987;
+    --mute2: #9E9CB8;
+    --good: #16A34A;
+    --good-soft: #DCFCE7;
+    --warn: #D97706;
+    --warn-soft: #FEF3C7;
+    --bad: #DC2626;
+    --bad-soft: #FEE2E2;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.55 'Inter', -apple-system, sans-serif; }
+  a { color: var(--purple); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  aside.sidebar {
+    width: 220px; flex-shrink: 0; background: var(--sidebar);
+    position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+  }
+  .sidebar-brand {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-brand .logo {
+    width: 32px; height: 32px; background: var(--purple); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+  .sidebar-brand .brand-title { font-size: 13px; font-weight: 600; color: white; line-height: 1.2; }
+  .sidebar-brand .brand-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+  .sidebar-section { padding: 16px 12px 8px; }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35);
+    text-transform: uppercase; letter-spacing: 0.08em; padding: 0 8px; margin-bottom: 4px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 8px; border-radius: 6px;
+    color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+  }
+  .sidebar-link:hover { background: var(--sidebar-hover); color: white; text-decoration: none; }
+  .sidebar-link.active { background: var(--purple); color: white; }
+  .sidebar-link .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--purple-mid); }
+  .sidebar-footer {
+    margin-top: auto; padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-footer a { font-size: 12px; color: rgba(255,255,255,0.4); display: block; }
+  .sidebar-footer a:hover { color: rgba(255,255,255,0.7); text-decoration: none; }
+
+  /* ── MAIN ── */
+  .main-wrap { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+  header.top-bar {
+    background: var(--panel); border-bottom: 1px solid var(--line);
+    padding: 14px 32px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 16px; }
+  .top-bar-back {
+    font-size: 12px; color: var(--mute); display: flex; align-items: center;
+    gap: 5px; transition: color .15s; white-space: nowrap;
+  }
+  .top-bar-back:hover { color: var(--purple); text-decoration: none; }
+  .page-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .page-subtitle { font-size: 12px; color: var(--mute); margin-top: 1px; }
+  .cta-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; background: var(--purple); color: white;
+    border-radius: 6px; font-size: 13px; font-weight: 600; white-space: nowrap;
+    transition: background 0.12s;
+  }
+  .cta-primary:hover { background: var(--purple-dark); text-decoration: none; }
+
+  main { padding: 28px 32px 80px; max-width: 1200px; }
+
+  /* ── TOOL SECTION ── */
+  section.tool { margin-bottom: 64px; scroll-margin-top: 72px; }
+  .tool-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tool-header-left h2 { margin: 0 0 4px; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .cat-chip {
+    font-size: 10px; font-weight: 600; color: var(--purple);
+    background: var(--purple-soft); border: 1px solid var(--purple-mid);
+    padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .blurb { margin: 0; color: var(--mute); max-width: 70ch; font-size: 13px; line-height: 1.6; }
+
+  /* ── DIMENSION STRIP ── */
+  .dim-strip { display: grid; gap: 12px; margin-bottom: 20px; }
+  .dim-card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(26,26,46,0.05);
+  }
+  .dim-card h4 {
+    margin: 0 0 4px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .verdict-chip {
+    display: inline-block; font-size: 10px; font-weight: 700; border-radius: 4px;
+    padding: 1px 7px; text-transform: none; letter-spacing: 0;
+  }
+  .verdict-chip.good { background: var(--good-soft); color: var(--good); }
+  .verdict-chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .verdict-chip.bad  { background: var(--bad-soft);  color: var(--bad); }
+  .dim-card .keyline { margin: 0 0 8px; font-size: 13px; color: var(--text); line-height: 1.55; font-weight: 500; }
+  .dim-card .bullets { margin: 0; padding-left: 16px; color: var(--mute); font-size: 12px; line-height: 1.6; }
+  .dim-card .bullets li { margin-bottom: 2px; }
+  .dim-card.empty { color: var(--mute2); font-size: 13px; font-style: italic; }
+
+  /* ── IMAGE GRID ── */
+  .img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  figure {
+    margin: 0; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 1px 4px rgba(26,26,46,0.06); transition: box-shadow 0.15s, transform 0.15s;
+    cursor: zoom-in;
+  }
+  figure:hover { box-shadow: 0 4px 16px rgba(26,26,46,0.1); transform: translateY(-2px); }
+  figure .imgwrap { background: #f8f8fc; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  figure img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  figure figcaption { padding: 10px 14px; border-top: 1px solid var(--line); }
+  figure figcaption .t { font-weight: 600; margin: 0; font-size: 12px; color: var(--mute); }
+
+  /* ── LIGHTBOX ── */
+  .lb-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(10,10,25,0.92); align-items: center; justify-content: center;
+  }
+  .lb-overlay.open { display: flex; }
+  .lb-overlay img { max-width: 90vw; max-height: 88vh; border-radius: 8px; object-fit: contain; }
+  .lb-close {
+    position: fixed; top: 20px; right: 24px; font-size: 28px; color: white;
+    cursor: pointer; background: none; border: none; line-height: 1; opacity: 0.7;
+  }
+  .lb-close:hover { opacity: 1; }
+
+  /* ── EMPTY / LOADING ── */
+  .empty-state { text-align: center; padding: 80px 32px; color: var(--mute2); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ── DIVIDER ── */
+  hr.section-divider { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    aside.sidebar { display: none; }
+    .main-wrap { margin-left: 0; }
+    header.top-bar { padding: 12px 16px; }
+    main { padding: 16px 16px 60px; }
+    .dim-strip { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">R</div>
+      <div>
+        <div class="brand-title" id="sb-title">Visual Gallery</div>
+        <div class="brand-sub" id="sb-sub">Loading…</div>
+      </div>
+    </div>
+    <div id="sb-nav"></div>
+    <div class="sidebar-footer">
+      <a href="/platform.html">← All Topics</a>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <a class="top-bar-back" href="/platform.html">← All topics</a>
+        <div>
+          <div class="page-title" id="tb-title">Loading…</div>
+          <div class="page-subtitle" id="tb-sub"></div>
+        </div>
+      </div>
+      <a class="cta-primary" id="tb-research-link" href="#">Open research view →</a>
+    </header>
+
+    <main id="main-content">
+      <div class="empty-state">
+        <div class="icon">⏳</div>
+        <p>Loading gallery…</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb" onclick="closeLb()">
+  <button class="lb-close" onclick="closeLb()">×</button>
+  <img id="lb-img" src="" alt="">
+</div>
+
+<script>
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Read topic ID from /topics/:id path
+const _m = location.pathname.match(/\/topics\/([^\/]+)/);
+const TOPIC_ID = _m ? _m[1] : new URLSearchParams(location.search).get('id');
+if (!TOPIC_ID) location.href = '/platform.html';
+
+document.getElementById('tb-research-link').href = `/topics/${TOPIC_ID}/research`;
+
+const VERDICT_LABEL = { good: 'Good', warn: 'Warning', bad: 'Needs work' };
+
+function openLb(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb').classList.add('open');
+}
+function closeLb() { document.getElementById('lb').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+async function load() {
+  let topic;
+  try {
+    const r = await fetch(`/api/topics/${TOPIC_ID}`);
+    if (!r.ok) throw new Error('Not found');
+    topic = await r.json();
+  } catch(e) {
+    document.getElementById('main-content').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <p>Could not load topic. <a href="/platform.html">Go back</a></p>
+      </div>`;
+    return;
+  }
+
+  const apps = topic.apps || [];
+  const dims = topic.dimensions || [];
+  const dimCols = Math.min(dims.length, 4);
+
+  // Update topbar + page title
+  document.title = `${topic.name} — Visual Gallery`;
+  document.getElementById('tb-title').textContent = `${topic.icon || ''} ${topic.name} — Visual Gallery`.trim();
+  document.getElementById('tb-sub').textContent = `${apps.length} tools · ${dims.map(d => d.name.toLowerCase()).join(' · ')}`;
+  document.getElementById('sb-title').textContent = topic.name;
+  document.getElementById('sb-sub').textContent = `${apps.length} tools`;
+
+  // Group apps by category for sidebar
+  const cats = {};
+  for (const app of apps) {
+    const c = app.category || 'Other';
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(app);
+  }
+  document.getElementById('sb-nav').innerHTML = Object.entries(cats).map(([cat, list]) => `
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">${esc(cat)}</div>
+      ${list.map(a => `
+        <a class="sidebar-link" href="#app-${esc(a.id)}">
+          <span class="dot"></span>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.name)}</span>
+        </a>`).join('')}
+    </div>`).join('');
+
+  // Load screenshots for all apps in parallel
+  const shotsMap = {};
+  await Promise.allSettled(apps.map(async app => {
+    try {
+      const r = await fetch(`/api/topics/${TOPIC_ID}/apps/${app.id}/screenshots`);
+      if (r.ok) shotsMap[app.id] = await r.json();
+    } catch(_) {}
+  }));
+
+  // Render each app
+  const main = document.getElementById('main-content');
+  if (apps.length === 0) {
+    main.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No apps in this topic yet. <a href="/topics/${TOPIC_ID}/research">Add some in the research view →</a></p></div>`;
+    return;
+  }
+
+  main.innerHTML = apps.map((app, i) => {
+    const findings = app.findings || {};
+
+    // Dimension cards
+    const dimCards = dims.map(d => {
+      const f = findings[d.id];
+      if (!f) return `<div class="dim-card empty"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-bottom:6px">${esc(d.name)}</div>No finding yet.</div>`;
+      return `
+        <div class="dim-card">
+          <h4>${esc(d.name)} ${f.verdict ? `<span class="verdict-chip ${f.verdict}">${esc(f.verdictLabel || VERDICT_LABEL[f.verdict] || f.verdict)}</span>` : ''}</h4>
+          ${f.keyline ? `<p class="keyline">${esc(f.keyline)}</p>` : ''}
+          ${(f.bullets||[]).length ? `<ul class="bullets">${f.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+        </div>`;
+    }).join('');
+
+    // Screenshots
+    const shots = shotsMap[app.id] || [];
+    const shotFigs = shots.map(s => `
+      <figure onclick="openLb('${esc(s.url)}')">
+        <div class="imgwrap"><img src="${esc(s.url)}" alt="${esc(s.file)}" loading="lazy"></div>
+        <figcaption><p class="t">${esc(s.file.replace(/^\d+-/, '').replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '))}</p></figcaption>
+      </figure>`).join('');
+
+    return `
+      ${i > 0 ? '<hr class="section-divider">' : ''}
+      <section class="tool" id="app-${esc(app.id)}">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <h2>${esc(app.name)} ${app.category ? `<span class="cat-chip">${esc(app.category)}</span>` : ''}</h2>
+            ${app.summary ? `<p class="blurb">${esc(app.summary)}</p>` : ''}
+          </div>
+          ${app.url ? `<a class="cta-primary" href="${esc(app.url)}" target="_blank" rel="noopener" style="font-size:12px;padding:6px 12px">Visit site ↗</a>` : ''}
+        </div>
+
+        <div class="dim-strip" style="grid-template-columns:repeat(${dimCols},1fr)">
+          ${dimCards}
+        </div>
+
+        ${shotFigs ? `<div class="img-grid">${shotFigs}</div>` : ''}
+      </section>`;
+  }).join('');
+}
+
+load();
+</script>
+</body>
+</html>

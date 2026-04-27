@@ -788,8 +788,8 @@
 
 <script>
 // ── STATE ─────────────────────────────────────────────────────────────────────
-// Support both /topics/:id (clean URL) and ?id= (legacy)
-const _pathMatch = location.pathname.match(/\/topics\/([^\/]+)$/);
+// Support /topics/:id/research, /topics/:id, and legacy ?id=
+const _pathMatch = location.pathname.match(/\/topics\/([^\/]+)/);
 const TOPIC_ID   = _pathMatch ? _pathMatch[1] : new URLSearchParams(location.search).get('id');
 if (!TOPIC_ID) { location.href = '/platform.html'; }
 
@@ -844,12 +844,8 @@ function updateTopbar() {
 
   const galleryBtn = document.getElementById('gallery-btn');
   if (galleryBtn) {
-    if (topic.galleryUrl) {
-      galleryBtn.href = topic.galleryUrl;
-      galleryBtn.style.display = '';
-    } else {
-      galleryBtn.style.display = 'none';
-    }
+    galleryBtn.href = topic.galleryUrl || `/topics/${TOPIC_ID}`;
+    galleryBtn.style.display = '';
   }
 
   const researchBtn = document.getElementById('research-btn');

@@ -50,11 +50,14 @@ app.use(express.json());
 // Redirect bare root to the platform home before static middleware intercepts it
 app.get('/', (_req, res) => res.redirect('/platform.html'));
 
-// /topics/sharing → visual gallery (index.html)
+// /topics/sharing → hand-crafted visual gallery
 app.get('/topics/sharing', (_req, res) => res.sendFile(path.join(ROOT, 'index.html')));
 
-// /topics/:id → topic research view (topic.html), ID passed via path
-app.get('/topics/:id', (_req, res) => res.sendFile(path.join(ROOT, 'topic.html')));
+// /topics/:id/research → research/data view
+app.get('/topics/:id/research', (_req, res) => res.sendFile(path.join(ROOT, 'topic.html')));
+
+// /topics/:id → dynamic visual gallery (works for every topic)
+app.get('/topics/:id', (_req, res) => res.sendFile(path.join(ROOT, 'gallery.html')));
 
 app.use(express.static(ROOT));
 
